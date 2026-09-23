@@ -39,18 +39,3 @@ async function get<T>(path: string): Promise<T> {
 
 // SWR-compatible fetcher (key is the API path).
 export const fetcher = <T>(path: string): Promise<T> => get<T>(path);
-
-export const api = {
-  marketOverview: () => get<MarketOverview>("/api/market/overview"),
-  sessionMovers: () => get<SessionMovers>("/api/market/session-movers"),
-  watchlist: (codes?: string) =>
-    get<WatchlistRow[]>(`/api/watchlist${codes ? `?codes=${encodeURIComponent(codes)}` : ""}`),
-  signals: (codes?: string, minDays = 25) =>
-    get<Signal[]>(
-      `/api/signals?min_days=${minDays}${codes ? `&codes=${encodeURIComponent(codes)}` : ""}`,
-    ),
-  history: (code: string, limit = 60) =>
-    get<PriceBar[]>(`/api/stocks/${encodeURIComponent(code)}/history?limit=${limit}`),
-  technical: (code: string) =>
-    get<TechnicalChart>(`/api/stocks/${encodeURIComponent(code)}/technical`),
-};
