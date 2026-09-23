@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MarketBadge } from "@/components/MarketBadge";
 import { MarketOverview } from "@/components/MarketOverview";
 import { SessionMovers } from "@/components/SessionMovers";
 import { WatchlistTable } from "@/components/WatchlistTable";
@@ -17,7 +18,10 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold tracking-tight">IDX Dashboard</h1>
           <p className="text-muted text-sm">Near-real-time market data & analytics · delayed ~5–15 menit</p>
         </div>
-        <span className="text-muted hidden text-xs sm:block">Auto-refresh 30s</span>
+        <div className="flex items-center gap-3">
+          <MarketBadge />
+          <span className="text-muted hidden text-xs sm:block">Auto-refresh 30s</span>
+        </div>
       </header>
 
       <div className="space-y-4">

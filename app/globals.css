@@ -79,6 +79,10 @@ body {
   background: rgba(139, 147, 167, 0.16);
   color: var(--fg-muted);
 }
+.badge-pre {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5a623;
+}
 
 .skeleton {
   background: linear-gradient(

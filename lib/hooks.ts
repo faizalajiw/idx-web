@@ -7,6 +7,7 @@ import type {
   SessionMovers,
   WatchlistRow,
   Signal,
+  PriceBar,
   TechnicalChart,
 } from "./types";
 
@@ -40,4 +41,11 @@ export function useSignals(codes?: string, minDays = 25) {
 export function useTechnical(code: string | null) {
   const key = code ? `/api/stocks/${encodeURIComponent(code)}/technical` : null;
   return useSWR<TechnicalChart>(key, fetcher, { refreshInterval: REFRESH });
+}
+
+export function useHistory(code: string | null, limit = 120) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/history?limit=${limit}`
+    : null;
+  return useSWR<PriceBar[]>(key, fetcher, { refreshInterval: REFRESH });
 }
