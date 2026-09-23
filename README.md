@@ -22,7 +22,7 @@ Start the backend first (from `idx-scraper`, with Postgres env loaded):
 
 ```bash
 cd /d/Project/idx-scraper
-set -a && . ./.env && . ./.env.local && set +a
+set -a && . ./.env && set +a
 .venv/Scripts/python.exe -m uvicorn idx_scraper.api.app:app --port 8000
 ```
 
