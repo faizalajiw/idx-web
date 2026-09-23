@@ -1,7 +1,8 @@
 "use client";
 
-import useSWR from "swr";
-import { fetcher } from "./api";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { fetcher, addToWatchlist, removeFromWatchlist } from "./api";
 import type {
   MarketOverview,
   SessionMovers,
@@ -48,4 +49,46 @@ export function useHistory(code: string | null, limit = 120) {
     ? `/api/stocks/${encodeURIComponent(code)}/history?limit=${limit}`
     : null;
   return useSWR<PriceBar[]>(key, fetcher, { refreshInterval: REFRESH });
+}
+
+const WATCHLIST_KEY = "/api/watchlist";
+
+/** Mutation hook: adds tickers to the persisted watchlist and updates cache. */
+export function useAddToWatchlist() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (codes: string[]) => {
+      const rows = await addToWatchlist(codes);
+      // Seed the default watchlist cache with the fresh rows, then let
+      // signal/stock caches revalidate in the background.
+      await mutate(WATCHLIST_KEY, rows, { revalidate: false });
+      mutate(
+        (key) =>
+          typeof key === "string" &&
+          (key.startsWith("/api/signals") || key.startsWith("/api/stocks")),
+        undefined,
+      );
+      return rows;
+    },
+    [mutate],
+  );
+}
+
+/** Mutation hook: removes one ticker and updates the cache. */
+export function useRemoveFromWatchlist() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (code: string) => {
+      const rows = await removeFromWatchlist(code);
+      await mutate(WATCHLIST_KEY, rows, { revalidate: false });
+      mutate(
+        (key) =>
+          typeof key === "string" &&
+          (key.startsWith("/api/signals") || key.startsWith("/api/stocks")),
+        undefined,
+      );
+      return rows;
+    },
+    [mutate],
+  );
 }

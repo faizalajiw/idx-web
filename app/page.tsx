@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MarketBadge } from "@/components/MarketBadge";
 import { MarketOverview } from "@/components/MarketOverview";
 import { SessionMovers } from "@/components/SessionMovers";
+import { SignalsPie } from "@/components/SignalsPie";
 import { WatchlistTable } from "@/components/WatchlistTable";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
@@ -33,6 +34,7 @@ export default function DashboardPage() {
             <TechnicalChart code={selected} />
           </div>
           <div className="space-y-4">
+            <SignalsPie />
             <SignalsPanel onSelect={setSelected} selected={selected} />
             <SessionMovers />
           </div>
