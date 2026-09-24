@@ -150,13 +150,13 @@ export function WatchlistTable({
   return (
     <Card
       title="Watchlist"
-      subtitle="Snapshot terakhir per emiten"
+      subtitle="Snapshot terakhir per emiten · klik baris untuk chart"
       right={
         <input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter kode…"
-          className="w-36 rounded-lg border border-[var(--border)] bg-[var(--bg-elev)] px-3 py-1.5 text-sm outline-none placeholder:text-[var(--fg-muted)] focus:border-[var(--accent)] sm:w-44"
+          className="input w-36 sm:w-44"
         />
       }
     >
@@ -178,13 +178,13 @@ export function WatchlistTable({
                 placeholder="Tambah kode…"
                 maxLength={4}
                 aria-invalid={!!newCode && !inputValid}
-                className="w-28 rounded-lg border border-[var(--border)] bg-[var(--bg-elev)] px-3 py-1.5 text-sm uppercase outline-none placeholder:normal-case placeholder:text-[var(--fg-muted)] focus:border-[var(--accent)]"
+                className="input w-28 uppercase placeholder:normal-case"
               />
               <button
                 type="button"
                 onClick={() => void handleAdd()}
                 disabled={!inputValid || busy || inputExists}
-                className="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/15 px-3 py-1.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/25 disabled:cursor-not-allowed disabled:opacity-40"
+                className="btn btn-primary"
               >
                 + Tambah
               </button>
@@ -204,10 +204,10 @@ export function WatchlistTable({
               }
             />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-muted border-b border-[var(--border)] text-left text-xs">
+            <div className="max-h-[420px] overflow-auto">
+              <table className="data-table">
+                <thead className="sticky top-0 z-10 bg-[var(--bg-card-solid)]">
+                  <tr>
                     {COLUMNS.map((col) => (
                       <th
                         key={col.key}
@@ -219,7 +219,7 @@ export function WatchlistTable({
                             setSortDir(col.key === "code" ? "asc" : "desc");
                           }
                         }}
-                        className={`cursor-pointer py-2 pr-3 font-medium select-none hover:text-[var(--fg)] ${col.right ? "text-right" : ""} ${col.key === "hist_days" ? "pr-0" : ""}`}
+                        className={`cursor-pointer select-none hover:text-[var(--fg)] ${col.right ? "text-right" : "text-left"} ${col.key === "hist_days" ? "pr-0" : ""}`}
                       >
                         {col.label}
                         <span className="ml-0.5 inline-block w-3">
@@ -239,8 +239,8 @@ export function WatchlistTable({
                       <tr
                         key={r.code}
                         onClick={() => onSelect?.(r.code)}
-                        className={`border-b border-[var(--border)]/50 transition-colors ${
-                          onSelect ? "cursor-pointer hover:bg-white/[0.03]" : ""
+                        className={`transition-colors ${
+                          onSelect ? "cursor-pointer" : ""
                         } ${isSel ? "bg-[var(--accent)]/10" : ""}`}
                       >
                         {COLUMNS.map((col) => (

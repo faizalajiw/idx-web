@@ -18,15 +18,15 @@ export function HistoryTable({ code }: { code: string }) {
         <EmptyState />
       ) : (
         <div className="max-h-[420px] overflow-y-auto">
-          <table className="w-full text-sm">
+          <table className="data-table">
             <thead>
-              <tr className="text-muted border-b border-[var(--border)] text-left text-xs">
-                <th className="py-2 pr-3 font-medium">Tanggal</th>
-                <th className="py-2 pr-3 text-right font-medium">Open</th>
-                <th className="py-2 pr-3 text-right font-medium">High</th>
-                <th className="py-2 pr-3 text-right font-medium">Low</th>
-                <th className="py-2 pr-3 text-right font-medium">Close</th>
-                <th className="py-2 text-right font-medium">Volume</th>
+              <tr>
+                <th className="text-left">Tanggal</th>
+                <th className="text-right">Open</th>
+                <th className="text-right">High</th>
+                <th className="text-right">Low</th>
+                <th className="text-right">Close</th>
+                <th className="text-right">Volume</th>
               </tr>
             </thead>
             <tbody>

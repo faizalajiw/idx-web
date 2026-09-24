@@ -35,6 +35,128 @@ export interface SessionMovers {
   top_losers: Mover[];
 }
 
+export interface BrokerRow {
+  broker: string;
+  code: string | null;
+  buy_value: number;
+  sell_value: number;
+  net: number;
+  buy_rank: number | null;
+  sell_rank: number | null;
+}
+
+export interface StockBrokerSummary {
+  code: string;
+  name: string | null;
+  date: string | null;
+  top_buyers: BrokerRow[];
+  top_sellers: BrokerRow[];
+}
+
+export interface SectorRow {
+  sector: string;
+  stock_count: number;
+  avg_percent: number | null;
+  total_value: number | null;
+  total_foreign_net: number | null;
+  gainers: number;
+  losers: number;
+  top_stock: { code: string; percent: number | null } | null;
+}
+
+export interface SectorAnalysis {
+  date: string | null;
+  sectors: SectorRow[];
+}
+
+export interface RRGPoint {
+  sector: string;
+  date: string;
+  rs_ratio: number;
+  rs_momentum: number;
+}
+
+export interface SectorRRG {
+  benchmark: string;
+  window: number;
+  date: string | null;
+  points: RRGPoint[];
+}
+
+export interface ValuationResponse {
+  undervalued: ValuationRow[];
+  overvalued: ValuationRow[];
+}
+
+export interface ForeignFlowDay {
+  date: string;
+  buy: number | null;
+  sell: number | null;
+  net: number | null;
+}
+
+export interface ForeignFlow {
+  date: string | null;
+  total_net: number | null;
+  total_buy: number | null;
+  total_sell: number | null;
+  days: ForeignFlowDay[];
+  top_net_in: { code: string; name: string | null; net: number | null; percent: number | null }[];
+  top_net_out: { code: string; name: string | null; net: number | null; percent: number | null }[];
+}
+
+export interface ValuationRow {
+  code: string;
+  name: string | null;
+  close: number | null;
+  z_score: number | null;
+  momentum_pct: number | null;
+  rsi: number | null;
+  trend_up: boolean;
+  target_price: number | null;
+}
+
+export interface NarrationSection {
+  title: string;
+  icon: string;
+  tone: "up" | "down" | "neutral";
+  text: string;
+}
+
+export interface MarketNarration {
+  date: string | null;
+  generated_at: string | null;
+  sections: NarrationSection[];
+}
+
+export interface ScreenerRow {
+  code: string;
+  name: string | null;
+  close: number | null;
+  percent: number | null;
+  rsi: number | null;
+  signal: string;
+  trend_up: boolean;
+  momentum_20d: number | null;
+  vol_ratio: number | null;
+  foreign_net: number | null;
+  value: number | null;
+  hist_days: number;
+}
+
+export interface ScreenerFilters {
+  signal?: string;
+  rsi_min?: number;
+  rsi_max?: number;
+  min_momentum?: number;
+  max_momentum?: number;
+  min_value?: number;
+  foreign_in_only?: boolean;
+  min_vol_ratio?: number;
+  min_days?: number;
+  limit?: number;
+}
+
 export interface WatchlistRow {
   code: string;
   close: number | null;
@@ -80,4 +202,25 @@ export interface TechnicalChart {
   code: string;
   signal: string;
   bars: IndicatorBar[];
+}
+
+export interface HoldCheckItem {
+  code: string;
+  name: string | null;
+  signal: string;
+  trend_up: boolean;
+  rsi: number | null;
+  macd_bullish: boolean;
+  bb_position: string | null;
+  z_score: number | null;
+  below_target_pct: number | null;
+  foreign_net: number | null;
+  score: number;
+  verdict: string;
+  reasons: string[];
+}
+
+export interface HoldCheckResponse {
+  date: string | null;
+  items: HoldCheckItem[];
 }

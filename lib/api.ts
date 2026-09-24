@@ -1,10 +1,14 @@
 import type {
   MarketOverview,
+  MarketNarration,
+  ScreenerFilters,
+  ScreenerRow,
+  SectorAnalysis,
   SessionMovers,
+  StockBrokerSummary,
+  ForeignFlow,
+  ValuationResponse,
   WatchlistRow,
-  Signal,
-  PriceBar,
-  TechnicalChart,
 } from "./types";
 
 export const API_BASE =
@@ -61,4 +65,20 @@ export async function removeFromWatchlist(code: string): Promise<WatchlistRow[]>
   );
   if (!res.ok) throw await parseError(res);
   return res.json() as Promise<WatchlistRow[]>;
+}
+
+export function screenerQuery(f: ScreenerFilters): string {
+  const p = new URLSearchParams();
+  if (f.signal) p.set("signal", f.signal);
+  if (f.rsi_min !== undefined) p.set("rsi_min", String(f.rsi_min));
+  if (f.rsi_max !== undefined) p.set("rsi_max", String(f.rsi_max));
+  if (f.min_momentum !== undefined) p.set("min_momentum", String(f.min_momentum));
+  if (f.max_momentum !== undefined) p.set("max_momentum", String(f.max_momentum));
+  if (f.min_value !== undefined) p.set("min_value", String(f.min_value));
+  if (f.foreign_in_only) p.set("foreign_in_only", "true");
+  if (f.min_vol_ratio !== undefined) p.set("min_vol_ratio", String(f.min_vol_ratio));
+  if (f.min_days !== undefined) p.set("min_days", String(f.min_days));
+  if (f.limit !== undefined) p.set("limit", String(f.limit));
+  const q = p.toString();
+  return q ? `?${q}` : "";
 }

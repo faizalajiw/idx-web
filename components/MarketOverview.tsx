@@ -8,7 +8,7 @@ import { ErrorState, Skeleton } from "./States";
 
 function Stat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: string }) {
   return (
-    <div className="card p-4">
+    <div className="card card-hover p-4">
       <p className="text-muted text-xs">{label}</p>
       <p className={`mt-1 text-xl font-semibold ${tone ?? ""}`}>{value}</p>
       {sub && <p className={`mt-0.5 text-xs ${tone ?? "text-muted"}`}>{sub}</p>}
@@ -18,19 +18,29 @@ function Stat({ label, value, sub, tone }: { label: string; value: string; sub?:
 
 function MoverList({ items, kind }: { items: Mover[]; kind: "gain" | "lose" }) {
   return (
-    <ul className="space-y-1.5">
-      {items.map((m) => (
-        <li key={m.code} className="flex items-center justify-between text-sm">
-          <span className="font-medium">{m.code}</span>
-          <span className="flex items-center gap-3">
-            <span className="text-muted tabular-nums">{fmtNum(m.close)}</span>
-            <span className={`tabular-nums font-semibold ${kind === "gain" ? "text-up" : "text-down"}`}>
+    <div>
+      <div className="text-muted grid grid-cols-[1.5rem_1fr_5rem_4rem] items-center gap-3 border-b border-[var(--border)] px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wide">
+        <span className="text-right">#</span>
+        <span>Kode</span>
+        <span className="text-right">Harga</span>
+        <span className="text-right">%</span>
+      </div>
+      <ul className="mt-1 space-y-1">
+        {items.map((m, i) => (
+          <li
+            key={m.code}
+            className="grid grid-cols-[1.5rem_1fr_5rem_4rem] items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/[0.04]"
+          >
+            <span className="text-muted text-right text-xs tabular-nums">{i + 1}</span>
+            <span className="font-medium">{m.code}</span>
+            <span className="text-muted text-right tabular-nums">{fmtNum(m.close)}</span>
+            <span className={`text-right font-semibold tabular-nums ${kind === "gain" ? "text-up" : "text-down"}`}>
               {fmtPct(m.percent)}
             </span>
-          </span>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -62,10 +72,10 @@ export function MarketOverview() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card title="Top Gainers">
+        <Card title="🚀 Top Gainers" hover>
           {isLoading || !data ? <Skeleton className="h-40" /> : <MoverList items={data.top_gainers} kind="gain" />}
         </Card>
-        <Card title="Top Losers">
+        <Card title="🩸 Top Losers" hover>
           {isLoading || !data ? <Skeleton className="h-40" /> : <MoverList items={data.top_losers} kind="lose" />}
         </Card>
       </div>
