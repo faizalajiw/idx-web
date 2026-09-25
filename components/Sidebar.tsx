@@ -11,6 +11,7 @@ import {
   Globe2,
   LayoutGrid,
   GraduationCap,
+  ShieldCheck,
   X,
   Menu,
   type LucideIcon,
@@ -47,6 +48,10 @@ const GROUPS: NavGroup[] = [
   {
     title: "Belajar",
     items: [{ href: "/learn", label: "Belajar Quant", icon: GraduationCap }],
+  },
+  {
+    title: "Sistem",
+    items: [{ href: "/quality", label: "Kualitas Data", icon: ShieldCheck }],
   },
 ];
 

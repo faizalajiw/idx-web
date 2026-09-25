@@ -19,6 +19,12 @@ import type {
   PriceBar,
   TechnicalChart,
   ValuationResponse,
+  QualityOverview,
+  QuarantineRow,
+  QuarantineReason,
+  CoverageGaps,
+  ThinDay,
+  CorpActionSummary,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -148,4 +154,44 @@ export function useRemoveFromWatchlist() {
     },
     [mutate],
   );
+}
+
+// ---------------------------------------------------------------- data quality
+
+export function useQualityOverview() {
+  return useSWR<QualityOverview>("/api/quality/overview", fetcher, {
+    refreshInterval: REFRESH,
+  });
+}
+
+export function useQuarantine(limit = 100) {
+  return useSWR<QuarantineRow[]>(`/api/quality/quarantine?limit=${limit}`, fetcher, {
+    refreshInterval: REFRESH,
+  });
+}
+
+export function useQuarantineReasons() {
+  return useSWR<QuarantineReason[]>("/api/quality/quarantine-reasons", fetcher, {
+    refreshInterval: REFRESH,
+  });
+}
+
+export function useCoverageGaps() {
+  return useSWR<CoverageGaps>("/api/quality/coverage-gaps", fetcher, {
+    refreshInterval: REFRESH,
+  });
+}
+
+export function useThinDays(minCodes = 100, limit = 30) {
+  return useSWR<ThinDay[]>(
+    `/api/quality/thin-days?min_codes=${minCodes}&limit=${limit}`,
+    fetcher,
+    { refreshInterval: REFRESH },
+  );
+}
+
+export function useCorpActionSummary() {
+  return useSWR<CorpActionSummary>("/api/quality/corp-actions", fetcher, {
+    refreshInterval: REFRESH,
+  });
 }
