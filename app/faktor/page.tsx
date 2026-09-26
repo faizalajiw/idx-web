@@ -4,6 +4,7 @@ import { useFactorsOverview, useRegimeHistory } from "@/lib/hooks";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { fmtNum } from "@/lib/format";
+import { Check } from "lucide-react";
 
 const f4 = (v: number | null) => (v === null ? "-" : v.toFixed(4));
 const f2 = (v: number | null) => (v === null ? "-" : v.toFixed(2));
@@ -24,6 +25,28 @@ const FACTOR_LABEL: Record<string, string> = {
   vol_rank_63d: "Rank volume 63h",
   foreign_net_pct: "Foreign net %",
   foreign_streak: "Foreign streak",
+  ob_imbalance: "Ketimpangan buku",
+  ob_absorption: "Absorption",
+};
+
+/** Fallback registry bila API belum menyertakan `definitions`. */
+const FACTOR_FALLBACK: Record<string, string> = {
+  mom_5d: "Return 5 hari bursa (momentum jangka pendek)",
+  mom_10d: "Return 10 hari bursa",
+  mom_21d: "Return 1 bulan bursa (~21 hari)",
+  mom_63d: "Return 3 bulan bursa (~63 hari)",
+  mom_12_1: "Momentum klasik 12-1: return ~252h dikurangi bulan terakhir",
+  rev_1d: "Reversal 1 hari (kebalikan return kemarin)",
+  vol_21d: "Volatilitas 21 hari (std return harian)",
+  amihud_21d: "Illiquidity Amihud 21 hari: |ret| per rupiah volume",
+  turnover_21d: "Rata-rata value transaksi 21 hari (log)",
+  rel_volume: "Volume hari ini relatif rata-rata 21 hari",
+  dist_52w_high: "Jarak dari puncak 52 minggu (<= 0)",
+  vol_rank_63d: "Percentile volume hari ini dalam 63 hari terakhir",
+  foreign_net_pct: "Foreign net / value transaksi (hari yang sama)",
+  foreign_streak: "Hari berturut-turut foreign net positif (negatif = jual)",
+  ob_imbalance: "Ketimpangan buku intraday: (bid_vol-offer_vol)/(total) rata-rata",
+  ob_absorption: "Buku vs arah harga: imbalance tertanda saat tick bergerak (negatif = absorption)",
 };
 
 const REGIME_BADGE: Record<string, string> = {
@@ -32,6 +55,28 @@ const REGIME_BADGE: Record<string, string> = {
   TRANSITION: "badge badge-warn",
   RANGING: "badge badge-hold",
 };
+
+function FactorRegistry() {
+  const { data } = useFactorsOverview();
+  const defs = data?.definitions ?? FACTOR_FALLBACK;
+  const entries = Object.entries(defs);
+  return (
+    <div className="space-y-2">
+      <p className="text-muted text-sm">
+        {entries.length} faktor dihitung engine IC tiap rekalibrasi —
+        termasuk faktor order-book dari snapshot intraday.
+      </p>
+      <ul className="grid grid-cols-1 gap-x-6 gap-y-1.5 md:grid-cols-2">
+        {entries.map(([key, desc]) => (
+          <li key={key} className="flex flex-col border-b border-[var(--border)] pb-1.5">
+            <span className="text-sm font-medium">{FACTOR_LABEL[key] ?? key}</span>
+            <span className="text-muted text-xs">{desc}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function WeightsCard() {
   const { data, error, isLoading } = useFactorsOverview();
@@ -114,7 +159,7 @@ function FactorsTable({ horizon }: { horizon: 5 | 10 }) {
               <td className="text-muted text-right tabular-nums">{f.n_days ?? "-"}</td>
               <td className="text-center">
                 {f.eligible ? (
-                  <span className="badge badge-buy">✓</span>
+                  <span className="badge badge-buy"><Check size={13} /></span>
                 ) : (
                   <span className="text-muted">—</span>
                 )}
@@ -204,6 +249,10 @@ export default function FaktorPage() {
 
       <Card title="Riwayat Rekalibrasi" subtitle="Setiap run menyimpan snapshot lengkap — idempoten per tanggal">
         <CalibrationHistory />
+      </Card>
+
+      <Card title="Registry Faktor" subtitle="Semua faktor yang dihitung — definisi persis seperti di kode">
+        <FactorRegistry />
       </Card>
 
       <p className="text-muted text-[11px] leading-snug">

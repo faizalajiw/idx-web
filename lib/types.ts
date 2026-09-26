@@ -159,6 +159,10 @@ export interface ScreenerRow {
   dist_52w: number | null;
   /** Hari bursa sejak sinyal BUY/SELL terakhir (null = belum pernah). */
   days_since_signal: number | null;
+  /** Ketimpangan buku intraday (-1..1): positif = bid lebih tebal. */
+  ob_imbalance: number | null;
+  /** Buku vs arah harga (-1..1): negatif = absorption (buyer menyerap offer). */
+  ob_absorption: number | null;
   foreign_net: number | null;
   value: number | null;
   hist_days: number;
@@ -343,6 +347,8 @@ export interface FactorsOverview {
   weights: Record<string, number>;
   factors: FactorRow[];
   history: { run_date: string; rows: number; eligible: number }[];
+  /** Registry lengkap faktor yang dihitung engine IC (key -> deskripsi). */
+  definitions?: Record<string, string>;
 }
 
 export interface RegimeDay {
