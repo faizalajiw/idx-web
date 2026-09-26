@@ -79,6 +79,7 @@ body {
 .text-down { color: var(--down); }
 .text-neutral { color: var(--neutral); }
 .text-muted { color: var(--fg-muted); }
+.text-warn { color: var(--warn); }
 
 .gradient-text {
   background: linear-gradient(135deg, #a5b4fc 0%, #67e8f9 100%);

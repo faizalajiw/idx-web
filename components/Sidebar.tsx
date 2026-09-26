@@ -8,6 +8,9 @@ import {
   Filter,
   Landmark,
   BadgeCheck,
+  FlaskConical,
+  Coins,
+  Bell,
   Globe2,
   LayoutGrid,
   GraduationCap,
@@ -24,7 +27,10 @@ type NavGroup = { title: string; items: NavItem[] };
 const GROUPS: NavGroup[] = [
   {
     title: "Utama",
-    items: [{ href: "/", label: "Dashboard", icon: LayoutDashboard }],
+    items: [
+      { href: "/", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/pantau", label: "Pantau", icon: Bell },
+    ],
   },
   {
     title: "Screening",
@@ -35,6 +41,8 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/valuation", label: "Valuasi", icon: Landmark },
       { href: "/hold-check", label: "Hold Check", icon: BadgeCheck },
+      { href: "/backtest", label: "Backtest", icon: FlaskConical },
+      { href: "/dividen", label: "Dividen", icon: Coins },
     ],
   },
   {

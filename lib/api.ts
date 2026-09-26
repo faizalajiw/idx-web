@@ -1,4 +1,10 @@
 import type {
+  AlertRuleCreate,
+  AlertStatus,
+  AlertTestResult,
+  BacktestConfig,
+  BacktestRequest,
+  BacktestResult,
   MarketOverview,
   MarketNarration,
   ScreenerFilters,
@@ -65,6 +71,59 @@ export async function removeFromWatchlist(code: string): Promise<WatchlistRow[]>
   );
   if (!res.ok) throw await parseError(res);
   return res.json() as Promise<WatchlistRow[]>;
+}
+
+/** Stored alert rules with their live values (no side effects). */
+export async function fetchAlerts(): Promise<AlertStatus> {
+  return get<AlertStatus>("/api/alerts");
+}
+
+async function mutateAlerts(
+  path: string,
+  method: "POST" | "DELETE",
+  body?: unknown,
+): Promise<AlertStatus> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) throw await parseError(res);
+  return res.json() as Promise<AlertStatus>;
+}
+
+/** Add a watch condition; returns the refreshed status. */
+export const createAlert = (rule: AlertRuleCreate): Promise<AlertStatus> =>
+  mutateAlerts("/api/alerts", "POST", rule);
+
+/** Remove a watch condition; returns the refreshed status. */
+export const deleteAlert = (ruleId: string): Promise<AlertStatus> =>
+  mutateAlerts(`/api/alerts/${encodeURIComponent(ruleId)}`, "DELETE");
+
+/** Send a one-off Telegram message so the user can verify the wiring. */
+export async function testTelegram(): Promise<AlertTestResult> {
+  const res = await fetch(`${API_BASE}/api/alerts/test`, { method: "POST" });
+  if (!res.ok) throw await parseError(res);
+  return res.json() as Promise<AlertTestResult>;
+}
+
+/** Strategies, cost defaults, and limits for the simulator form. */
+export async function fetchBacktestConfig(): Promise<BacktestConfig> {
+  return get<BacktestConfig>("/api/backtest/config");
+}
+
+/**
+ * Run one point-in-time backtest. Computation only — the backend persists
+ * nothing, so this is safe to call repeatedly while tuning parameters.
+ */
+export async function runBacktest(req: BacktestRequest): Promise<BacktestResult> {
+  const res = await fetch(`${API_BASE}/api/backtest/run`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) throw await parseError(res);
+  return res.json() as Promise<BacktestResult>;
 }
 
 export function screenerQuery(f: ScreenerFilters): string {

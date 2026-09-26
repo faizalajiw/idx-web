@@ -2,12 +2,23 @@
 
 import { useCallback } from "react";
 import useSWR, { useSWRConfig } from "swr";
-import { fetcher, addToWatchlist, removeFromWatchlist, screenerQuery } from "./api";
+import {
+  fetcher,
+  addToWatchlist,
+  removeFromWatchlist,
+  screenerQuery,
+  createAlert,
+  deleteAlert,
+} from "./api";
 import type {
+  AlertRuleCreate,
+  AlertStatus,
+  BacktestConfig,
   ForeignFlow,
   HoldCheckResponse,
   MarketNarration,
   MarketOverview,
+  MarketRegime,
   ScreenerFilters,
   ScreenerRow,
   SectorAnalysis,
@@ -25,6 +36,10 @@ import type {
   CoverageGaps,
   ThinDay,
   CorpActionSummary,
+  DividendOverview,
+  DividendStock,
+  DividendDetail,
+  CorpActionRow,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -33,6 +48,12 @@ const REFRESH = 30_000;
 export function useMarketOverview() {
   return useSWR<MarketOverview>("/api/market/overview", fetcher, {
     refreshInterval: REFRESH,
+  });
+}
+
+export function useMarketRegime() {
+  return useSWR<MarketRegime>("/api/market/regime", fetcher, {
+    refreshInterval: 300_000, // regime bergerak lambat; 5 menit cukup
   });
 }
 
@@ -193,5 +214,91 @@ export function useThinDays(minCodes = 100, limit = 30) {
 export function useCorpActionSummary() {
   return useSWR<CorpActionSummary>("/api/quality/corp-actions", fetcher, {
     refreshInterval: REFRESH,
+  });
+}
+
+// ---------------------------------------------------------------- alerts
+
+const ALERTS_KEY = "/api/alerts";
+
+/** Stored watch conditions with their live values. */
+export function useAlerts() {
+  return useSWR<AlertStatus>(ALERTS_KEY, fetcher, { refreshInterval: REFRESH });
+}
+
+export function useCreateAlert() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (rule: AlertRuleCreate) => {
+      const status = await createAlert(rule);
+      await mutate(ALERTS_KEY, status, { revalidate: false });
+      return status;
+    },
+    [mutate],
+  );
+}
+
+export function useDeleteAlert() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (ruleId: string) => {
+      const status = await deleteAlert(ruleId);
+      await mutate(ALERTS_KEY, status, { revalidate: false });
+      return status;
+    },
+    [mutate],
+  );
+}
+
+// --------------------------------------------------- dividends & corp actions
+
+/**
+ * Dividend totals, history by year, recent payouts and the top yields.
+ * Dividends only change when a new ex-date is ingested, so 5 minutes is plenty.
+ */
+export function useDividendOverview() {
+  return useSWR<DividendOverview>("/api/dividends/overview", fetcher, {
+    refreshInterval: 300_000,
+  });
+}
+
+/** Every emiten that has ever paid cash, with its trailing yield. */
+export function useDividendStocks(
+  minYield = 0,
+  sort: "yield" | "cash" | "recent" = "yield",
+  limit = 200,
+) {
+  const key =
+    `/api/dividends/stocks?sort=${sort}&limit=${limit}` +
+    (minYield > 0 ? `&min_yield=${minYield}` : "");
+  return useSWR<DividendStock[]>(key, fetcher, {
+    refreshInterval: 300_000,
+    keepPreviousData: true,
+  });
+}
+
+/** One emiten's dividend + split history. 404s are a normal "never paid". */
+export function useStockDividends(code: string | null) {
+  const key = code ? `/api/stocks/${encodeURIComponent(code)}/dividends` : null;
+  return useSWR<DividendDetail>(key, fetcher, {
+    refreshInterval: 300_000,
+    shouldRetryOnError: false,
+  });
+}
+
+/** Raw corporate-action ledger, optionally filtered to one action type. */
+export function useCorpActions(actionType?: string, limit = 40) {
+  const key =
+    `/api/corporate-actions?limit=${limit}` +
+    (actionType ? `&action_type=${encodeURIComponent(actionType)}` : "");
+  return useSWR<CorpActionRow[]>(key, fetcher, { refreshInterval: 300_000 });
+}
+
+// ---------------------------------------------------------------- backtest
+
+/** Strategy catalog + cost defaults for the backtest form (rarely changes). */
+export function useBacktestConfig() {
+  return useSWR<BacktestConfig>("/api/backtest/config", fetcher, {
+    refreshInterval: 300_000,
   });
 }
