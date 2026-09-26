@@ -294,6 +294,69 @@ export interface ThinDay {
   codes: number;
 }
 
+export interface QualityDuplicates {
+  multi_versioned_bars: number;
+}
+
+// --------------------------------------------------------------- research UI
+
+export interface StockEventRow {
+  event: string;
+  description: string;
+  my_count: number;
+  my_last_date: string | null;
+  my_median_fwd: number | null;
+  my_median_abnormal: number | null;
+  market_count: number;
+  market_hit_rate: number | null;
+  market_median_fwd: number | null;
+  market_mean_abnormal: number | null;
+}
+
+export interface StockEvents {
+  code: string;
+  as_of: string;
+  events: StockEventRow[];
+}
+
+export interface FactorRow {
+  factor: string;
+  horizon: number;
+  mean_ic: number | null;
+  icir: number | null;
+  t_stat: number | null;
+  hit_rate: number | null;
+  n_days: number | null;
+  eligible: boolean;
+  weight: number | null;
+}
+
+export interface FactorsOverview {
+  latest_run: string | null;
+  weights: Record<string, number>;
+  factors: FactorRow[];
+  history: { run_date: string; rows: number; eligible: number }[];
+}
+
+export interface RegimeDay {
+  date: string;
+  regime: "TRENDING_UP" | "TRENDING_DOWN" | "TRANSITION" | "RANGING" | null;
+  adx: number | null;
+  realized_vol: number | null;
+}
+
+export interface RegimeHistory {
+  recent: RegimeDay[];
+  summary: {
+    days: number;
+    first?: string;
+    last?: string;
+    share: Record<string, number>;
+    transitions: number;
+    avg_adx: number | null;
+  } | null;
+}
+
 export interface CorpActionSummary {
   by_type: Record<string, number>;
   by_source: Record<string, number>;

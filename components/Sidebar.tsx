@@ -43,6 +43,7 @@ const GROUPS: NavGroup[] = [
       { href: "/hold-check", label: "Hold Check", icon: BadgeCheck },
       { href: "/backtest", label: "Backtest", icon: FlaskConical },
       { href: "/dividen", label: "Dividen", icon: Coins },
+      { href: "/faktor", label: "Faktor & Kalibrasi", icon: ShieldCheck },
     ],
   },
   {

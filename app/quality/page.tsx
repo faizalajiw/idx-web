@@ -10,6 +10,7 @@ import {
   useCoverageGaps,
   useThinDays,
   useCorpActionSummary,
+  useQualityDuplicates,
 } from "@/lib/hooks";
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "up" | "down" | "neutral" }) {
@@ -155,6 +156,23 @@ function ThinDaysCard() {
   );
 }
 
+function DuplicatesCard() {
+  const { data, error, isLoading } = useQualityDuplicates();
+  if (error) return <ErrorState message="Gagal memuat duplicate check." />;
+  if (isLoading || !data) return <Skeleton className="h-20 w-full" />;
+
+  const n = data.multi_versioned_bars;
+  const tone = n === 0 ? "text-up" : n < 50 ? "" : "text-down";
+  return (
+    <p className="text-sm leading-relaxed">
+      <span className={`font-semibold tabular-nums ${tone}`}>{fmtNum(n)}</span> bar
+      harga memiliki lebih dari satu versi (knowledge_date berbeda). Normal bila
+      kecil — hasil re-ingest/backfill yang sah; lonjakan mendadak bisa menandakan
+      bug re-ingest yang menulis ulang histori.
+    </p>
+  );
+}
+
 function CorpActionsCard() {
   const { data, error, isLoading } = useCorpActionSummary();
   if (error) return <ErrorState message="Gagal memuat corp actions." />;
@@ -216,6 +234,10 @@ export default function QualityPage() {
           <ThinDaysCard />
         </Card>
       </div>
+
+      <Card title="Duplicate Bars" subtitle="Sanity: (code, tanggal) dengan >1 versi knowledge">
+        <DuplicatesCard />
+      </Card>
 
       <Card title="Corporate Actions" subtitle="Breakdown per jenis & sumber">
         <CorpActionsCard />

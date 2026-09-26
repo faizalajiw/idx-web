@@ -9,6 +9,7 @@ import { HoldCheckPanel } from "@/components/HoldCheckPanel";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { RegimeTimeline } from "@/components/RegimeTimeline";
 import { useMarketOverview } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact, trendClass } from "@/lib/format";
 import Link from "next/link";
@@ -77,6 +78,7 @@ export default function DashboardPage() {
 
       <HeroIndex />
       <RegimeBanner />
+      <RegimeTimeline />
       <MarketNarrationCard />
       <MarketOverview />
 

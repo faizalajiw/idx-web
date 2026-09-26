@@ -35,7 +35,11 @@ import type {
   QuarantineReason,
   CoverageGaps,
   ThinDay,
+  QualityDuplicates,
   CorpActionSummary,
+  StockEvents,
+  FactorsOverview,
+  RegimeHistory,
   DividendOverview,
   DividendStock,
   DividendDetail,
@@ -200,6 +204,35 @@ export function useQuarantineReasons() {
 export function useCoverageGaps() {
   return useSWR<CoverageGaps>("/api/quality/coverage-gaps", fetcher, {
     refreshInterval: REFRESH,
+  });
+}
+
+export function useQualityDuplicates() {
+  return useSWR<QualityDuplicates>("/api/quality/duplicates", fetcher, {
+    refreshInterval: REFRESH,
+  });
+}
+
+/** Event study per emiten (backend cache 1 jam; slow-moving). */
+export function useStockEvents(code: string | null) {
+  const key = code ? `/api/stocks/${encodeURIComponent(code)}/events` : null;
+  return useSWR<StockEvents>(key, fetcher, {
+    refreshInterval: 600_000,
+    shouldRetryOnError: false,
+  });
+}
+
+/** Ringkasan kalibrasi faktor (IC bulanan + bobot aktif). */
+export function useFactorsOverview() {
+  return useSWR<FactorsOverview>("/api/factors/overview", fetcher, {
+    refreshInterval: 600_000,
+  });
+}
+
+/** Histori regime harian + agregat. */
+export function useRegimeHistory(days = 90) {
+  return useSWR<RegimeHistory>(`/api/market/regime/history?days=${days}`, fetcher, {
+    refreshInterval: 600_000,
   });
 }
 

@@ -9,6 +9,7 @@ import { HistoryTable } from "@/components/HistoryTable";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { BrokerSummary } from "@/components/BrokerSummary";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { EventStudyCard } from "@/components/EventStudyCard";
 
 const NAV_BTN =
   "card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm transition-colors hover:bg-white/[0.03]";
@@ -86,6 +87,7 @@ export default function StockDetailPage() {
           <div className="space-y-4">
             <SignalsPanel codes={code} />
             <BrokerSummary code={code} />
+            <EventStudyCard code={code} />
             <HistoryTable code={code} />
           </div>
         </div>
