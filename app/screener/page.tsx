@@ -7,6 +7,7 @@ import { fmtNum, fmtPct, fmtCompact } from "@/lib/format";
 import type { ScreenerFilters } from "@/lib/types";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { Card } from "@/components/Card";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 const PRESETS: { label: string; emoji: string; filters: ScreenerFilters; desc: string }[] = [
   {
@@ -40,6 +41,9 @@ const FACTORS = [
   ["Momentum 20 hari", "Perubahan harga 20 hari bursa terakhir (%)."],
   ["RSI(14)", "Kelebihanbelian relatif; <35 oversold, >70 overbought."],
   ["Volume ratio", "Volume hari ini ÷ rata-rata 20 hari. >2 = aktivitas menonjol."],
+  ["ATR%", "ATR(14) sebagai % dari close — volatilitas komparabel antar emiten. Tinggi = lebih berisiko."],
+  ["Jarak 52w", "Posisi harga vs puncak 52 minggu (%). 0% = sedang di puncak; jauh di bawah = momentum lemah."],
+  ["Hari sejak sinyal", "Hari bursa sejak BUY/SELL terakhir. Besar = sinyal sudah tua; 0-5 = sinyal baru."],
   ["Foreign net", "Net buy/sell asing hari terakhir (Rp, notional = lembar × close)."],
   ["Likuiditas", "Nilai transaksi harian — filter minimal untuk hindari saham 'oleh-oleh'."],
 ];
@@ -70,6 +74,8 @@ export default function ScreenerPage() {
           Multi-factor screening rule-based — transparan, bukan black box.
         </p>
       </div>
+
+      <RegimeBanner />
 
       <Card title="Strategi Preset" subtitle="Klik untuk menjalankan skenario">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -121,6 +127,9 @@ export default function ScreenerPage() {
                   <th className="text-right">RSI</th>
                   <th className="text-right">Momentum 20d</th>
                   <th className="text-right">Vol Ratio</th>
+                  <th className="text-right" title="ATR(14) % dari close">ATR%</th>
+                  <th className="text-right" title="Posisi vs puncak 52 minggu">Jarak 52w</th>
+                  <th className="text-right" title="Hari bursa sejak BUY/SELL terakhir">Hr sinyal</th>
                   <th className="text-right">Foreign Net</th>
                   <th className="text-right">Value</th>
                   <th className="text-center">Signal</th>
@@ -148,6 +157,20 @@ export default function ScreenerPage() {
                     </td>
                     <td className="text-right tabular-nums">
                       {r.vol_ratio !== null ? `${r.vol_ratio.toFixed(2)}×` : "-"}
+                    </td>
+                    <td
+                      className={`text-right tabular-nums ${
+                        (r.atr_pct ?? 0) >= 5 ? "text-down" : ""
+                      }`}
+                      title="ATR(14) % dari close — tinggi = volatil"
+                    >
+                      {r.atr_pct !== null ? `${r.atr_pct.toFixed(1)}%` : "-"}
+                    </td>
+                    <td className="text-right tabular-nums" title="0% = di puncak 52 minggu">
+                      {r.dist_52w !== null ? `${r.dist_52w.toFixed(1)}%` : "-"}
+                    </td>
+                    <td className="text-muted text-right tabular-nums" title="Hari bursa sejak sinyal terakhir">
+                      {r.days_since_signal !== null ? r.days_since_signal : "-"}
                     </td>
                     <td className={`text-right tabular-nums ${(r.foreign_net ?? 0) >= 0 ? "text-up" : "text-down"}`}>
                       {fmtCompact(r.foreign_net)}
