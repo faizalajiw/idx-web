@@ -189,7 +189,14 @@ export interface WatchlistRow {
 
 export interface Signal {
   code: string;
+  /** Sudah melewati corp-action filter ex-dividend. */
   signal: "BUY" | "SELL" | "HOLD" | string;
+  /** SELL mentah sebelum filter (null bila tidak ada guard aktif). */
+  raw_signal: string | null;
+  /** Cash dividend per saham pada ex-date terakhir dalam 7 hari (null = tidak ada). */
+  div_cash: number | null;
+  /** True = SELL palsu ex-dividend yang dinetralkan jadi HOLD. */
+  div_adjusted: boolean;
   close: number | null;
   pct: number | null;
   rsi: number | null;

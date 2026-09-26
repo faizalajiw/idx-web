@@ -62,6 +62,14 @@ function SignalRow({ s, onSelect, selected }: { s: Signal; onSelect?: (c: string
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${s.trend_up ? "bg-[var(--up)]" : "bg-[var(--down)]"}`} />
         <span className="text-sm font-semibold">{s.code}</span>
         <span className={`${badgeClass(s.signal)} shrink-0`}>{s.signal}</span>
+        {s.div_adjusted && (
+          <span
+            title={`SELL mentah dibatalkan: harga turun mekanis ex-dividend (Rp ${s.div_cash ?? 0}/saham) — bukan tekanan jual`}
+            className="shrink-0 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--accent)]"
+          >
+            ex-div
+          </span>
+        )}
         <span className="ml-auto text-sm font-semibold tabular-nums">{fmtNum(s.close)}</span>
         <span className={`text-xs tabular-nums ${up ? "text-up" : "text-down"}`}>{fmtPct(s.pct)}</span>
       </div>
