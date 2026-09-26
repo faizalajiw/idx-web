@@ -4,7 +4,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.07)] p-3 text-sm text-down">
+    <div className="rounded-md border border-[rgba(239,83,80,0.3)] bg-[rgba(239,83,80,0.07)] p-3 text-sm text-down">
       {message}
     </div>
   );

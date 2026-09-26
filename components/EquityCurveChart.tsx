@@ -16,7 +16,7 @@ import { fmtCompact } from "@/lib/format";
 
 const AXIS = "#8b93a7";
 const GRID = "rgba(255,255,255,0.06)";
-const STRATEGY = "#22d3ee";
+const STRATEGY = "#2962ff";
 const BENCHMARK = "#8f97ab";
 
 interface TooltipEntry {

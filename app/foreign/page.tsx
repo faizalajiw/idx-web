@@ -90,7 +90,7 @@ export default function ForeignFlowPage() {
                 <ReferenceLine y={0} stroke="rgba(148,163,184,0.3)" />
                 <Bar dataKey="net" radius={[4, 4, 0, 0]} maxBarSize={26}>
                   {chartData.map((d, i) => (
-                    <Cell key={i} fill={(d.net ?? 0) >= 0 ? "#34d399" : "#f87171"} />
+                    <Cell key={i} fill={(d.net ?? 0) >= 0 ? "#26a69a" : "#ef5350"} />
                   ))}
                 </Bar>
               </BarChart>

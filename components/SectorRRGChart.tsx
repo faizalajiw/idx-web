@@ -44,7 +44,7 @@ function sectorColor(name: string, palette: string[]): string {
 }
 
 const PALETTE = [
-  "#6366f1", "#22d3ee", "#34d399", "#fbbf24", "#f87171",
+  "#2962ff", "#26a69a", "#f5a623", "#ef5350", "#9c27b0",
   "#a78bfa", "#f472b6", "#4ade80", "#fb923c", "#38bdf8",
 ];
 

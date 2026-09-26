@@ -12,8 +12,8 @@ import { RegimeBanner } from "@/components/RegimeBanner";
 function heatColor(pct: number | null): string {
   if (pct === null) return "rgba(143,151,171,0.15)";
   const clamped = Math.max(-3, Math.min(3, pct));
-  if (clamped >= 0) return `rgba(52,211,153,${0.1 + (clamped / 3) * 0.4})`;
-  return `rgba(248,113,113,${0.1 + (-clamped / 3) * 0.4})`;
+  if (clamped >= 0) return `rgba(38,166,154,${0.1 + (clamped / 3) * 0.4})`;
+  return `rgba(239,83,80,${0.1 + (-clamped / 3) * 0.4})`;
 }
 
 export default function SectorsPage() {

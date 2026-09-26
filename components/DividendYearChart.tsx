@@ -15,7 +15,7 @@ import type { DividendYear } from "@/lib/types";
 
 const AXIS = "#8b93a7";
 const GRID = "rgba(255,255,255,0.06)";
-const EVENTS = "#22d3ee";
+const EVENTS = "#26a69a";
 const CODES = "#a78bfa";
 
 interface TooltipEntry {

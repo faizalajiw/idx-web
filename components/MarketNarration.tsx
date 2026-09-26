@@ -5,8 +5,8 @@ import { Card } from "./Card";
 import { ErrorState, Skeleton } from "./States";
 
 const TONE_CLASS: Record<string, string> = {
-  up: "text-up border-[rgba(52,211,153,0.25)] bg-[rgba(52,211,153,0.06)]",
-  down: "text-down border-[rgba(248,113,113,0.25)] bg-[rgba(248,113,113,0.06)]",
+  up: "text-up border-[rgba(38,166,154,0.25)] bg-[rgba(38,166,154,0.06)]",
+  down: "text-down border-[rgba(239,83,80,0.25)] bg-[rgba(239,83,80,0.06)]",
   neutral: "text-fg border-[var(--border)] bg-[var(--bg-elev)]",
 };
 
