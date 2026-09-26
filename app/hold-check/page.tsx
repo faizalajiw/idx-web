@@ -1,4 +1,5 @@
 import { HoldCheckPanel } from "@/components/HoldCheckPanel";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 export const metadata = { title: "Hold Check · Market Labs" };
 
@@ -15,6 +16,7 @@ export default function HoldCheckPage() {
           60-hari).
         </p>
       </div>
+      <RegimeBanner />
       <HoldCheckPanel />
     </main>
   );

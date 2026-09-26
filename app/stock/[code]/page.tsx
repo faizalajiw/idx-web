@@ -7,6 +7,8 @@ import { useWatchlist } from "@/lib/hooks";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { HistoryTable } from "@/components/HistoryTable";
 import { SignalsPanel } from "@/components/SignalsPanel";
+import { BrokerSummary } from "@/components/BrokerSummary";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 const NAV_BTN =
   "card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm transition-colors hover:bg-white/[0.03]";
@@ -76,12 +78,14 @@ export default function StockDetailPage() {
       </header>
 
       <div className="space-y-4">
+        <RegimeBanner />
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           <div className="xl:col-span-2">
             <TechnicalChart code={code} />
           </div>
           <div className="space-y-4">
             <SignalsPanel codes={code} />
+            <BrokerSummary code={code} />
             <HistoryTable code={code} />
           </div>
         </div>

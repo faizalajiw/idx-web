@@ -14,6 +14,7 @@ import { useForeignFlow } from "@/lib/hooks";
 import { fmtCompact, fmtPct, fmtNum } from "@/lib/format";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 function shortDate(d: string): string {
   return d.slice(5);
@@ -55,6 +56,8 @@ export default function ForeignFlowPage() {
           Arus dana asing di pasar reguler (notional = lembar × harga close)
         </p>
       </div>
+
+      <RegimeBanner />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="card card-hover p-5">

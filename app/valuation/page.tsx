@@ -5,6 +5,7 @@ import { useValuation } from "@/lib/hooks";
 import { fmtNum, fmtPct } from "@/lib/format";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 function zBadge(z: number | null): string {
   if (z === null) return "badge badge-hold";
@@ -90,6 +91,8 @@ export default function ValuationPage() {
           Screening statistik terhadap harga saham sendiri (mean reversion)
         </p>
       </div>
+
+      <RegimeBanner />
 
       <div className="card p-4 text-sm leading-relaxed text-[var(--fg-muted)]">
         <span className="font-semibold text-[var(--fg)]">Cara baca: </span>

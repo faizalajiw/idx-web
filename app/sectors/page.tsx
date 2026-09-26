@@ -7,6 +7,7 @@ import type { SectorRow } from "@/lib/types";
 import { Card } from "@/components/Card";
 import { SectorRRGChart } from "@/components/SectorRRGChart";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
+import { RegimeBanner } from "@/components/RegimeBanner";
 
 function heatColor(pct: number | null): string {
   if (pct === null) return "rgba(143,151,171,0.15)";
@@ -30,6 +31,8 @@ export default function SectorsPage() {
           {data?.date ?? "-"}
         </p>
       </div>
+
+      <RegimeBanner />
 
       <SectorRRGChart />
 

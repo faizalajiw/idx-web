@@ -8,6 +8,7 @@ import { WatchlistTable } from "@/components/WatchlistTable";
 import { HoldCheckPanel } from "@/components/HoldCheckPanel";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
+import { RegimeBanner } from "@/components/RegimeBanner";
 import { useMarketOverview } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact, trendClass } from "@/lib/format";
 import Link from "next/link";
@@ -75,6 +76,7 @@ export default function DashboardPage() {
       </div>
 
       <HeroIndex />
+      <RegimeBanner />
       <MarketNarrationCard />
       <MarketOverview />
 
