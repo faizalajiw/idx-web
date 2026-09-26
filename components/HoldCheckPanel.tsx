@@ -25,6 +25,20 @@ function scoreColor(score: number): string {
   return "var(--down)";
 }
 
+const pct = (p: number) => `${(p * 100).toFixed(0)}%`;
+
+/**
+ * Warna persentil faktor. `inverted` = persentil tinggi itu BURUK
+ * (vol/likuiditas — penalti IC); else persentil tinggi itu BAIK (52w momentum).
+ */
+function factorTone(p: number, inverted: boolean): string {
+  const bad = inverted ? p >= 0.8 : p <= 0.2;
+  const good = inverted ? p <= 0.2 : p >= 0.8;
+  if (bad) return "#fbbf24";
+  if (good) return "var(--up)";
+  return "var(--muted)";
+}
+
 function HoldCard({
   item,
   onSelect,
@@ -70,6 +84,49 @@ function HoldCard({
           />
         </div>
       </div>
+
+      {/* Rincian skor: teknikal (base) vs lapisan faktor IC */}
+      {item.base_score !== null && item.factor_adj !== null && (
+        <div className="text-muted text-[11px] tabular-nums">
+          Skor teknikal {item.base_score}
+          {item.factor_adj !== 0 ? (
+            <span style={{ color: item.factor_adj > 0 ? "var(--up)" : "#fbbf24" }}>
+              {" "}
+              {item.factor_adj > 0 ? "+" : ""}
+              {item.factor_adj} faktor
+            </span>
+          ) : (
+            " (faktor IC netral)"
+          )}
+        </div>
+      )}
+
+      {/* Persentil faktor vs seluruh pasar (0-100%) */}
+      {item.factor_pct && (
+        <div
+          className="text-muted grid grid-cols-3 gap-1 text-[11px] tabular-nums"
+          title="Persentil emiten vs seluruh pasar — sumber: IC analysis bulanan"
+        >
+          <span>
+            VOL{" "}
+            <span style={{ color: factorTone(item.factor_pct.vol_pct, true) }}>
+              {pct(item.factor_pct.vol_pct)}
+            </span>
+          </span>
+          <span>
+            LIQ{" "}
+            <span style={{ color: factorTone(item.factor_pct.turnover_pct, true) }}>
+              {pct(item.factor_pct.turnover_pct)}
+            </span>
+          </span>
+          <span>
+            52W{" "}
+            <span style={{ color: factorTone(item.factor_pct.dist_52w_pct, false) }}>
+              {pct(item.factor_pct.dist_52w_pct)}
+            </span>
+          </span>
+        </div>
+      )}
 
       {/* Metric chips */}
       <div className="text-muted grid grid-cols-3 gap-1 text-xs tabular-nums">
@@ -125,7 +182,7 @@ export function HoldCheckPanel({
   return (
     <Card
       title="Hold Check"
-      subtitle="Sinyal teknikal + valuasi z-score → skor kelayakan 0–100"
+      subtitle="Sinyal teknikal + valuasi z-score → skor 0–100, disesuaikan lapisan faktor IC (±10)"
     >
       {error ? (
         <ErrorState message={`Gagal memuat hold check: ${error.message}`} />
@@ -154,8 +211,12 @@ export function HoldCheckPanel({
             ))}
           </div>
           <p className="text-muted text-[11px] leading-snug">
-            Alat bantu riset, bukan rekomendasi beli/jual. Skor gabungan dari sinyal
-            SMA20/50 + RSI, MACD, Bollinger, dan posisi harga vs band 60-hari.
+            Alat bantu riset, bukan rekomendasi beli/jual. Skor gabungan sinyal
+            SMA20/50 + RSI, MACD, Bollinger, posisi harga vs band 60-hari, lalu
+            lapisan faktor IC (VOL = volatilitas, LIQ = likuiditas, 52W = jarak
+            dari puncak 52-minggu; persentil vs seluruh pasar) menyesuaikan
+            maksimal ±10 poin. Bobot dari IC analysis bulanan (tabel
+            research.factor_ic_history).
           </p>
         </div>
       )}
