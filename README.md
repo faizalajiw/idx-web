@@ -147,18 +147,62 @@ MA/BB/RSI/MACD), broker summary per emiten, dan detail dividen (riwayat cash + s
 
 ## Alur Data
 
-Frontend murni presentasi. Semua kalkulasi di backend FastAPI; UI hanya fetch JSON
-lewat SWR dan render.
+Frontend murni presentasi. Semua kalkulasi berat ada di backend; Postgres jadi satu-
+satunya sumber kebenaran; UI hanya fetch JSON lewat SWR dan render.
 
 ```mermaid
-flowchart LR
-  IDX[IDX GetIndexList / Yahoo fallback] --> SC[idx-scraper scheduler]
-  SC --> PG[(Postgres / Supabase)]
-  PG --> API[FastAPI read-only /api/*]
-  API -->|SWR fetch, refresh 30s| HK[lib/hooks.ts]
-  HK --> CMP[components/*]
-  CMP --> UI[Pages app/*]
+flowchart TD
+  subgraph Sumber
+    IDX[IDX GetIndexList / GetStockSummary<br/>via Cloudflare bypass]
+    YF[Yahoo Finance .JK<br/>fallback historis]
+  end
+
+  subgraph Ingest["idx-scraper (Python + APScheduler)"]
+    CF[cf_transport.py<br/>Chrome persisten share cookie CF]
+    JOB[Scheduler jobs<br/>preopen / intraday / EOD]
+    RESEARCH[Research layer PIT<br/>regime, signal_log, sentiment, faktor]
+  end
+
+  subgraph Store
+    PG[(Postgres / Supabase<br/>raw_eod, prices_pit, index_quotes,<br/>broker_daily, signal_log, research.*)]
+  end
+
+  subgraph API["FastAPI (read-only)"]
+    EP["/api/market/*, /api/watchlist,<br/>/api/signals, /api/backtest, dll"]
+  end
+
+  subgraph Web["idx-web (Next.js)"]
+    HOOKS[lib/hooks.ts<br/>SWR, refresh 30s]
+    CMP[components/*]
+    PAGE[Pages app/*]
+  end
+
+  IDX --> CF --> JOB
+  YF --> JOB
+  JOB --> PG
+  JOB --> RESEARCH --> PG
+  PG --> EP
+  EP -->|JSON| HOOKS --> CMP --> PAGE
 ```
+
+Tahapannya:
+
+1. **Sumber** — Angka utama dari **IDX** (`GetIndexList` untuk IHSG, `GetStockSummary`
+   untuk EOD semua emiten). **Yahoo Finance** hanya fallback historis. Endpoint IDX
+   diproteksi Cloudflare.
+2. **Ingest (idx-scraper)** — `cf_transport.py` menjalankan Chrome persisten yang sudah
+   lolos challenge Cloudflare, lalu menembak JSON IDX lewat `page.evaluate(fetch(...))`
+   agar ikut memakai cookie yang bersih. **APScheduler** (timezone WIB) menjalankan job
+   preopen / intraday / EOD. Setelah raw data masuk, **research layer point-in-time**
+   menghitung regime IHSG, jejak sinyal, sentimen, dan faktor kuantitatif.
+3. **Store (Postgres/Supabase)** — Semua ditulis idempotent (upsert `ON CONFLICT`).
+   Tabel inti: `raw_eod` (source of truth), `prices_pit`, `index_quotes` (IHSG close
+   resmi IDX-live), `broker_daily`, `signal_log`, plus schema `research.*`. Timezone
+   di-set `Asia/Jakarta`.
+4. **API (FastAPI read-only)** — Hanya membaca dari DB, **nol kalkulasi**. Expose
+   endpoint `/api/*` lewat connection pool (autocommit sebelum `SET time zone`).
+5. **Web (idx-web)** — `lib/hooks.ts` fetch JSON via **SWR** (auto-refresh 30 detik),
+   diteruskan ke `components/*`, dirakit di halaman `app/*`. Frontend murni presentasi.
 
 ## Setup
 
