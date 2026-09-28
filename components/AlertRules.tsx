@@ -150,6 +150,7 @@ export function AlertRules() {
     <Card
       title="Aturan Notifikasi"
       subtitle="Dikirim via Telegram sekali per persilangan ambang"
+      info="Buat 'alarm' harga sendiri: pilih saham dan kondisinya (mis. harga tembus angka tertentu), lalu kamu diberi tahu via Telegram saat kondisi itu terjadi."
       right={
         data ? (
           <span className={data.triggered_count > 0 ? "badge badge-warn" : "badge badge-hold"}>

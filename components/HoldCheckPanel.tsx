@@ -6,12 +6,23 @@ import { fmtNum } from "@/lib/format";
 import type { HoldCheckItem } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
+import { LastUpdated } from "./LastUpdated";
+import {
+  ShieldCheck,
+  CircleCheck,
+  TriangleAlert,
+  DoorOpen,
+  type LucideIcon,
+} from "lucide-react";
 
-const VERDICT_STYLES: Record<string, { badge: string; bar: string; icon: string }> = {
-  "STRONG HOLD": { badge: "badge badge-buy", bar: "var(--up)", icon: "✅" },
-  HOLD: { badge: "badge badge-hold", bar: "var(--accent)", icon: "🙂" },
-  TRIM: { badge: "badge badge-warn", bar: "#fbbf24", icon: "⚠️" },
-  EXIT: { badge: "badge badge-sell", bar: "var(--down)", icon: "🚪" },
+const VERDICT_STYLES: Record<
+  string,
+  { badge: string; bar: string; icon: LucideIcon }
+> = {
+  "STRONG HOLD": { badge: "badge badge-buy", bar: "var(--up)", icon: CircleCheck },
+  HOLD: { badge: "badge badge-hold", bar: "var(--accent)", icon: ShieldCheck },
+  TRIM: { badge: "badge badge-warn", bar: "var(--warn)", icon: TriangleAlert },
+  EXIT: { badge: "badge badge-sell", bar: "var(--down)", icon: DoorOpen },
 };
 
 function verdictStyle(v: string) {
@@ -21,7 +32,7 @@ function verdictStyle(v: string) {
 function scoreColor(score: number): string {
   if (score >= 75) return "var(--up)";
   if (score >= 55) return "var(--accent)";
-  if (score >= 35) return "#fbbf24";
+  if (score >= 35) return "var(--warn)";
   return "var(--down)";
 }
 
@@ -34,7 +45,7 @@ const pct = (p: number) => `${(p * 100).toFixed(0)}%`;
 function factorTone(p: number, inverted: boolean): string {
   const bad = inverted ? p >= 0.8 : p <= 0.2;
   const good = inverted ? p <= 0.2 : p >= 0.8;
-  if (bad) return "#fbbf24";
+  if (bad) return "var(--warn)";
   if (good) return "var(--up)";
   return "var(--muted)";
 }
@@ -50,6 +61,7 @@ function HoldCard({
 }) {
   const [open, setOpen] = useState(false);
   const style = verdictStyle(item.verdict);
+  const VerdictIcon = style.icon;
 
   return (
     <div
@@ -66,7 +78,9 @@ function HoldCard({
           {item.code}
           {item.name ? <span className="text-muted ml-2 hidden text-xs lg:inline">{item.name}</span> : null}
         </span>
-        <span className={style.badge}>{style.icon} {item.verdict}</span>
+        <span className={style.badge}>
+          <VerdictIcon size={13} className="mr-1" /> {item.verdict}
+        </span>
       </button>
 
       {/* Score bar */}
@@ -90,7 +104,7 @@ function HoldCard({
         <div className="text-muted text-[11px] tabular-nums">
           Skor teknikal {item.base_score}
           {item.factor_adj !== 0 ? (
-            <span style={{ color: item.factor_adj > 0 ? "var(--up)" : "#fbbf24" }}>
+            <span style={{ color: item.factor_adj > 0 ? "var(--up)" : "var(--warn)" }}>
               {" "}
               {item.factor_adj > 0 ? "+" : ""}
               {item.factor_adj} faktor
@@ -183,6 +197,8 @@ export function HoldCheckPanel({
     <Card
       title="Hold Check"
       subtitle="Sinyal teknikal + valuasi z-score → skor 0–100, disesuaikan lapisan faktor IC (±10)"
+      info="Bantu jawab pertanyaan 'saham yang saya pegang masih layak ditahan atau tidak?'. Menggabungkan sinyal harga + valuasi jadi skor 0–100 dan verdict (Strong Hold / Hold / Trim / Exit). Tetap keputusan akhir di tanganmu."
+      right={<LastUpdated sessionDate={data?.date} />}
     >
       {error ? (
         <ErrorState message={`Gagal memuat hold check: ${error.message}`} />
@@ -197,13 +213,15 @@ export function HoldCheckPanel({
       ) : (
         <div className="space-y-3">
           <div className="text-muted flex flex-wrap gap-2 text-xs">
-            {(["STRONG HOLD", "HOLD", "TRIM", "EXIT"] as const).map((v) =>
-              counts[v] ? (
+            {(["STRONG HOLD", "HOLD", "TRIM", "EXIT"] as const).map((v) => {
+              if (!counts[v]) return null;
+              const VIcon = verdictStyle(v).icon;
+              return (
                 <span key={v} className={verdictStyle(v).badge}>
-                  {verdictStyle(v).icon} {v}: {counts[v]}
+                  <VIcon size={13} className="mr-1" /> {v}: {counts[v]}
                 </span>
-              ) : null,
-            )}
+              );
+            })}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {items.map((it) => (

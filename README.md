@@ -5,51 +5,160 @@ all calculations happen in the FastAPI backend
 (`market-labs/idx-scraper/src/idx_scraper/api`). Data source auto-switches between
 the official IDX feed and Yahoo Finance fallback.
 
-## Features
+## Peta Navigasi
 
-### Market Overview & Narasi
-- **Market Overview** — IHSG close/change, total volume, top gainers/losers
-- **Narasi Pasar** — auto-generated market summary (IHSG + breadth: up/down/flat)
-- **Market Regime** — IHSG regime detection (ADX + realized volatility)
-- **Session Movers** — biggest movers of the current session
+Sidebar dibagi jadi 7 grup. Semua tabel emiten bisa di-klik untuk membuka
+detail teknikal `/stock/[code]`.
 
-### Watchlist & Signals (`/pantau`)
-- **Watchlist CRUD** — add/remove/replace tickers (persisted to `.env`)
-- **Technical signals** — BUY/SELL/HOLD per emiten
-- **Hold-Check** — combined technical + valuation "still worth holding?" verdict
+```mermaid
+graph LR
+  subgraph Utama
+    A[Dashboard /]
+    B[Watchlist /watchlist]
+    C[Pantau /pantau]
+  end
+  subgraph Screening
+    D[Screener /screener]
+  end
+  subgraph Analisis
+    E[Valuasi /valuation]
+    F[Hold Check /hold-check]
+    G[Jejak Sinyal /jejak-sinyal]
+    H[Backtest /backtest]
+    I[Dividen /dividen]
+    J[Faktor & Kalibrasi /faktor]
+  end
+  subgraph Flow
+    K[Foreign Flow /foreign]
+    L[Sentimen /sentimen]
+  end
+  subgraph Sektor
+    M[Sektor /sectors]
+  end
+  subgraph Belajar
+    N[Belajar Quant /learn]
+  end
+  subgraph Sistem
+    O[Kualitas Data /quality]
+  end
+  A -.klik ticker.-> P[Stock Detail /stock/CODE]
+  B -.klik ticker.-> P
+  D -.klik ticker.-> P
+```
 
-### Per-Stock Analysis (`/stock/[code]`)
-- **Price history** & **technical chart** (OHLCV + indicators)
-- **Broker summary** per emiten
-- **Dividend detail** per emiten (cash history + splits)
+## Menu & Fitur
 
-### Advanced Analytics
-- **Foreign Flow** — foreign fund flow (`/foreign`)
-- **Sector Analysis** + **RRG** (Relative Rotation Graph, `/sectors`)
-- **Valuation** — PER/PBV and peers (`/valuation`)
-- **Screener** — multi-criteria filter: signal, RSI, momentum, value, foreign-in,
-  volume ratio (`/screener`)
+### Grup: Utama
 
-### Dividends & Corporate Actions (`/dividen`)
-- **Dividend overview** — totals, yearly history, top trailing yields
-- **Corporate actions ledger** — splits, reverse splits, bonus, rights, dividends
+#### Dashboard (`/`)
+Ringkasan pasar hari ini dalam satu layar:
+- **Hero IHSG** — nilai Composite, perubahan poin & persen, volume/value/jumlah
+  emiten aktif, plus waktu update terakhir.
+- **Regime Banner + Timeline** — deteksi rezim IHSG (ADX + volatilitas realized:
+  TRENDING/RANGING/TRANSISI) beserta riwayatnya.
+- **Narasi Pasar** — ringkasan otomatis (IHSG + breadth naik/turun/flat).
+- **Market Overview** — top gainers & losers.
+- **Top Leaders** — leaderboard likuiditas per metrik (volume / value / frekuensi);
+  realtime saat jam bursa, EOD di luar jam.
+- **Top Brokers** — broker teraktif hari ini.
+- **Signals Panel** — sinyal teknikal BUY/SELL/HOLD; klik emiten → chart di bawah.
+- **Technical Chart** — kanvas detail bersama (dipilih dari panel mana pun).
 
-### Data Quality (`/quality`)
-- **Quality overview** — coverage, freshness, counts for the `research.*` layer
-- **Quarantine viewer** — rows rejected by the quality gate + reason
-- **Coverage gaps** & **thin days** — detect missing/partial scrape days
-- **Duplicate detection** — bars with more than one knowledge_date
+#### Watchlist (`/watchlist`)
+Daftar pantau manual — tambah/hapus emiten sendiri (persisted ke `.env` backend),
+auto-refresh 30 detik. Klik baris → technical chart emiten itu.
 
-### Alerts (Telegram)
-- **Alert rules CRUD** — create watch conditions
-- **Test message** — verify Telegram wiring
+#### Pantau (`/pantau`)
+Watchlist + notifikasi dalam satu alur "pilih saham → pasang batas → tunggu Telegram":
+- **Alert Rules CRUD** — pasang batas harga / RSI / volume per emiten.
+- **Telegram Status** — cek koneksi + kirim pesan tes.
+- Aturan diperiksa tiap data EOD baru masuk; notifikasi dikirim **sekali per
+  persilangan** (anti-spam) dan reset setelah kondisi kembali normal.
 
-### Backtest (`/backtest`)
-- **Backtest engine** — point-in-time simulation, equity curve + metrics, with a
-  cost model (commission, tax, slippage) and configurable rebalance frequency
+### Grup: Screening
 
-### Learn (`/learn`)
-- Education / glossary page for market terms
+#### Screener (`/screener`)
+Filter multi-kriteria: sinyal, RSI, momentum, value, foreign-in, rasio volume.
+Hasil bisa di-klik ke detail emiten.
+
+### Grup: Analisis
+
+#### Valuasi (`/valuation`)
+PER/PBV per emiten beserta peers pembanding.
+
+#### Hold Check (`/hold-check`)
+Verdikt gabungan teknikal + valuasi: "saham ini masih layak dipegang?"
+
+#### Jejak Sinyal (`/jejak-sinyal`)
+Track record kualitas sinyal:
+- Hit rate, mean/median forward return, abnormal return vs pasar, dan MFE/MAE per
+  horizon (5 / 10 / 21 hari bursa).
+- Breakdown per rezim IHSG (trending / ranging / transisi).
+- Daftar sinyal terbaru dengan return yang sudah terealisasi.
+
+#### Backtest (`/backtest`)
+Simulator strategi point-in-time: equity curve + metrik, cost model (komisi, pajak,
+slippage), frekuensi rebalance yang bisa diatur, dan perbandingan gross/net vs
+buy & hold. Backend tidak menyimpan apa pun → aman dijalankan berulang saat tuning.
+
+#### Dividen (`/dividen`)
+Overview dividen (total, riwayat tahunan, top trailing yield) + ledger corporate
+action (split, reverse split, bonus, rights, dividen).
+
+#### Faktor & Kalibrasi (`/faktor`)
+Registry faktor kuantitatif (momentum, volatilitas, likuiditas Amihud, foreign net,
+ketimpangan order book, absorption, dll) dengan definisi & kalibrasinya.
+
+### Grup: Flow
+
+#### Foreign Flow (`/foreign`)
+Arus dana asing (net buy/sell) peringkat pasar.
+
+#### Sentimen (`/sentimen`)
+- **Gauge sentimen pasar** (0–100: risk-on / netral / risk-off) — breadth harga +
+  IHSG + porsi emiten dibeli asing.
+- **Daftar akumulasi & distribusi** — arus asing + ketimpangan buku intraday
+  (bid/offer) & absorption, lengkap dengan alasan per emiten. Dihitung dari data
+  tersimpan, bukan berita.
+
+### Grup: Sektor
+
+#### Sektor (`/sectors`)
+Analisis sektor + **RRG** (Relative Rotation Graph) untuk melihat rotasi
+kepemimpinan sektor.
+
+### Grup: Belajar
+
+#### Belajar Quant (`/learn`)
+Halaman edukasi / glosarium istilah pasar & kuantitatif.
+
+### Grup: Sistem
+
+#### Kualitas Data (`/quality`)
+Dashboard mutu layer `research.*`:
+- Overview coverage, freshness, jumlah baris.
+- Quarantine viewer (baris yang ditolak quality gate + alasannya).
+- Coverage gaps & thin days (deteksi hari scrape hilang/parsial).
+- Deteksi duplikat (bar dengan lebih dari satu knowledge_date).
+
+### Detail Emiten (`/stock/[code]`)
+Dibuka dengan klik ticker mana pun. Berisi price history, technical chart (OHLCV +
+MA/BB/RSI/MACD), broker summary per emiten, dan detail dividen (riwayat cash + split).
+
+## Alur Data
+
+Frontend murni presentasi. Semua kalkulasi di backend FastAPI; UI hanya fetch JSON
+lewat SWR dan render.
+
+```mermaid
+flowchart LR
+  IDX[IDX GetIndexList / Yahoo fallback] --> SC[idx-scraper scheduler]
+  SC --> PG[(Postgres / Supabase)]
+  PG --> API[FastAPI read-only /api/*]
+  API -->|SWR fetch, refresh 30s| HK[lib/hooks.ts]
+  HK --> CMP[components/*]
+  CMP --> UI[Pages app/*]
+```
 
 ## Setup
 
@@ -90,8 +199,9 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SessionMovers, SectorRRGChart, BrokerSummary, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, Sidebar, Card, States
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, BrokerSummary, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
+- `app/watchlist/page.tsx` — daftar pantau manual + technical chart
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
 - `app/stock/[code]/page.tsx` — per-stock technical, history, brokers, dividends
 - `app/screener/page.tsx` — multi-criteria stock screener
@@ -99,8 +209,11 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/foreign/page.tsx` — foreign fund flow
 - `app/valuation/page.tsx` — PER/PBV valuation view
 - `app/hold-check/page.tsx` — combined hold verdict
+- `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
 - `app/dividen/page.tsx` — dividend overview, trailing yields, corp-action ledger
 - `app/quality/page.tsx` — data-quality dashboard (coverage, quarantine, gaps)
+- `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)
+- `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
 - `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
 - `app/learn/page.tsx` — education / glossary page
 

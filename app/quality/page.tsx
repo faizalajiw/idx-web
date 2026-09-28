@@ -218,28 +218,28 @@ export default function QualityPage() {
         </p>
       </div>
 
-      <Card title="Ringkasan">
+      <Card title="Ringkasan" info="Halaman ini memantau kesehatan & kelengkapan data yang dipakai seluruh aplikasi. Berguna untuk memastikan angka yang kamu lihat memang lengkap dan bisa dipercaya.">
         <OverviewCard />
       </Card>
 
-      <Card title="Quarantine" subtitle="Baris EOD yang ditolak quality gate">
+      <Card title="Quarantine" subtitle="Baris EOD yang ditolak quality gate" info="Data harga yang ditolak sistem karena terlihat aneh/salah (misal harga melonjak tak wajar). Dikarantina agar tidak mengotori analisis.">
         <QuarantineCard />
       </Card>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Coverage Gaps" subtitle="Weekday tanpa data EOD">
+        <Card title="Coverage Gaps" subtitle="Weekday tanpa data EOD" info="Hari kerja bursa yang datanya bolong (tidak terekam). Kalau banyak, sebagian analisis bisa kurang akurat.">
           <CoverageCard />
         </Card>
-        <Card title="Thin Days" subtitle="Hari dengan < 100 emiten (kemungkinan scrape parsial)">
+        <Card title="Thin Days" subtitle="Hari dengan < 100 emiten (kemungkinan scrape parsial)" info="Hari dengan jumlah saham terekam sangat sedikit — pertanda pengambilan data mungkin tidak lengkap hari itu.">
           <ThinDaysCard />
         </Card>
       </div>
 
-      <Card title="Duplicate Bars" subtitle="Sanity: (code, tanggal) dengan >1 versi knowledge">
+      <Card title="Duplicate Bars" subtitle="Sanity: (code, tanggal) dengan >1 versi knowledge" info="Cek apakah ada data harga ganda untuk saham & tanggal yang sama. Idealnya nol — kalau ada, sistem menandainya untuk dibersihkan.">
         <DuplicatesCard />
       </Card>
 
-      <Card title="Corporate Actions" subtitle="Breakdown per jenis & sumber">
+      <Card title="Corporate Actions" subtitle="Breakdown per jenis & sumber" info="Aksi korporasi (stock split, dividen, bonus, dll) yang tercatat. Penting karena bisa mengubah harga saham secara mekanis, bukan karena naik/turun beneran.">
         <CorpActionsCard />
       </Card>
     </div>

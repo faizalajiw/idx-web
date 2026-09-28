@@ -7,67 +7,121 @@ import { fmtNum, fmtPct, fmtCompact } from "@/lib/format";
 import type { WatchlistRow } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
-
-type SortKey =
-  | "code"
-  | "close"
-  | "change"
-  | "percent"
-  | "volume"
-  | "foreign_net"
-  | "hist_days";
-type SortDir = "asc" | "desc";
-
-const NUMERIC_KEYS: SortKey[] = [
-  "close",
-  "change",
-  "percent",
-  "volume",
-  "foreign_net",
-  "hist_days",
-];
-
-const COLUMNS: { key: SortKey; label: string; right: boolean }[] = [
-  { key: "code", label: "Kode", right: false },
-  { key: "close", label: "Close", right: true },
-  { key: "change", label: "Change", right: true },
-  { key: "percent", label: "%", right: true },
-  { key: "volume", label: "Volume", right: true },
-  { key: "foreign_net", label: "Foreign Net", right: true },
-  { key: "hist_days", label: "Hari", right: true },
-];
+import { TickerLogo } from "./TickerLogo";
+import { LastUpdated } from "./LastUpdated";
 
 const CODE_RE = /^[A-Z]{4}$/; // IDX tickers: four letters
 
-function cell(r: WatchlistRow, key: SortKey): React.ReactNode {
-  switch (key) {
-    case "close":
-      return fmtNum(r.close);
-    case "change":
-      return (
-        <span className={`${(r.change ?? 0) >= 0 ? "text-up" : "text-down"}`}>
-          {fmtNum(r.change)}
-        </span>
-      );
-    case "percent":
-      return (
-        <span className={`${(r.percent ?? 0) >= 0 ? "text-up" : "text-down"}`}>
-          {fmtPct(r.percent)}
-        </span>
-      );
-    case "volume":
-      return fmtCompact(r.volume);
-    case "foreign_net":
-      return (
-        <span className={`${(r.foreign_net ?? 0) >= 0 ? "text-up" : "text-down"}`}>
-          {fmtCompact(r.foreign_net)}
-        </span>
-      );
-    case "hist_days":
-      return <span className="text-muted">{r.hist_days}</span>;
-    default:
-      return r.code;
+type MoveFilter = "up" | "down";
+
+function MoveTally({
+  data,
+  active,
+  onToggle,
+}: {
+  data: WatchlistRow[];
+  active: MoveFilter | null;
+  onToggle: (f: MoveFilter) => void;
+}) {
+  let naik = 0;
+  let turun = 0;
+  for (const r of data) {
+    if ((r.percent ?? 0) >= 0) naik++;
+    else turun++;
   }
+  const items: { label: string; key: MoveFilter; value: number; dot: string; text: string }[] = [
+    { label: "Naik", key: "up", value: naik, dot: "bg-[var(--up)]", text: "text-up" },
+    { label: "Turun", key: "down", value: turun, dot: "bg-[var(--down)]", text: "text-down" },
+  ];
+  return (
+    <div className="flex items-center gap-1.5">
+      {items.map((it) => {
+        const isActive = active === it.key;
+        return (
+          <button
+            key={it.key}
+            type="button"
+            onClick={() => onToggle(it.key)}
+            aria-pressed={isActive}
+            title={isActive ? `Tampilkan semua` : `Filter ${it.label} saja`}
+            className={`flex items-center gap-1.5 rounded-full border bg-white/[0.02] px-2.5 py-1 transition-colors ${
+              isActive ? "border-[var(--accent)] ring-1 ring-[var(--accent)]" : "border-[var(--border)] hover:border-[var(--fg)]/40"
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${it.dot}`} />
+            <span className="text-muted text-[10px] font-medium uppercase tracking-wide">{it.label}</span>
+            <span className={`text-xs font-semibold tabular-nums ${it.text}`}>{it.value}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Metric({ label, value, tone }: { label: string; value: React.ReactNode; tone?: "up" | "down" }) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-muted text-[10px] uppercase tracking-wide">{label}</span>
+      <span className={`text-xs tabular-nums ${tone === "up" ? "text-up" : tone === "down" ? "text-down" : ""}`}>{value}</span>
+    </div>
+  );
+}
+
+function WatchRow({
+  r,
+  onSelect,
+  selected,
+  onRemove,
+  busy,
+}: {
+  r: WatchlistRow;
+  onSelect?: (code: string) => void;
+  selected?: string | null;
+  onRemove: (code: string) => void;
+  busy: boolean;
+}) {
+  const up = (r.percent ?? 0) >= 0;
+  return (
+    <div
+      onClick={() => onSelect?.(r.code)}
+      className={`flex cursor-pointer flex-col gap-2 rounded-lg border border-[var(--border)] px-3 py-2 text-left transition-colors hover:bg-white/[0.04] ${
+        selected === r.code ? "ring-1 ring-[var(--accent)]" : ""
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${up ? "bg-[var(--up)]" : "bg-[var(--down)]"}`} />
+        <Link
+          href={`/stock/${r.code}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-2 text-sm font-semibold hover:underline"
+        >
+          <TickerLogo code={r.code} size={22} />
+          {r.code}
+        </Link>
+        <span className="ml-auto text-sm font-semibold tabular-nums">{fmtNum(r.close)}</span>
+        <span className={`text-xs tabular-nums ${up ? "text-up" : "text-down"}`}>{fmtPct(r.percent)}</span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(r.code);
+          }}
+          disabled={busy}
+          title={`Hapus ${r.code} dari watchlist`}
+          aria-label={`Hapus ${r.code} dari watchlist`}
+          className="text-muted ml-1 shrink-0 rounded px-1.5 py-0.5 transition-colors hover:text-down disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          ×
+        </button>
+      </div>
+      <div className="grid grid-cols-4 gap-2 border-t border-[var(--border)] pt-2">
+        <Metric label="Change" value={fmtNum(r.change)} tone={(r.change ?? 0) >= 0 ? "up" : "down"} />
+        <Metric label="Volume" value={fmtCompact(r.volume)} />
+        <Metric label="Foreign Net" value={fmtCompact(r.foreign_net)} tone={(r.foreign_net ?? 0) >= 0 ? "up" : "down"} />
+        <Metric label="Hari" value={r.hist_days} />
+      </div>
+    </div>
+  );
 }
 
 export function WatchlistTable({
@@ -84,28 +138,24 @@ export function WatchlistTable({
   const removeFromWatchlist = useRemoveFromWatchlist();
 
   const [filter, setFilter] = useState("");
+  const [moveFilter, setMoveFilter] = useState<MoveFilter | null>(null);
   const [newCode, setNewCode] = useState("");
   const [mutateError, setMutateError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>("code");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  function toggleMove(f: MoveFilter) {
+    setMoveFilter((cur) => (cur === f ? null : f));
+  }
 
   const rows = useMemo(() => {
     if (!data) return [];
     const q = filter.trim().toUpperCase();
-    const filtered = q ? data.filter((r) => r.code.includes(q)) : data;
-    const dir = sortDir === "asc" ? 1 : -1;
-    const isNumeric = NUMERIC_KEYS.includes(sortKey);
-    return [...filtered].sort((a, b) => {
-      if (isNumeric) {
-        const key = sortKey as Exclude<SortKey, "code">;
-        const av: number | null = a[key];
-        const bv: number | null = b[key];
-        return ((av ?? -Infinity) - (bv ?? -Infinity)) * dir;
-      }
-      return a.code.localeCompare(b.code) * dir;
-    });
-  }, [data, filter, sortKey, sortDir]);
+    let filtered = q ? data.filter((r) => r.code.includes(q)) : data;
+    if (moveFilter === "up") filtered = filtered.filter((r) => (r.percent ?? 0) >= 0);
+    else if (moveFilter === "down") filtered = filtered.filter((r) => (r.percent ?? 0) < 0);
+    return [...filtered].sort((a, b) => a.code.localeCompare(b.code));
+  }, [data, filter, moveFilter]);
+
 
   const inputCode = newCode.trim().toUpperCase();
   const inputValid = CODE_RE.test(inputCode);
@@ -150,20 +200,23 @@ export function WatchlistTable({
   return (
     <Card
       title="Watchlist"
-      subtitle="Snapshot terakhir per emiten · klik baris untuk chart"
+      subtitle="Snapshot terakhir per emiten · klik untuk chart"
+      info="Daftar saham yang kamu pantau. Tambahkan kode saham favoritmu di sini agar harga dan sinyalnya mudah dicek sekali lihat. Klik kartu untuk melihat grafik detailnya."
       right={
-        <input
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder="Filter kode…"
-          className="input w-36 sm:w-44"
-        />
+        <div className="flex items-center gap-2">
+          <LastUpdated dep={data} />
+          {data && data.length > 0 ? <MoveTally data={data} active={moveFilter} onToggle={toggleMove} /> : null}
+        </div>
       }
     >
       {error ? (
         <ErrorState message={`Gagal memuat watchlist: ${error.message}`} />
       ) : isLoading || !data ? (
-        <Skeleton className="h-48" />
+        <div className="grid grid-cols-1 gap-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-[76px]" />
+          ))}
+        </div>
       ) : (
         <>
           {/* Add / remove form */}
@@ -189,6 +242,12 @@ export function WatchlistTable({
                 + Tambah
               </button>
             </div>
+            <input
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filter kode…"
+              className="input w-28 uppercase placeholder:normal-case"
+            />
             {inputMessage && newCode && (
               <span className="text-muted text-xs">{inputMessage}</span>
             )}
@@ -200,87 +259,23 @@ export function WatchlistTable({
               message={
                 filtering
                   ? `Tidak ada emiten yang cocok dengan "${filter.trim()}".`
-                  : undefined
+                  : moveFilter
+                    ? `Tidak ada emiten yang ${moveFilter === "up" ? "naik" : "turun"}.`
+                    : undefined
               }
             />
           ) : (
-            <div className="max-h-[420px] overflow-auto">
-              <table className="data-table">
-                <thead className="sticky top-0 z-10 bg-[var(--bg-card-solid)]">
-                  <tr>
-                    {COLUMNS.map((col) => (
-                      <th
-                        key={col.key}
-                        onClick={() => {
-                          if (col.key === sortKey) {
-                            setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-                          } else {
-                            setSortKey(col.key);
-                            setSortDir(col.key === "code" ? "asc" : "desc");
-                          }
-                        }}
-                        className={`cursor-pointer select-none hover:text-[var(--fg)] ${col.right ? "text-right" : "text-left"} ${col.key === "hist_days" ? "pr-0" : ""}`}
-                      >
-                        {col.label}
-                        <span className="ml-0.5 inline-block w-3">
-                          {sortKey === col.key ? (sortDir === "asc" ? "▲" : "▼") : ""}
-                        </span>
-                      </th>
-                    ))}
-                    <th className="py-2 text-right font-medium">
-                      <span className="sr-only">Aksi</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => {
-                    const isSel = selected === r.code;
-                    return (
-                      <tr
-                        key={r.code}
-                        onClick={() => onSelect?.(r.code)}
-                        className={`transition-colors ${
-                          onSelect ? "cursor-pointer" : ""
-                        } ${isSel ? "bg-[var(--accent)]/10" : ""}`}
-                      >
-                        {COLUMNS.map((col) => (
-                          <td
-                            key={col.key}
-                            className={`py-2 pr-3 text-right tabular-nums ${col.key === "hist_days" ? "pr-0" : ""}`}
-                          >
-                            {col.key === "code" ? (
-                              <Link
-                                href={`/stock/${r.code}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="font-semibold hover:underline"
-                              >
-                                {r.code}
-                              </Link>
-                            ) : (
-                              cell(r, col.key)
-                            )}
-                          </td>
-                        ))}
-                        <td className="py-2 text-right">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void handleRemove(r.code);
-                            }}
-                            disabled={busy}
-                            title={`Hapus ${r.code} dari watchlist`}
-                            aria-label={`Hapus ${r.code} dari watchlist`}
-                            className="text-muted rounded px-1.5 py-0.5 transition-colors hover:text-down disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            ×
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="grid max-h-[560px] grid-cols-1 gap-2 overflow-y-auto pr-1">
+              {rows.map((r) => (
+                <WatchRow
+                  key={r.code}
+                  r={r}
+                  onSelect={onSelect}
+                  selected={selected}
+                  onRemove={(c) => void handleRemove(c)}
+                  busy={busy}
+                />
+              ))}
             </div>
           )}
         </>

@@ -1,13 +1,17 @@
+import { InfoHint } from "./InfoHint";
+
 export function Card({
   title,
   subtitle,
+  info,
   right,
   children,
   className = "",
   hover = false,
 }: {
-  title?: string;
+  title?: React.ReactNode;
   subtitle?: string;
+  info?: string;
   right?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -18,7 +22,12 @@ export function Card({
       {(title || right) && (
         <header className="mb-4 flex items-start justify-between gap-3">
           <div>
-            {title && <h2 className="text-sm font-semibold tracking-wide">{title}</h2>}
+            {title && (
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold tracking-wide">
+                {title}
+                {info && <InfoHint text={info} />}
+              </h2>
+            )}
             {subtitle && <p className="text-muted mt-0.5 text-xs">{subtitle}</p>}
           </div>
           {right}

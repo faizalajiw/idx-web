@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useSignals } from "@/lib/hooks";
 import { fmtNum, fmtPct } from "@/lib/format";
 import type { Signal } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
+import { LastUpdated } from "./LastUpdated";
+
+type SignalFilter = "BUY" | "SELL" | "HOLD";
 
 function badgeClass(sig: string): string {
   if (sig === "BUY") return "badge badge-buy";
@@ -12,30 +16,47 @@ function badgeClass(sig: string): string {
   return "badge badge-hold";
 }
 
-function SignalTally({ data }: { data: Signal[] }) {
+function SignalTally({
+  data,
+  active,
+  onToggle,
+}: {
+  data: Signal[];
+  active: SignalFilter | null;
+  onToggle: (f: SignalFilter) => void;
+}) {
   const counts = { BUY: 0, SELL: 0, HOLD: 0 };
   for (const s of data) {
     if (s.signal === "BUY") counts.BUY++;
     else if (s.signal === "SELL") counts.SELL++;
     else counts.HOLD++;
   }
-  const items: { label: string; value: number; dot: string; text: string }[] = [
+  const items: { label: SignalFilter; value: number; dot: string; text: string }[] = [
     { label: "BUY", value: counts.BUY, dot: "bg-[var(--up)]", text: "text-up" },
     { label: "HOLD", value: counts.HOLD, dot: "bg-[var(--muted)]", text: "text-muted" },
     { label: "SELL", value: counts.SELL, dot: "bg-[var(--down)]", text: "text-down" },
   ];
   return (
     <div className="flex items-center gap-1.5">
-      {items.map((it) => (
-        <div
-          key={it.label}
-          className="flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-white/[0.02] px-2.5 py-1"
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${it.dot}`} />
-          <span className="text-muted text-[10px] font-medium uppercase tracking-wide">{it.label}</span>
-          <span className={`text-xs font-semibold tabular-nums ${it.text}`}>{it.value}</span>
-        </div>
-      ))}
+      {items.map((it) => {
+        const isActive = active === it.label;
+        return (
+          <button
+            key={it.label}
+            type="button"
+            onClick={() => onToggle(it.label)}
+            aria-pressed={isActive}
+            title={isActive ? `Tampilkan semua` : `Filter ${it.label} saja`}
+            className={`flex items-center gap-1.5 rounded-full border bg-white/[0.02] px-2.5 py-1 transition-colors ${
+              isActive ? "border-[var(--accent)] ring-1 ring-[var(--accent)]" : "border-[var(--border)] hover:border-[var(--fg)]/40"
+            }`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${it.dot}`} />
+            <span className="text-muted text-[10px] font-medium uppercase tracking-wide">{it.label}</span>
+            <span className={`text-xs font-semibold tabular-nums ${it.text}`}>{it.value}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -93,12 +114,27 @@ export function SignalsPanel({
   selected?: string | null;
 }) {
   const { data, error, isLoading } = useSignals(codes);
+  const [filter, setFilter] = useState<SignalFilter | null>(null);
+
+  function toggleFilter(f: SignalFilter) {
+    setFilter((cur) => (cur === f ? null : f));
+  }
+
+  const shown = data && filter ? data.filter((s) => s.signal === filter) : data;
 
   return (
     <Card
       title="Trading Signals"
       subtitle="SMA20/50 + RSI(14) rule-based"
-      right={data && data.length > 0 ? <SignalTally data={data} /> : undefined}
+      info="Sinyal beli/jual/tahan otomatis berdasarkan rumus teknikal (rata-rata harga & momentum). Ini alat bantu, BUKAN ajakan beli. Selalu cek konteks lain dan jangan ikut buta."
+      right={
+        <div className="flex items-center gap-2">
+          <LastUpdated dep={data} />
+          {data && data.length > 0 ? (
+            <SignalTally data={data} active={filter} onToggle={toggleFilter} />
+          ) : null}
+        </div>
+      }
     >
       {error ? (
         <ErrorState message={`Gagal memuat signals: ${error.message}`} />
@@ -110,9 +146,11 @@ export function SignalsPanel({
         </div>
       ) : data.length === 0 ? (
         <EmptyState />
+      ) : shown && shown.length === 0 ? (
+        <EmptyState message={`Tidak ada emiten dengan sinyal ${filter}.`} />
       ) : (
         <div className="grid max-h-[560px] grid-cols-1 gap-2 overflow-y-auto pr-1">
-          {data.map((s) => (
+          {shown!.map((s) => (
             <SignalRow key={s.code} s={s} onSelect={onSelect} selected={selected} />
           ))}
         </div>

@@ -13,8 +13,12 @@ import {
 import { useForeignFlow } from "@/lib/hooks";
 import { fmtCompact, fmtPct, fmtNum } from "@/lib/format";
 import { Card } from "@/components/Card";
+import { InfoHint } from "@/components/InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { TickerLogo } from "@/components/TickerLogo";
+import { LastUpdated } from "@/components/LastUpdated";
+import { CircleArrowUp, CircleArrowDown } from "lucide-react";
 
 function shortDate(d: string): string {
   return d.slice(5);
@@ -52,8 +56,9 @@ export default function ForeignFlowPage() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           Foreign <span className="gradient-text">Flow</span>
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
+        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Arus dana asing di pasar reguler (notional = lembar × harga close)
+          <LastUpdated sessionDate={data?.date} />
         </p>
       </div>
 
@@ -61,8 +66,9 @@ export default function ForeignFlowPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="card card-hover p-5">
-          <p className="text-muted text-xs font-semibold tracking-widest uppercase">
+          <p className="text-muted flex items-center gap-1 text-xs font-semibold tracking-widest uppercase">
             Net Asing · {data?.date ?? "-"}
+            <InfoHint text="Selisih total beli dikurangi total jual oleh investor asing. Hijau (+) = asing net masuk, merah (−) = asing net keluar. Ini gambaran arah 'uang besar' asing." />
           </p>
           <p className={`mt-2 text-3xl font-bold tabular-nums ${net >= 0 ? "text-up" : "text-down"}`}>
             {net >= 0 ? "+" : "-"}Rp {fmtCompact(Math.abs(net) || null)}
@@ -100,7 +106,7 @@ export default function ForeignFlowPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card title="🟢 Top Net Buy" subtitle="Akumulasi asing terbesar">
+        <Card title={<><CircleArrowUp size={15} className="text-up" /> Top Net Buy</>} subtitle="Akumulasi asing terbesar" info="Saham yang paling banyak DIBELI investor asing (net beli). Sering dianggap tanda minat 'uang besar', tapi bukan jaminan harga naik — asing juga bisa salah dan berbalik jual.">
           {isLoading || !data ? (
             <Skeleton className="h-64" />
           ) : data.top_net_in.length === 0 ? (
@@ -111,6 +117,7 @@ export default function ForeignFlowPage() {
                 <li key={m.code} className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
                     <span className="text-muted w-5 text-xs tabular-nums">{i + 1}.</span>
+                    <TickerLogo code={m.code} size={22} />
                     <span className="font-semibold">{m.code}</span>
                   </span>
                   <span className="flex items-center gap-3">
@@ -124,7 +131,7 @@ export default function ForeignFlowPage() {
             </ul>
           )}
         </Card>
-        <Card title="🔴 Top Net Sell" subtitle="Distribusi asing terbesar">
+        <Card title={<><CircleArrowDown size={15} className="text-down" /> Top Net Sell</>} subtitle="Distribusi asing terbesar" info="Saham yang paling banyak DIJUAL investor asing (net jual). Bisa jadi sinyal asing sedang keluar, tapi belum tentu harga langsung jatuh — perhatikan juga konteks pasar keseluruhan.">
           {isLoading || !data ? (
             <Skeleton className="h-64" />
           ) : data.top_net_out.length === 0 ? (
@@ -135,6 +142,7 @@ export default function ForeignFlowPage() {
                 <li key={m.code} className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
                     <span className="text-muted w-5 text-xs tabular-nums">{i + 1}.</span>
+                    <TickerLogo code={m.code} size={22} />
                     <span className="font-semibold">{m.code}</span>
                   </span>
                   <span className="flex items-center gap-3">

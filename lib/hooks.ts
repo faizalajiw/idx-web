@@ -19,11 +19,12 @@ import type {
   MarketNarration,
   MarketOverview,
   MarketRegime,
+  MarketLeaders,
+  TopBrokers,
   ScreenerFilters,
   ScreenerRow,
   SectorAnalysis,
   SectorRRG,
-  SessionMovers,
   StockBrokerSummary,
   WatchlistRow,
   Signal,
@@ -40,6 +41,8 @@ import type {
   StockEvents,
   FactorsOverview,
   RegimeHistory,
+  SentimentResponse,
+  SignalTrack,
   DividendOverview,
   DividendStock,
   DividendDetail,
@@ -61,15 +64,28 @@ export function useMarketRegime() {
   });
 }
 
-export function useSessionMovers() {
-  return useSWR<SessionMovers>("/api/market/session-movers", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
-
 export function useWatchlist(codes?: string) {
   const key = `/api/watchlist${codes ? `?codes=${encodeURIComponent(codes)}` : ""}`;
   return useSWR<WatchlistRow[]>(key, fetcher, { refreshInterval: REFRESH });
+}
+
+/**
+ * Ranking likuiditas per metrik (volume/value/frequency). Backend memilih
+ * realtime saat jam bursa, EOD di luar jam. Frequency selalu EOD.
+ */
+export function useMarketLeaders(
+  metric: "volume" | "value" | "frequency",
+  limit = 5,
+) {
+  const key = `/api/market/leaders?metric=${metric}&limit=${limit}`;
+  return useSWR<MarketLeaders>(key, fetcher, { refreshInterval: REFRESH });
+}
+
+/** Top broker by value (EOD). Kosong sampai broker_daily terisi. */
+export function useTopBrokers(limit = 5) {
+  return useSWR<TopBrokers>(`/api/market/top-brokers?limit=${limit}`, fetcher, {
+    refreshInterval: REFRESH,
+  });
 }
 
 export function useSignals(codes?: string, minDays = 25) {
@@ -120,6 +136,17 @@ export function useSectorRRG(window = 21, tailWeeks = 8) {
 export function useForeignFlow(days = 20) {
   const key = `/api/foreign-flow?days=${days}`;
   return useSWR<ForeignFlow>(key, fetcher, { refreshInterval: REFRESH });
+}
+
+/**
+ * Sentimen posisi/aliran dari data tersimpan (arus asing + buku intraday).
+ * Backend memilih hari EOD terakhir yang lengkap; lambat berubah → 5 menit.
+ */
+export function useSentiment(limit = 15) {
+  return useSWR<SentimentResponse>(`/api/sentiment?limit=${limit}`, fetcher, {
+    refreshInterval: 300_000,
+    shouldRetryOnError: false,
+  });
 }
 
 export function useValuation() {
@@ -233,6 +260,17 @@ export function useFactorsOverview() {
 export function useRegimeHistory(days = 90) {
   return useSWR<RegimeHistory>(`/api/market/regime/history?days=${days}`, fetcher, {
     refreshInterval: 600_000,
+  });
+}
+
+/**
+ * Track record sinyal BUY/SELL: hit-rate & forward return historis, dipecah
+ * per regime. Backend menghitung dari layer PIT (cache 1 jam) — lambat berubah.
+ */
+export function useSignalTrack() {
+  return useSWR<SignalTrack>("/api/signals/track", fetcher, {
+    refreshInterval: 600_000,
+    shouldRetryOnError: false,
   });
 }
 

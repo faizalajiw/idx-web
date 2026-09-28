@@ -12,6 +12,7 @@ import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { DividendYearChart } from "@/components/DividendYearChart";
 import { DividendDetailPanel } from "@/components/DividendDetailPanel";
+import { LastUpdated } from "@/components/LastUpdated";
 
 type SortKey = "yield" | "cash" | "recent";
 
@@ -295,8 +296,9 @@ export default function DividenPage() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           Dividen & <span className="gradient-text">Aksi Korporasi</span>
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
+        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           {data ? `${data.totals.events.toLocaleString("id-ID")} pembayaran dividen · per ${data.as_of}` : "Memuat data dividen…"}
+          <LastUpdated sessionDate={data?.as_of} updatedAt={data?.generated_at} />
         </p>
       </div>
 
@@ -344,17 +346,19 @@ export default function DividenPage() {
           <Card
             title="Aktivitas Dividen per Tahun"
             subtitle={`${totals.splits} aksi korporasi (split) tercatat · rentang ${totals.first_ex_date} → ${totals.last_ex_date}`}
+            info="Dividen = bagian laba perusahaan yang dibagikan ke pemegang saham. Grafik ini menunjukkan tren pembagian dividen tiap tahun — perusahaan yang rutin bagi dividen sering dianggap lebih stabil."
           >
             <DividendYearChart years={data.by_year} />
           </Card>
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            <Card title="Yield Tertinggi (12 bulan)" subtitle="25 emiten dengan yield trailing tertinggi">
+            <Card title="Yield Tertinggi (12 bulan)" subtitle="25 emiten dengan yield trailing tertinggi" info="Yield = dividen setahun dibagi harga saham (dalam %). Makin tinggi makin 'royal', tapi yield sangat tinggi kadang tanda harga turun tajam atau dividen spesial sekali bayar — jangan langsung tergiur.">
               <YieldTable rows={data.top_yield} />
             </Card>
             <Card
               title="Baru Dibayar"
               subtitle={`Ex-date dalam ${data.recent_days} hari terakhir`}
+              info="Dividen yang baru saja dibagikan. 'Ex-date' = tanggal batas; beli setelah tanggal ini berarti tidak dapat dividen periode tersebut."
             >
               <RecentTable rows={data.recent} />
             </Card>

@@ -93,6 +93,7 @@ export function DividendDetailPanel({ initialCode }: { initialCode?: string }) {
     <Card
       title="Riwayat Dividen per Emiten"
       subtitle="Dividen tunai per lembar, plus aksi korporasi yang pernah dilakukan"
+      info="Sejarah bagi hasil (dividen) yang pernah dibagikan perusahaan ke pemegang saham, per lembar. Dividen rutin bisa jadi tanda perusahaan sehat, tapi masa lalu tidak menjamin masa depan."
       right={
         <div className="flex items-center gap-2">
           <input

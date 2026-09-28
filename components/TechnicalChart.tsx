@@ -55,7 +55,7 @@ export function TechnicalChart({ code }: { code: string | null }) {
 
   if (!code) {
     return (
-      <Card title="Technical Chart">
+      <Card title="Technical Chart" info="Grafik harga saham lengkap dengan indikator teknikal (garis rata-rata harga, momentum, dll). Dipakai untuk melihat pola pergerakan harga. Pilih saham dulu dari watchlist atau daftar sinyal.">
         <EmptyState message="Pilih emiten dari watchlist atau signals untuk melihat chart." />
       </Card>
     );
@@ -67,6 +67,7 @@ export function TechnicalChart({ code }: { code: string | null }) {
     <Card
       title={`Technical — ${code}`}
       subtitle="Close, MA20/50, Bollinger, RSI, MACD"
+      info="MA20/50 = rata-rata harga 20 & 50 hari (arah tren). Bollinger = pita batas wajar harga. RSI = seberapa 'panas/dingin' saham (jenuh beli/jual). MACD = ukuran perubahan momentum. Semua ini alat bantu baca pola, bukan ramalan pasti."
       right={data ? <span className={badgeClass(data.signal)}>{data.signal}</span> : undefined}
     >
       {error ? (

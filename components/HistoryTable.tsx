@@ -9,7 +9,7 @@ export function HistoryTable({ code }: { code: string }) {
   const { data, error, isLoading } = useHistory(code);
 
   return (
-    <Card title={`Riwayat Harga — ${code}`} subtitle="20 hari terakhir (terbaru di atas)">
+    <Card title={`Riwayat Harga — ${code}`} subtitle="20 hari terakhir (terbaru di atas)" info="Tabel harga saham 20 hari bursa terakhir (buka, tertinggi, terendah, tutup, volume). Berguna untuk melihat pergerakan harian tanpa harus baca grafik.">
       {error ? (
         <ErrorState message={`Gagal memuat riwayat: ${error.message}`} />
       ) : isLoading || !data ? (

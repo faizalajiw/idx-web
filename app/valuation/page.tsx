@@ -6,6 +6,9 @@ import { fmtNum, fmtPct } from "@/lib/format";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { TickerLogo } from "@/components/TickerLogo";
+import { LastUpdated } from "@/components/LastUpdated";
+import { CircleArrowUp, CircleArrowDown } from "lucide-react";
 
 function zBadge(z: number | null): string {
   if (z === null) return "badge badge-hold";
@@ -47,14 +50,15 @@ function RowTable({ rows, kind }: {
           {rows.map((r) => (
             <tr key={r.code}>
               <td>
-                <Link href={`/stock/${r.code}`} className="font-semibold hover:underline">
-                  {r.code}
+                <Link href={`/stock/${r.code}`} className="flex items-center gap-2.5 hover:underline">
+                  <TickerLogo code={r.code} size={24} />
+                  <span className="font-semibold">{r.code}</span>
+                  {r.name && (
+                    <span className="text-muted hidden text-xs md:inline">
+                      {r.name.length > 22 ? `${r.name.slice(0, 22)}…` : r.name}
+                    </span>
+                  )}
                 </Link>
-                {r.name && (
-                  <span className="text-muted ml-2 hidden text-xs md:inline">
-                    {r.name.length > 22 ? `${r.name.slice(0, 22)}…` : r.name}
-                  </span>
-                )}
               </td>
               <td className="text-right tabular-nums">{fmtNum(r.close)}</td>
               <td className="text-muted text-right tabular-nums">{fmtNum(r.target_price)}</td>
@@ -87,8 +91,9 @@ export default function ValuationPage() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           Under<span className="gradient-text">/Over</span>value
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
+        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Screening statistik terhadap harga saham sendiri (mean reversion)
+          <LastUpdated dep={data} />
         </p>
       </div>
 
@@ -114,14 +119,26 @@ export default function ValuationPage() {
       ) : (
         <>
           <Card
-            title={`🟢 Potensi Undervalued${data ? ` · ${data.undervalued.length} saham` : ""}`}
+            title={
+              <>
+                <CircleArrowUp size={15} className="text-up" /> Potensi Undervalued
+                {data ? ` · ${data.undervalued.length} saham` : ""}
+              </>
+            }
             subtitle="Harga di bawah band statistiknya, tertekan paling dalam di atas"
+            info="Saham yang harganya sekarang tergolong 'murah' dibanding rata-rata historisnya sendiri. Murah secara statistik ≠ pasti untung — bisa saja murah karena memang ada masalah di perusahaannya."
           >
             {data && <RowTable rows={data.undervalued} kind="under" />}
           </Card>
           <Card
-            title={`🔴 Potensi Overvalued${data ? ` · ${data.overvalued.length} saham` : ""}`}
+            title={
+              <>
+                <CircleArrowDown size={15} className="text-down" /> Potensi Overvalued
+                {data ? ` · ${data.overvalued.length} saham` : ""}
+              </>
+            }
             subtitle="Harga paling melar di atas band statistiknya"
+            info="Saham yang harganya sekarang tergolong 'mahal' dibanding rata-rata historisnya sendiri. Mahal ≠ pasti turun — saham bagus bisa tetap mahal dalam waktu lama."
           >
             {data && <RowTable rows={data.overvalued} kind="over" />}
           </Card>

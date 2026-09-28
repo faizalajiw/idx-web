@@ -39,6 +39,7 @@ export function TelegramStatus() {
     <Card
       title="Koneksi Telegram"
       subtitle="Tujuan pengiriman notifikasi aturan di samping"
+      info="Menghubungkan aplikasi ke Telegram supaya kamu dapat notifikasi otomatis saat aturan alert terpenuhi — jadi nggak perlu pelototin dashboard terus."
       right={
         data ? (
           <span className={enabled ? "badge badge-buy" : "badge badge-warn"}>

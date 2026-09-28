@@ -1,17 +1,25 @@
 "use client";
 
 import { useMarketRegime } from "@/lib/hooks";
+import {
+  TrendingUp,
+  TrendingDown,
+  Shuffle,
+  MoveHorizontal,
+  type LucideIcon,
+} from "lucide-react";
+import { LastUpdated } from "./LastUpdated";
 
 /** Warna & ikon per regime. */
-const REGIME_STYLE: Record<string, { badge: string; icon: string; label: string }> = {
-  TRENDING_UP: { badge: "badge badge-buy", icon: "📈", label: "Trending Up" },
-  TRENDING_DOWN: { badge: "badge badge-sell", icon: "📉", label: "Trending Down" },
-  TRANSITION: { badge: "badge badge-warn", icon: "🔀", label: "Transisi" },
-  RANGING: { badge: "badge badge-hold", icon: "↔️", label: "Ranging" },
+const REGIME_STYLE: Record<string, { badge: string; icon: LucideIcon; label: string }> = {
+  TRENDING_UP: { badge: "badge badge-buy", icon: TrendingUp, label: "Trending Up" },
+  TRENDING_DOWN: { badge: "badge badge-sell", icon: TrendingDown, label: "Trending Down" },
+  TRANSITION: { badge: "badge badge-warn", icon: Shuffle, label: "Transisi" },
+  RANGING: { badge: "badge badge-hold", icon: MoveHorizontal, label: "Ranging" },
 };
 
 const VOL_STYLE: Record<string, { label: string; color: string }> = {
-  VOLATILE: { label: "Volatil", color: "#fbbf24" },
+  VOLATILE: { label: "Volatil", color: "var(--warn)" },
   NORMAL: { label: "Normal", color: "var(--muted)" },
   QUIET: { label: "Tenang", color: "var(--up)" },
 };
@@ -46,6 +54,7 @@ export function RegimeBanner() {
 
   const style = REGIME_STYLE[data!.regime ?? ""] ?? REGIME_STYLE.RANGING;
   const vol = data!.vol_state ? VOL_STYLE[data!.vol_state] : null;
+  const RegimeIcon = style.icon;
 
   return (
     <div
@@ -56,7 +65,7 @@ export function RegimeBanner() {
         Regime IHSG
       </span>
       <span className={style.badge}>
-        <span aria-hidden>{style.icon}</span> {style.label}
+        <RegimeIcon size={13} className="mr-1" aria-hidden /> {style.label}
         {data!.adx !== null && ` · ADX ${data!.adx}`}
       </span>
       {data!.plus_di !== null && data!.minus_di !== null && (
@@ -72,7 +81,9 @@ export function RegimeBanner() {
       <span className="text-muted hidden text-xs md:inline">
         {hint(data!.regime)}
       </span>
-      <span className="text-muted ml-auto text-[10px]">{data!.as_of}</span>
+      <span className="ml-auto">
+        <LastUpdated sessionDate={data!.as_of} />
+      </span>
     </div>
   );
 }

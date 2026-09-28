@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { fmtNum } from "@/lib/format";
 import { Check } from "lucide-react";
+import { LastUpdated } from "@/components/LastUpdated";
 
 const f4 = (v: number | null) => (v === null ? "-" : v.toFixed(4));
 const f2 = (v: number | null) => (v === null ? "-" : v.toFixed(2));
@@ -219,39 +220,41 @@ function RegimeSummary() {
 }
 
 export default function FaktorPage() {
+  const { data } = useFactorsOverview();
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           Faktor &amp; <span className="gradient-text">Kalibrasi</span>
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
+        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Hasil IC analysis bulanan: faktor mana yang benar-benar predictive di
           data IDX, dan bobot yang dipakai composite Hold Check.
+          <LastUpdated sessionDate={data?.latest_run} />
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card title="Bobot Composite Aktif" subtitle="Dari run IC terbaru — otomatis dipakai Hold Check">
+        <Card title="Bobot Composite Aktif" subtitle="Dari run IC terbaru — otomatis dipakai Hold Check" info="Seberapa besar 'suara' tiap faktor (momentum, valuasi, dll) dalam skor gabungan. Bobot lebih besar = faktor itu dianggap lebih andal belakangan ini. Dihitung otomatis dari data.">
           <WeightsCard />
         </Card>
-        <Card title="Regime IHSG Historis" subtitle="Distribusi regime + transisi (backfill otomatis)">
+        <Card title="Regime IHSG Historis" subtitle="Distribusi regime + transisi (backfill otomatis)" info="Rekap seberapa sering pasar berada di tiap kondisi (tren naik/turun/sideways) dan seberapa sering berpindah. Membantu paham karakter pasar dari waktu ke waktu.">
           <RegimeSummary />
         </Card>
       </div>
 
-      <Card title="IC per Faktor — Horizon 5 hari" subtitle="Spearman rank IC faktor vs forward return, fill T+1">
+      <Card title="IC per Faktor — Horizon 5 hari" subtitle="Spearman rank IC faktor vs forward return, fill T+1" info="IC (Information Coefficient) = ukuran seberapa akurat sebuah faktor memprediksi arah harga ~5 hari ke depan. Makin tinggi = faktor makin bisa diandalkan. Ini analisis lanjutan; pengguna awam bisa mengabaikannya.">
         <FactorsTable horizon={5} />
       </Card>
-      <Card title="IC per Faktor — Horizon 10 hari" subtitle="Horizon acuan bobot composite">
+      <Card title="IC per Faktor — Horizon 10 hari" subtitle="Horizon acuan bobot composite" info="Sama seperti di atas, tapi mengukur prediksi ~10 hari ke depan. Horizon inilah yang dipakai untuk menentukan bobot faktor di skor gabungan.">
         <FactorsTable horizon={10} />
       </Card>
 
-      <Card title="Riwayat Rekalibrasi" subtitle="Setiap run menyimpan snapshot lengkap — idempoten per tanggal">
+      <Card title="Riwayat Rekalibrasi" subtitle="Setiap run menyimpan snapshot lengkap — idempoten per tanggal" info="Catatan setiap kali sistem menghitung ulang bobot faktornya. Berguna untuk melacak bagaimana 'resep' skor berubah seiring waktu.">
         <CalibrationHistory />
       </Card>
 
-      <Card title="Registry Faktor" subtitle="Semua faktor yang dihitung — definisi persis seperti di kode">
+      <Card title="Registry Faktor" subtitle="Semua faktor yang dihitung — definisi persis seperti di kode" info="Daftar lengkap semua faktor beserta definisinya, persis seperti yang dihitung program. Untuk transparansi — supaya jelas angka datang dari mana.">
         <FactorRegistry />
       </Card>
 

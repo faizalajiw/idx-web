@@ -3,12 +3,42 @@
 import { useNarration } from "@/lib/hooks";
 import { Card } from "./Card";
 import { ErrorState, Skeleton } from "./States";
+import { LastUpdated } from "./LastUpdated";
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  Globe2,
+  Landmark,
+  Activity,
+  Newspaper,
+  Circle,
+  type LucideIcon,
+} from "lucide-react";
 
 const TONE_CLASS: Record<string, string> = {
   up: "text-up border-[rgba(38,166,154,0.25)] bg-[rgba(38,166,154,0.06)]",
   down: "text-down border-[rgba(239,83,80,0.25)] bg-[rgba(239,83,80,0.06)]",
   neutral: "text-fg border-[var(--border)] bg-[var(--bg-elev)]",
 };
+
+/** Peta emoji dari API → ikon lucide agar seragam dengan sidebar. */
+const ICON_MAP: Record<string, LucideIcon> = {
+  "📈": TrendingUp,
+  "📉": TrendingDown,
+  "📊": BarChart3,
+  "🌐": Globe2,
+  "🌏": Globe2,
+  "🏦": Landmark,
+  "🏛️": Landmark,
+  "⚡": Activity,
+  "📰": Newspaper,
+};
+
+function NarrationIcon({ emoji }: { emoji?: string }) {
+  const Icon = (emoji && ICON_MAP[emoji.trim()]) || Circle;
+  return <Icon size={14} aria-hidden />;
+}
 
 export function MarketNarrationCard() {
   const { data, error, isLoading } = useNarration();
@@ -21,7 +51,13 @@ export function MarketNarrationCard() {
           ? `Ringkasan otomatis sesi ${data.date}`
           : "Ringkasan otomatis dari data tersimpan"
       }
-      right={<span className="badge badge-accent">auto-generated</span>}
+      info="Rangkuman kondisi pasar hari ini dalam bahasa sederhana, dibuat otomatis dari data. Cocok untuk cepat paham 'apa yang lagi terjadi' tanpa harus baca angka satu per satu."
+      right={
+        <div className="flex items-center gap-2">
+          <LastUpdated sessionDate={data?.date} updatedAt={data?.generated_at} />
+          <span className="badge badge-accent">auto-generated</span>
+        </div>
+      }
     >
       {error ? (
         <ErrorState message={`Gagal memuat narasi: ${error.message}`} />
@@ -42,7 +78,7 @@ export function MarketNarrationCard() {
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <p className="flex items-center gap-2 text-xs font-semibold tracking-wide">
-                <span aria-hidden>{s.icon}</span>
+                <NarrationIcon emoji={s.icon} />
                 {s.title.toUpperCase()}
               </p>
               <p className="mt-1.5 text-sm leading-relaxed">{s.text}</p>

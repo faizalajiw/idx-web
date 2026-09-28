@@ -8,6 +8,7 @@ import { Card } from "@/components/Card";
 import { SectorRRGChart } from "@/components/SectorRRGChart";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { LastUpdated } from "@/components/LastUpdated";
 
 function heatColor(pct: number | null): string {
   if (pct === null) return "rgba(143,151,171,0.15)";
@@ -26,9 +27,10 @@ export default function SectorsPage() {
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           Analisis <span className="gradient-text">Sektor</span>
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
+        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Rata-rata pergerakan, nilai transaksi, dan arus asing per sektor ·{" "}
           {data?.date ?? "-"}
+          <LastUpdated sessionDate={data?.date} />
         </p>
       </div>
 
@@ -36,7 +38,7 @@ export default function SectorsPage() {
 
       <SectorRRGChart />
 
-      <Card title="Peta Sektor" subtitle="Diurutkan dari sektor terkuat">
+      <Card title="Peta Sektor" subtitle="Diurutkan dari sektor terkuat" info="Perbandingan performa antar sektor (perbankan, energi, konsumer, dll). Membantu melihat 'sektor mana yang lagi panas' — sering lebih penting daripada memilih satu saham saja.">
         {error ? (
           <ErrorState message={`Gagal memuat sektor: ${error.message}`} />
         ) : isLoading ? (

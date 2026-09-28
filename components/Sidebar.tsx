@@ -9,9 +9,12 @@ import {
   Landmark,
   BadgeCheck,
   FlaskConical,
+  History,
   Coins,
   Bell,
+  Eye,
   Globe2,
+  Waves,
   LayoutGrid,
   GraduationCap,
   ShieldCheck,
@@ -29,6 +32,7 @@ const GROUPS: NavGroup[] = [
     title: "Utama",
     items: [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/watchlist", label: "Watchlist", icon: Eye },
       { href: "/pantau", label: "Pantau", icon: Bell },
     ],
   },
@@ -41,6 +45,7 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/valuation", label: "Valuasi", icon: Landmark },
       { href: "/hold-check", label: "Hold Check", icon: BadgeCheck },
+      { href: "/jejak-sinyal", label: "Jejak Sinyal", icon: History },
       { href: "/backtest", label: "Backtest", icon: FlaskConical },
       { href: "/dividen", label: "Dividen", icon: Coins },
       { href: "/faktor", label: "Faktor & Kalibrasi", icon: ShieldCheck },
@@ -48,7 +53,10 @@ const GROUPS: NavGroup[] = [
   },
   {
     title: "Flow",
-    items: [{ href: "/foreign", label: "Foreign Flow", icon: Globe2 }],
+    items: [
+      { href: "/foreign", label: "Foreign Flow", icon: Globe2 },
+      { href: "/sentimen", label: "Sentimen", icon: Waves },
+    ],
   },
   {
     title: "Sektor",
@@ -79,8 +87,8 @@ function Brand() {
   return (
     <Link href="/" className="flex items-center gap-2.5 px-1">
       <span
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-[0_4px_16px_-4px_rgba(139,92,246,0.6)]"
-        style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-white"
+        style={{ background: "var(--accent)" }}
         aria-hidden
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

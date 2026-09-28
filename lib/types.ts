@@ -41,13 +41,6 @@ export interface MarketRegime {
   dir_hint: "up" | "down" | null;
 }
 
-export interface SessionMovers {
-  date: string | null;
-  captured_at: string | null;
-  top_gainers: Mover[];
-  top_losers: Mover[];
-}
-
 export interface BrokerRow {
   broker: string;
   code: string | null;
@@ -208,6 +201,40 @@ export interface Signal {
   macd: number | null;
   trend_up: boolean;
   live: boolean;
+}
+
+/** Satu emiten di panel Top Volume/Value/Frequency. */
+export interface LeaderRow {
+  code: string;
+  name: string | null;
+  close: number | null;
+  percent: number | null;
+  volume: number | null;
+  value: number | null;
+  frequency: number | null;
+}
+
+/** Ranking likuiditas: realtime (intraday) saat jam bursa, EOD di luar jam. */
+export interface MarketLeaders {
+  metric: "volume" | "value" | "frequency" | string;
+  source: "intraday" | "eod" | string;
+  date: string | null;
+  captured_at: string | null;
+  rows: LeaderRow[];
+}
+
+export interface BrokerLeaderRow {
+  broker_code: string;
+  broker_name: string | null;
+  volume: number | null;
+  value: number | null;
+  frequency: number | null;
+}
+
+export interface TopBrokers {
+  date: string | null;
+  captured_at: string | null;
+  rows: BrokerLeaderRow[];
 }
 
 export interface PriceBar {
@@ -373,6 +400,100 @@ export interface RegimeHistory {
 export interface CorpActionSummary {
   by_type: Record<string, number>;
   by_source: Record<string, number>;
+}
+
+// --------------------------------------------------------- sentimen (flow & buku)
+
+/** Satu emiten di daftar sorotan sentimen (akumulasi / distribusi). */
+export interface SentimentItem {
+  code: string;
+  name: string | null;
+  close: number | null;
+  percent: number | null;
+  value: number | null;
+  foreign_net: number | null;
+  /** Net asing / nilai transaksi hari itu (rasio mentah). */
+  foreign_net_pct: number | null;
+  /** Persentil cross-sectional arus asing (0..1) — dasar komponen skor. */
+  foreign_rank: number | null;
+  ob_imbalance: number | null;
+  ob_absorption: number | null;
+  score: number;
+  label: string;
+  reasons: string[];
+}
+
+/** Gauge sentimen pasar 0..100 dari breadth harga + IHSG + breadth arus asing. */
+export interface SentimentMarket {
+  score: number;
+  label: string;
+  components: Record<string, number>;
+  breadth_up: number | null;
+  foreign_breadth: number | null;
+  up: number;
+  down: number;
+  flat: number;
+  index_percent: number | null;
+  total_value: number | null;
+  total_foreign_net: number | null;
+  foreign_to_value: number | null;
+}
+
+export interface SentimentResponse {
+  as_of: string | null;
+  generated_at: string | null;
+  market: SentimentMarket;
+  accumulation: SentimentItem[];
+  distribution: SentimentItem[];
+  stats: Record<string, number>;
+  weights: Record<string, number>;
+  orderbook_available: boolean;
+  disclaimer: string | null;
+}
+
+// -------------------------------------------------jejak sinyal (track record)
+
+/** Track record satu irisan (jenis sinyal x regime x horizon). */
+export interface SignalTrackStat {
+  signal: string;
+  regime: string | null;
+  horizon: number;
+  n: number;
+  hit_rate: number | null;
+  mean_fwd: number | null;
+  median_fwd: number | null;
+  /** Forward return dikurangi return pasar equal-weight pada window yang sama. */
+  mean_abnormal: number | null;
+  t_stat: number | null;
+  /** Puncak (kenaikan terbaik) selama horizon, rata-rata. */
+  avg_mfe: number | null;
+  /** Dasar (penurunan terburuk) selama horizon, rata-rata. */
+  avg_mae: number | null;
+}
+
+/** Satu sinyal terbaru dengan return yang sudah terealisasi. */
+export interface SignalTrackRecent {
+  code: string;
+  date: string;
+  signal: string;
+  close: number | null;
+  fwd_5: number | null;
+  fwd_10: number | null;
+  fwd_21: number | null;
+}
+
+/** Track record sinyal BUY/SELL (point-in-time, entry T+1). */
+export interface SignalTrack {
+  generated_at: string | null;
+  signals: number;
+  buy: number;
+  sell: number;
+  first_date: string | null;
+  last_date: string | null;
+  horizons: number[];
+  overall: SignalTrackStat[];
+  by_regime: SignalTrackStat[];
+  recent: SignalTrackRecent[];
 }
 
 // ---------------------------------------------------------------- alerts

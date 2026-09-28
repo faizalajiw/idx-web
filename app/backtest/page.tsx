@@ -16,6 +16,7 @@ import { EquityCurveChart } from "@/components/EquityCurveChart";
 import { RebalanceLedger } from "@/components/RebalanceLedger";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { LastUpdated } from "@/components/LastUpdated";
 
 const PERIODS = [
   { id: "6M", label: "6 Bulan", months: 6 },
@@ -333,7 +334,7 @@ export default function BacktestPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* ---------------------------------------------------------- form */}
         <div className="lg:col-span-1">
-          <Card title="Konfigurasi" subtitle="Strategi, universe, periode, dan biaya">
+          <Card title="Konfigurasi" subtitle="Strategi, universe, periode, dan biaya" info="Backtest = uji sebuah strategi memakai data masa lalu, seolah-olah kamu menjalankannya dulu. Atur strateginya di sini. Ini simulasi untuk belajar — hasil masa lalu tidak menjamin masa depan.">
             {configError ? (
               <ErrorState message={`Gagal memuat konfigurasi: ${configError.message}`} />
             ) : configLoading || !config || !costPct ? (
@@ -535,6 +536,8 @@ export default function BacktestPage() {
               <Card
                 title="Equity Curve"
                 subtitle={`${result.codes.length} emiten · ${result.days} hari bursa · ${result.start} → ${result.end}`}
+                info="Grafik pertumbuhan modal dari waktu ke waktu jika strategi dijalankan. Garis naik = untung, turun = rugi. Perhatikan juga seberapa dalam jatuhnya, bukan cuma hasil akhirnya."
+                right={<LastUpdated dep={result} />}
               >
                 <EquityCurveChart
                   points={result.equity_curve}
@@ -545,6 +548,7 @@ export default function BacktestPage() {
               <Card
                 title="Perbandingan Metrik"
                 subtitle={`Modal awal Rp ${fmtCompact(result.initial_cash)} · strategi ${result.strategy_name}`}
+                info="Membandingkan hasil strategi (setelah dan sebelum biaya) dengan benchmark (beli-tahan biasa). Berguna untuk cek: apakah strategi ini benar-benar lebih baik daripada sekadar diam memegang saham?"
               >
                 <MetricsTable
                   gross={result.gross_metrics}
@@ -556,6 +560,7 @@ export default function BacktestPage() {
               <Card
                 title="Dampak Biaya"
                 subtitle={`Rebalance ${cadenceLabel} ×${result.rebalance_days} · turnover Rp ${fmtCompact(result.cost_impact.turnover)} · ${result.days} hari bursa`}
+                info="Rincian biaya (komisi, pajak, slippage) yang menggerus keuntungan. Banyak strategi terlihat cuan di atas kertas tapi rugi setelah biaya nyata dihitung. Bagian ini menjaga kamu tetap realistis."
               >
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Stat
@@ -593,6 +598,7 @@ export default function BacktestPage() {
               <Card
                 title="Ledger Rebalance"
                 subtitle={`Rebalance ${cadenceLabel} · klik salah satu sesi untuk lihat trade & posisinya`}
+                info="Catatan setiap kali strategi menyusun ulang portofolio (rebalance): saham apa yang dibeli/dijual dan berapa. Klik sebuah sesi untuk lihat detail transaksinya."
               >
                 <RebalanceLedger
                   events={result.rebalances}

@@ -119,6 +119,7 @@ export function SectorRRGChart() {
     <Card
       title="RRG Sektor"
       subtitle="Rotasi sektor mingguan vs IHSG · kanan = outperform, atas = menguat"
+      info="RRG (Relative Rotation Graph) memetakan sektor mana yang sedang memimpin atau tertinggal dibanding pasar. Kanan-atas = kuat & menguat, kiri-bawah = lemah & melemah. Alat lanjutan untuk melihat rotasi 'ke mana uang berpindah'."
       right={data?.date ? <span className="text-muted text-xs">{data.date}</span> : undefined}
     >
       {error ? (

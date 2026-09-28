@@ -2,6 +2,7 @@
 
 import { useRegimeHistory } from "@/lib/hooks";
 import { Card } from "./Card";
+import { LastUpdated } from "./LastUpdated";
 
 const REGIME_COLOR: Record<string, string> = {
   TRENDING_UP: "var(--up)",
@@ -20,6 +21,8 @@ export function RegimeTimeline() {
     <Card
       title="Timeline Regime IHSG"
       subtitle="60 hari bursa terakhir — warna = regime, arsir = volatilitas tinggi"
+      info="Regime = 'suasana' pasar secara umum: sedang tren naik, tren turun, atau menyamping (sideways). Batang berarsir menandai hari yang harganya sangat bergejolak. Gunanya untuk tahu apakah sekarang waktu yang ramah atau berisiko untuk masuk pasar."
+      right={<LastUpdated sessionDate={data?.summary?.last} />}
     >
       {isLoading || !data ? (
         <div className="h-8 animate-pulse rounded bg-white/[0.04]" />

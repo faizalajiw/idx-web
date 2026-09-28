@@ -38,6 +38,7 @@ export function BrokerSummary({ code }: { code: string }) {
     <Card
       title="Aliran Dana (proxy)"
       subtitle={data?.date ? `EOD ${data.date}` : "Estimasi dari data agregat"}
+      info="Perkiraan pihak mana yang paling banyak membeli & menjual saham ini. Disebut 'proxy' karena diperkirakan dari data agregat, bukan angka broker resmi — jadikan gambaran kasar saja."
     >
       {error ? (
         <ErrorState message={`Gagal memuat aliran dana: ${error.message}`} />

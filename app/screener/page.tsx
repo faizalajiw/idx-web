@@ -9,6 +9,7 @@ import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { Card } from "@/components/Card";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { TickerLogo } from "@/components/TickerLogo";
+import { LastUpdated } from "@/components/LastUpdated";
 import {
   Rocket,
   BarChart3,
@@ -262,43 +263,47 @@ export default function ScreenerPage() {
       <Card
         title={`Hasil Screening${data ? ` · ${data.length} saham` : ""}`}
         subtitle={`Urut: ${COLUMNS.find((c) => c.key === sortKey)?.label} ${sortDir === "desc" ? "↓" : "↑"}`}
+        info="Screener = alat saring saham berdasarkan kriteria tertentu (momentum, RSI, dsb). Pakai tab filter cepat di atas atau atur faktornya sendiri. Klik judul kolom untuk urutkan, dan tombol 'Kolom' untuk pilih data yang ditampilkan."
         right={
-          <div className="relative">
-            <button
-              onClick={() => setShowCols((s) => !s)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-xs font-medium text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
-            >
-              <SlidersHorizontal size={13} /> Kolom
-            </button>
-            {showCols && (
-              <>
-                {/* klik luar untuk tutup */}
-                <button
-                  aria-hidden
-                  tabIndex={-1}
-                  onClick={() => setShowCols(false)}
-                  className="fixed inset-0 z-10 cursor-default"
-                />
-                <div className="absolute right-0 z-20 mt-1 w-52 rounded-md border border-[var(--border)] bg-[var(--bg-card-solid)] p-1.5 shadow-lg">
-                  <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
-                    Tampilkan kolom
-                  </p>
-                  {COLUMNS.map((c) => {
-                    const on = visible.has(c.key);
-                    return (
-                      <button
-                        key={c.key}
-                        onClick={() => toggleCol(c.key)}
-                        className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-xs hover:bg-[var(--bg-elev)]"
-                      >
-                        <span className={on ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"}>{c.label}</span>
-                        {on && <Check size={13} className="text-[var(--accent)]" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+          <div className="flex items-center gap-2">
+            <LastUpdated dep={data} />
+            <div className="relative">
+              <button
+                onClick={() => setShowCols((s) => !s)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-2.5 py-1.5 text-xs font-medium text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
+              >
+                <SlidersHorizontal size={13} /> Kolom
+              </button>
+              {showCols && (
+                <>
+                  {/* klik luar untuk tutup */}
+                  <button
+                    aria-hidden
+                    tabIndex={-1}
+                    onClick={() => setShowCols(false)}
+                    className="fixed inset-0 z-10 cursor-default"
+                  />
+                  <div className="absolute right-0 z-20 mt-1 w-52 rounded-md border border-[var(--border)] bg-[var(--bg-card-solid)] p-1.5 shadow-lg">
+                    <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+                      Tampilkan kolom
+                    </p>
+                    {COLUMNS.map((c) => {
+                      const on = visible.has(c.key);
+                      return (
+                        <button
+                          key={c.key}
+                          onClick={() => toggleCol(c.key)}
+                          className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-xs hover:bg-[var(--bg-elev)]"
+                        >
+                          <span className={on ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"}>{c.label}</span>
+                          {on && <Check size={13} className="text-[var(--accent)]" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         }
       >

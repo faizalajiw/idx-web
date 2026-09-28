@@ -3,17 +3,27 @@
 import { useStockEvents } from "@/lib/hooks";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
+import {
+  Rocket,
+  Droplet,
+  BarChart3,
+  Mountain,
+  TrendingUp,
+  TrendingDown,
+  Circle,
+  type LucideIcon,
+} from "lucide-react";
 
 const pct = (v: number | null, digits = 1) =>
   v === null ? "-" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(digits)}%`;
 
-const EVENT_LABEL: Record<string, { label: string; icon: string }> = {
-  jump_up: { label: "Jump Up", icon: "🚀" },
-  jump_down: { label: "Jump Down", icon: "🩸" },
-  vol_spike: { label: "Volume Spike", icon: "📊" },
-  near_high: { label: "Dekat Puncak 63h", icon: "⛰️" },
-  ma_cross_up: { label: "SMA20↑50", icon: "📈" },
-  ma_cross_down: { label: "SMA20↓50", icon: "📉" },
+const EVENT_LABEL: Record<string, { label: string; icon: LucideIcon }> = {
+  jump_up: { label: "Jump Up", icon: Rocket },
+  jump_down: { label: "Jump Down", icon: Droplet },
+  vol_spike: { label: "Volume Spike", icon: BarChart3 },
+  near_high: { label: "Dekat Puncak 63h", icon: Mountain },
+  ma_cross_up: { label: "SMA20↑50", icon: TrendingUp },
+  ma_cross_down: { label: "SMA20↓50", icon: TrendingDown },
 };
 
 function tone(v: number | null): string {
@@ -33,6 +43,7 @@ export function EventStudyCard({ code }: { code: string }) {
     <Card
       title="Event Study"
       subtitle="Median return 21 hari bursa setelah event (entry T+1), vs baseline seluruh pasar"
+      info="Melihat rata-rata pergerakan harga saham SETELAH kejadian tertentu (mis. lonjakan volume) di masa lalu. Menjawab: 'kalau pola ini muncul, biasanya harga ke mana?' — berdasar sejarah, bukan ramalan."
     >
       {error ? (
         <ErrorState message="Gagal memuat event study." />
@@ -60,12 +71,13 @@ export function EventStudyCard({ code }: { code: string }) {
               </thead>
               <tbody>
                 {data.events.map((e) => {
-                  const meta = EVENT_LABEL[e.event] ?? { label: e.event, icon: "•" };
+                  const meta = EVENT_LABEL[e.event] ?? { label: e.event, icon: Circle };
+                  const EventIcon = meta.icon;
                   const noData = e.my_count === 0;
                   return (
                     <tr key={e.event}>
                       <td>
-                        <span aria-hidden className="mr-1">{meta.icon}</span>
+                        <EventIcon size={13} className="mr-1 inline align-[-2px]" aria-hidden />
                         {meta.label}
                       </td>
                       <td className={`text-right tabular-nums ${noData ? "text-muted" : "font-semibold"}`}>

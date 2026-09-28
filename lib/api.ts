@@ -10,7 +10,6 @@ import type {
   ScreenerFilters,
   ScreenerRow,
   SectorAnalysis,
-  SessionMovers,
   StockBrokerSummary,
   ForeignFlow,
   ValuationResponse,
