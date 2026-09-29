@@ -296,6 +296,45 @@ export interface BrokerFlow {
   classification: BrokerClassificationRow[];
 }
 
+/** Satu hari aliran asing satu emiten (rupiah). */
+export interface StockForeignFlowDay {
+  date: string;
+  net: number | null;
+  buy: number | null;
+  sell: number | null;
+  /** Hari berturut-turut net searah; null = hari tanpa data. */
+  streak: number | null;
+  /** True hanya di hari tanda net berubah vs hari non-nol sebelumnya. */
+  flip: boolean | null;
+}
+
+export interface StockForeignFlowFlip {
+  last_flip: { date: string; to: "net_buy" | "net_sell" } | null;
+  days_since_flip: number | null;
+  current_streak: number | null;
+  current_side: "net_buy" | "net_sell" | "flat";
+}
+
+export interface StockForeignFlowPeer {
+  code: string;
+  net_sum: number;
+  net_mean: number;
+  n_days: number;
+  is_self: boolean;
+}
+
+export interface StockForeignFlow {
+  code: string;
+  sector: string;
+  /** False = bucket fallback "Lainnya" (bukan sektor sebenarnya). */
+  comparable: boolean;
+  date: string | null;
+  flow: StockForeignFlowDay[];
+  flip_summary: StockForeignFlowFlip;
+  peers: StockForeignFlowPeer[];
+  peer_rank: { rank: number | null; count: number; median_sum: number | null };
+}
+
 export interface PriceBar {
   date: string;
   open: number | null;
@@ -960,6 +999,8 @@ export interface BrokerActivityHistoryPoint {
   score: number;
   coverage: number;
   drivers: BrokerActivityDriver[];
+  /** Median skor seluruh emiten yang diskor tanggal yang sama (baseline pasar). */
+  market_median?: number | null;
 }
 
 /** Satu emiten sebanding (sektor sama) dengan skornya pada sesi terakhir. */

@@ -16,6 +16,7 @@ import type {
   BacktestConfig,
   BrokerActivity,
   BrokerFlow,
+  StockForeignFlow,
   StockBrokerActivity,
   SectorRotation,
   ForeignFlow,
@@ -99,6 +100,18 @@ export function useTopBrokers(limit = 5) {
 export function useBrokerFlow(days = 20, topN = 5) {
   return useSWR<BrokerFlow>(
     `/api/broker-flow?days=${days}&top_n=${topN}`,
+    fetcher,
+    { refreshInterval: 300_000 },
+  );
+}
+
+/**
+ * Aliran asing satu emiten: tren harian, flip arah, dan peer sektor.
+ * Data EOD harian — refresh 5 menit cukup.
+ */
+export function useStockForeignFlow(code: string, days = 30, peerDays = 10) {
+  return useSWR<StockForeignFlow>(
+    `/api/stocks/${encodeURIComponent(code)}/foreign-flow?days=${days}&peer_days=${peerDays}`,
     fetcher,
     { refreshInterval: 300_000 },
   );

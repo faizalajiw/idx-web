@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useBrokerActivity } from "@/lib/hooks";
 import { BrokerFlowCard } from "@/components/BrokerFlowCard";
+import { FlowTimelineCard } from "@/components/FlowTimelineCard";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -52,6 +54,8 @@ function DriverChip({ d }: { d: BrokerActivityDriver }) {
 
 function RankingTable() {
   const { data, error, isLoading } = useBrokerActivity(25);
+  // Emiten yang dipilih di tabel -> timeline aliran dananya muncul di bawah.
+  const [selected, setSelected] = useState<string | null>(null);
 
   if (error) return <ErrorState message={`Gagal memuat Aktivitas Broker: ${error.message}`} />;
   if (isLoading || !data) return <Skeleton className="h-72 w-full" />;
@@ -88,7 +92,14 @@ function RankingTable() {
         </thead>
         <tbody>
           {data.rows.map((r: BrokerActivityRow, i: number) => (
-            <tr key={r.code}>
+            <tr
+              key={r.code}
+              onClick={() => setSelected((v) => (v === r.code ? null : r.code))}
+              className={`cursor-pointer transition-colors hover:bg-white/[0.04] ${
+                selected === r.code ? "bg-white/[0.06]" : ""
+              }`}
+              title="Klik untuk lihat timeline aliran dana emiten ini"
+            >
               <td className="text-muted tabular-nums">{i + 1}</td>
               <td>
                 <div className="flex flex-col">
@@ -123,9 +134,14 @@ function RankingTable() {
       <p className="text-muted mt-3 text-[11px] leading-snug">
         Skala skor 0–100 bersifat <em>relatif</em>: 50 = median pasar, dan angka
         ini memeringkatkan emiten terhadap emiten lain pada hari yang sama —
-        bukan perkiraan persentase kenaikan harga. Data harga{" "}
-        {data.as_of ?? "-"}.
+        bukan perkiraan persentase kenaikan harga. Klik baris emiten untuk
+        membuka timeline aliran dananya. Data harga {data.as_of ?? "-"}.
       </p>
+      {selected && (
+        <div className="mt-3">
+          <FlowTimelineCard code={selected} title={`Timeline Aliran Dana — ${selected}`} />
+        </div>
+      )}
     </div>
   );
 }
