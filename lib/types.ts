@@ -242,12 +242,58 @@ export interface BrokerLeaderRow {
   volume: number | null;
   value: number | null;
   frequency: number | null;
+  /** Kategori bandarmologi dari map kurasi kode di backend (asing/lokal/bumn). */
+  category?: string | null;
 }
 
 export interface TopBrokers {
   date: string | null;
   captured_at: string | null;
   rows: BrokerLeaderRow[];
+}
+
+/** Kategori broker: "asing" | "lokal" | "bumn". */
+export type BrokerFlowCategory = "asing" | "lokal" | "bumn";
+
+export interface BrokerFlowCategoryStat {
+  value: number | null;
+  share: number | null;
+  n_brokers: number;
+}
+
+export interface BrokerFlowTopRow {
+  broker_code: string;
+  broker_name: string | null;
+  value: number;
+  share: number | null;
+}
+
+export interface BrokerFlowDay {
+  date: string;
+  total_value: number | null;
+  asing_value: number;
+  lokal_value: number;
+  bumn_value: number;
+  asing_share: number | null;
+  lokal_share: number | null;
+  bumn_share: number | null;
+}
+
+export interface BrokerClassificationRow {
+  broker_code: string;
+  broker_name: string | null;
+  category: string;
+}
+
+export interface BrokerFlow {
+  date: string | null;
+  captured_at: string | null;
+  n_brokers: number;
+  total_value: number | null;
+  categories: Record<BrokerFlowCategory, BrokerFlowCategoryStat>;
+  top: Record<BrokerFlowCategory, BrokerFlowTopRow[]>;
+  history: BrokerFlowDay[];
+  classification: BrokerClassificationRow[];
 }
 
 export interface PriceBar {

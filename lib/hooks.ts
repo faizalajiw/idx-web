@@ -15,6 +15,7 @@ import type {
   AlertStatus,
   BacktestConfig,
   BrokerActivity,
+  BrokerFlow,
   StockBrokerActivity,
   SectorRotation,
   ForeignFlow,
@@ -89,6 +90,18 @@ export function useTopBrokers(limit = 5) {
   return useSWR<TopBrokers>(`/api/market/top-brokers?limit=${limit}`, fetcher, {
     refreshInterval: REFRESH,
   });
+}
+
+/**
+ * Komposisi nilai transaksi broker per kategori (asing/lokal/BUMN) + tren.
+ * Sumber EOD harian — bergerak sekali sehari, refresh 5 menit cukup.
+ */
+export function useBrokerFlow(days = 20, topN = 5) {
+  return useSWR<BrokerFlow>(
+    `/api/broker-flow?days=${days}&top_n=${topN}`,
+    fetcher,
+    { refreshInterval: 300_000 },
+  );
 }
 
 /**

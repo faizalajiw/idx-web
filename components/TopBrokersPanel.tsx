@@ -5,9 +5,22 @@ import { useTopBrokers } from "@/lib/hooks";
 import { fmtNum, fmtCompact } from "@/lib/format";
 import type { BrokerLeaderRow } from "@/lib/types";
 import { getBrokerType, BROKER_TYPE_META } from "@/lib/brokerType";
+import type { BrokerFlowCategory } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
+
+/**
+ * Kategori prioritas dari backend (map kurasi kode broker). Fallback ke
+ * classifier nama lama kalau respons berasal dari backend versi sebelum ada
+ * field `category`.
+ */
+function rowCategory(r: Pick<BrokerLeaderRow, "category" | "broker_name">): BrokerFlowCategory {
+  if (r.category === "asing" || r.category === "lokal" || r.category === "bumn") {
+    return r.category;
+  }
+  return getBrokerType(r.broker_name);
+}
 
 function BrokerTypeLegend() {
   return (
@@ -29,7 +42,7 @@ function BrokerTypeLegend() {
 
 function BrokerItem({ r, rank }: { r: BrokerLeaderRow; rank: number }) {
   const [open, setOpen] = useState(false);
-  const type = getBrokerType(r.broker_name);
+  const type = rowCategory(r);
   const typeTw = BROKER_TYPE_META[type].twClass;
   return (
     <div className="rounded-lg border border-[var(--border)] transition-colors hover:bg-white/[0.04]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useBrokerActivity } from "@/lib/hooks";
+import { BrokerFlowCard } from "@/components/BrokerFlowCard";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -351,6 +352,8 @@ export default function BrokerActivityPage() {
       >
         <FactorGate />
       </Card>
+
+      <BrokerFlowCard />
 
       <Card
         title="Struktur Broker Pasar"
