@@ -282,7 +282,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/watchlist/page.tsx` — daftar pantau manual + technical chart
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
@@ -299,6 +299,17 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
 - `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
 - `app/learn/page.tsx` — education / glossary page
-- `app/broker-activity/page.tsx` — aktivitas broker (skor aliran tervalidasi IC + struktur broker pasar)
+- `app/broker-activity/page.tsx` — aktivitas broker (skor aliran tervalidasi IC + komposisi asing/lokal/BUMN + struktur broker pasar)
+
+## Chat Commands
+
+Perintah singkat buat nyuruh AI jalanin project ini. Tinggal copy-paste di chat:
+
+| Perintah | Yang dijalankan |
+|---|---|
+| `jalanin web` | `npm run dev` (Next.js dev server, port 3000) |
+| `jalanin web + backend` | jalankan `npm run dev` + `python -m idx_scraper.cli serve` di idx-scraper |
+
+> **Note:** Frontend butuh backend jalan di `localhost:8000`. Kalau backend belum jalan, dashboard tetap load tapi data nggak muncul.
 
 Full change history for both repos: see `../idx-scraper/AUDIT.md`.
