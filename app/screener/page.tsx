@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useScreener } from "@/lib/hooks";
+import { useScreener, useBrokerActivity } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact } from "@/lib/format";
 import type { ScreenerFilters, ScreenerRow } from "@/lib/types";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
@@ -19,6 +19,7 @@ import {
   ArrowDown,
   SlidersHorizontal,
   Check,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 
@@ -47,6 +48,12 @@ const PRESETS: { label: string; icon: LucideIcon; filters: ScreenerFilters; desc
     filters: { signal: "BUY", rsi_min: 50, rsi_max: 65, min_days: 30 },
     desc: "Sinyal BUY, uptrend, RSI sehat (tidak overbought)",
   },
+  {
+    label: "Akumulasi Broker",
+    icon: Activity,
+    filters: { min_broker_score: 60, min_value: 5e9, min_days: 30 },
+    desc: "Skor aktivitas broker ≥60 (hanya faktor aliran yang lolos uji IC), likuid >Rp 5 M/hari",
+  },
 ];
 
 const FACTORS = [
@@ -57,6 +64,7 @@ const FACTORS = [
   ["ATR%", "ATR(14) sebagai % dari close — volatilitas komparabel antar emiten. Tinggi = lebih berisiko."],
   ["Jarak 52w", "Posisi harga vs puncak 52 minggu (%). 0% = sedang di puncak; jauh di bawah = momentum lemah."],
   ["Hari sejak sinyal", "Hari bursa sejak BUY/SELL terakhir. Besar = sinyal sudah tua; 0-5 = sinyal baru."],
+  ["Skor aktivitas broker", "Skor 0-100 dari aliran asing bernotasi rupiah + ketimpangan buku intraday, dibobot oleh uji IC. 50 = median pasar. Butuh run `idx ic` di backend dulu; sebelum itu kolomnya kosong dan filter menyaring semua."],
   ["Order-book imbalance", "Ketimpangan bid vs offer dari snapshot intraday (-1..1). Positif = bid lebih tebal — akumulasi diam-diam; negatif = offer tebal — distribusi."],
   ["Absorption", "Buku vs arah harga (-1..1). Negatif = offer tebal tapi harga tetap naik — buyer kuat menyerap (bullish)."],
   ["Foreign net", "Net buy/sell asing hari terakhir (Rp, notional = lembar × close)."],
@@ -81,6 +89,7 @@ type SortKey = keyof Pick<
   | "days_since_signal"
   | "ob_imbalance"
   | "ob_absorption"
+  | "broker_score"
   | "foreign_net"
   | "value"
 >;
@@ -149,6 +158,18 @@ const COLUMNS: ColumnDef[] = [
     cellClass: (r) => `text-right tabular-nums ${r.ob_absorption !== null && r.ob_absorption < 0 ? "text-up" : ""}`,
   },
   {
+    key: "broker_score",
+    label: "Skor Broker",
+    title:
+      "Skor aktivitas broker 0-100 (proksi aliran, bobot dari uji IC). 50 = median pasar; kosong = skor belum tervalidasi",
+    render: (r) => (r.broker_score !== null ? r.broker_score.toFixed(1) : "-"),
+    cellClass: (r) => {
+      const s = r.broker_score;
+      const tone = s === null ? "text-muted" : s >= 60 ? "text-up" : s <= 40 ? "text-down" : "";
+      return `text-right font-semibold tabular-nums ${tone}`;
+    },
+  },
+  {
     key: "foreign_net",
     label: "Foreign Net",
     render: (r) => fmtCompact(r.foreign_net),
@@ -163,6 +184,12 @@ export default function ScreenerPage() {
   const [filters, setFilters] = useState<ScreenerFilters>(PRESETS[0].filters);
   const [active, setActive] = useState(0);
   const { data, error, isLoading } = useScreener(filters);
+
+  // Status validasi skor broker: tanpa ini, filter broker yang belum tervalidasi
+  // hanya menghasilkan "tidak ada saham lolos" tanpa alasan yang jelas.
+  const { data: broker } = useBrokerActivity(1);
+  const brokerFilterOn = filters.min_broker_score !== undefined;
+  const brokerNotValidated = brokerFilterOn && broker !== undefined && !broker.validated;
 
   const [sortKey, setSortKey] = useState<SortKey>("momentum_20d");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -246,6 +273,18 @@ export default function ScreenerPage() {
           );
         })}
       </div>
+
+      {brokerNotValidated && (
+        <div className="rounded-md border border-[rgba(255,193,7,0.3)] bg-[rgba(255,193,7,0.07)] p-3 text-sm">
+          <p className="font-medium">Filter skor broker tidak berlaku — skor belum tervalidasi.</p>
+          <p className="text-muted mt-1">
+            {broker?.reason ?? "Belum ada faktor aliran yang lolos uji IC."} Tanpa skor yang
+            bisa dihitung, tidak ada emiten yang bisa dinyatakan lolos kriteria ini —
+            karena itu hasilnya kosong, bukan filter yang diam-diam diabaikan. Lihat
+            halaman <strong>Aktivitas Broker</strong> untuk status validasinya.
+          </p>
+        </div>
+      )}
 
       <details className="text-muted text-sm">
         <summary className="cursor-pointer select-none font-medium text-[var(--fg)]">

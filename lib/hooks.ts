@@ -14,6 +14,9 @@ import type {
   AlertRuleCreate,
   AlertStatus,
   BacktestConfig,
+  BrokerActivity,
+  StockBrokerActivity,
+  SectorRotation,
   ForeignFlow,
   HoldCheckResponse,
   MarketNarration,
@@ -88,6 +91,16 @@ export function useTopBrokers(limit = 5) {
   });
 }
 
+/**
+ * Skor aktivitas broker per emiten (bobot dari run IC) + struktur broker pasar.
+ * Skor bergerak harian dan bobot IC bulanan -> refresh 5 menit cukup.
+ */
+export function useBrokerActivity(limit = 25) {
+  return useSWR<BrokerActivity>(`/api/broker-activity?limit=${limit}`, fetcher, {
+    refreshInterval: 300_000,
+  });
+}
+
 export function useSignals(codes?: string, minDays = 25) {
   const key = `/api/signals?min_days=${minDays}${
     codes ? `&codes=${encodeURIComponent(codes)}` : ""
@@ -158,6 +171,17 @@ export function useValuation() {
 export function useScreener(filters: ScreenerFilters) {
   const key = `/api/screener${screenerQuery(filters)}`;
   return useSWR<ScreenerRow[]>(key, fetcher, { keepPreviousData: true });
+}
+
+/**
+ * Skor aktivitas broker satu emiten + riwayat driver-nya. Skor bergerak harian
+ * dan bobot IC bulanan -> refresh 5 menit cukup.
+ */
+export function useStockBrokerActivity(code: string | null, lookback = 60) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/broker-activity?lookback=${lookback}`
+    : null;
+  return useSWR<StockBrokerActivity>(key, fetcher, { refreshInterval: 300_000 });
 }
 
 export function useStockBrokers(code: string | null) {
@@ -331,6 +355,18 @@ export function useDividendOverview() {
   return useSWR<DividendOverview>("/api/dividends/overview", fetcher, {
     refreshInterval: 300_000,
   });
+}
+
+/**
+ * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana).
+ * Berbeda dari RRG yang berbasis harga relatif. Bergerak harian -> 5 menit cukup.
+ */
+export function useSectorRotation(lookback = 60, minNames = 3) {
+  return useSWR<SectorRotation>(
+    `/api/sectors/rotation?lookback=${lookback}&min_names=${minNames}`,
+    fetcher,
+    { refreshInterval: 300_000 },
+  );
 }
 
 /** Every emiten that has ever paid cash, with its trailing yield. */

@@ -82,7 +82,7 @@ export function RegimeBanner() {
         {hint(data!.regime)}
       </span>
       <span className="ml-auto">
-        <LastUpdated sessionDate={data!.as_of} />
+        <LastUpdated sessionDate={data!.as_of} updatedAt={data!.generated_at} />
       </span>
     </div>
   );

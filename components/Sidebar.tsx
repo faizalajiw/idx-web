@@ -15,6 +15,7 @@ import {
   Eye,
   Globe2,
   Waves,
+  Activity,
   LayoutGrid,
   GraduationCap,
   ShieldCheck,
@@ -56,6 +57,7 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/foreign", label: "Foreign Flow", icon: Globe2 },
       { href: "/sentimen", label: "Sentimen", icon: Waves },
+      { href: "/broker-activity", label: "Aktivitas Broker", icon: Activity },
     ],
   },
   {

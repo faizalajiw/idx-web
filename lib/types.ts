@@ -39,6 +39,8 @@ export interface MarketRegime {
   source: string | null;
   as_of: string | null;
   dir_hint: "up" | "down" | null;
+  /** Jam backend memperbarui regime ini (WIB, ISO). */
+  generated_at?: string | null;
 }
 
 export interface BrokerRow {
@@ -156,6 +158,11 @@ export interface ScreenerRow {
   ob_imbalance: number | null;
   /** Buku vs arah harga (-1..1): negatif = absorption (buyer menyerap offer). */
   ob_absorption: number | null;
+  /**
+   * Skor aktivitas broker 0-100 (proksi aliran, bobot dari IC). Null bila skor
+   * belum tervalidasi atau emiten di luar coverage.
+   */
+  broker_score: number | null;
   foreign_net: number | null;
   value: number | null;
   hist_days: number;
@@ -170,6 +177,8 @@ export interface ScreenerFilters {
   min_value?: number;
   foreign_in_only?: boolean;
   min_vol_ratio?: number;
+  /** Skor aktivitas broker minimal (0-100); hanya bermakna bila skor tervalidasi IC. */
+  min_broker_score?: number;
   min_days?: number;
   limit?: number;
 }
@@ -201,6 +210,10 @@ export interface Signal {
   macd: number | null;
   trend_up: boolean;
   live: boolean;
+  /** Tanggal sesi bursa bar terakhir (YYYY-MM-DD) untuk badge update. */
+  as_of?: string | null;
+  /** Jam backend menghitung sinyal ini (WIB, ISO) untuk badge "diperbarui". */
+  generated_at?: string | null;
 }
 
 /** Satu emiten di panel Top Volume/Value/Frequency. */
@@ -278,6 +291,10 @@ export interface HoldCheckItem {
   base_score: number | null;
   /** Penyesuaian skor dari lapisan faktor IC, poin (-10..+10). */
   factor_adj: number | null;
+  /** Skor aktivitas broker 0-100; null = lapisan broker tidak aktif. */
+  broker_score: number | null;
+  /** Penyesuaian skor dari lapisan aktivitas broker, poin (-8..+8); 0 = tidak aktif. */
+  broker_adj: number | null;
   /** Percentile cross-sectional pasar per faktor (0..1); null = emiten di luar coverage ranking. */
   factor_pct: {
     vol_pct: number;
@@ -290,6 +307,8 @@ export interface HoldCheckItem {
 
 export interface HoldCheckResponse {
   date: string | null;
+  /** Jam backend menghitung hold check (WIB, ISO). */
+  generated_at?: string | null;
   items: HoldCheckItem[];
 }
 
@@ -395,6 +414,8 @@ export interface RegimeHistory {
     transitions: number;
     avg_adx: number | null;
   } | null;
+  /** Jam backend memperbarui histori regime (WIB, ISO). */
+  generated_at?: string | null;
 }
 
 export interface CorpActionSummary {
@@ -801,4 +822,172 @@ export interface BacktestResult {
   cost_impact: CostImpact;
   equity_curve: EquityPoint[];
   disclaimer: string;
+}
+
+/** Konsentrasi transaksi per broker firma (seluruh pasar, EOD). */
+export interface BrokerConcentrationRow {
+  broker_code: string;
+  broker_name: string | null;
+  volume: number | null;
+  value: number | null;
+  frequency: number | null;
+  share: number | null;
+}
+
+export interface BrokerConcentration {
+  date: string | null;
+  captured_at: string | null;
+  n_brokers: number;
+  total_value: number | null;
+  cr1: number | null;
+  cr3: number | null;
+  cr5: number | null;
+  hhi: number | null;
+  top: BrokerConcentrationRow[];
+}
+
+/** Satu faktor aliran + hasil uji IC dan bobot yang dipakai skor. */
+export interface BrokerActivityFactor {
+  factor: string;
+  label: string;
+  description: string | null;
+  mean_ic: number | null;
+  icir: number | null;
+  t_stat: number | null;
+  hit_rate: number | null;
+  n_days: number | null;
+  eligible: boolean;
+  direction: number;
+  weight: number;
+}
+
+/** Kontributor skor satu emiten — menjelaskan "kenapa skornya begitu". */
+export interface BrokerActivityDriver {
+  factor: string;
+  label: string;
+  contribution: number;
+  percentile: number | null;
+}
+
+export interface BrokerActivityRow {
+  code: string;
+  name: string | null;
+  close: number | null;
+  change: number | null;
+  percent: number | null;
+  score: number;
+  /** Porsi faktor yang nilainya tersedia untuk emiten ini (0..1). */
+  coverage: number;
+  drivers: BrokerActivityDriver[];
+}
+
+/**
+ * Skor aktivitas broker per emiten (proksi aliran, bobot dari IC) + struktur
+ * broker pasar. `validated` false -> `rows` kosong dan `reason` menjelaskan.
+ */
+export interface BrokerActivity {
+  as_of: string | null;
+  validated: boolean;
+  reason: string | null;
+  horizon: number | null;
+  ic_run_date: string | null;
+  eligible_count: number;
+  factors: BrokerActivityFactor[];
+  rows: BrokerActivityRow[];
+  market: BrokerConcentration;
+}
+
+/** Nilai skor satu emiten pada sesi terakhir + peringkatnya di pasar. */
+export interface BrokerActivitySnapshot {
+  score: number;
+  coverage: number;
+  rank: number;
+  universe: number;
+  /** 1.0 = peringkat teratas, 0.0 = terbawah. */
+  percentile: number;
+  drivers: BrokerActivityDriver[];
+}
+
+/** Satu titik riwayat: skor emiten pada satu tanggal + driver saat itu. */
+export interface BrokerActivityHistoryPoint {
+  date: string;
+  score: number;
+  coverage: number;
+  drivers: BrokerActivityDriver[];
+}
+
+/** Satu emiten sebanding (sektor sama) dengan skornya pada sesi terakhir. */
+export interface BrokerActivityPeer {
+  code: string;
+  name: string | null;
+  score: number;
+  coverage: number;
+  is_self: boolean;
+}
+
+/**
+ * Pembanding skor di dalam satu sektor.
+ * `comparable` false = emiten jatuh ke bucket fallback "Lainnya", yang bukan
+ * sektor sebenarnya — pembandingnya tidak berarti.
+ */
+export interface BrokerActivitySector {
+  name: string;
+  comparable: boolean;
+  peer_count: number;
+  my_rank: number | null;
+  median_score: number | null;
+  peers: BrokerActivityPeer[];
+}
+
+/**
+ * Skor aktivitas broker satu emiten + riwayat skor/driver-nya.
+ * `current` null = emiten tidak masuk cross-section hari terakhir (bukan nol).
+ */
+export interface StockBrokerActivity {
+  code: string;
+  as_of: string | null;
+  validated: boolean;
+  reason: string | null;
+  horizon: number | null;
+  ic_run_date: string | null;
+  eligible_count: number;
+  /** Pembanding sektor; null bila emiten tidak punya skor sama sekali. */
+  sector: BrokerActivitySector | null;
+  current: BrokerActivitySnapshot | null;
+  history: BrokerActivityHistoryPoint[];
+}
+
+/**
+ * Satu sektor pada rotasi berbasis aktivitas broker.
+ * `phase`: AKUMULASI (level tinggi & naik) / MEMUDAR (tinggi & turun) /
+ * MEMBAIK (rendah & naik) / TERPURUK (rendah & turun) / STABIL (perubahan ~0,
+ * arah tidak diklaim).
+ */
+export interface SectorRotationRow {
+  sector: string;
+  n_names: number;
+  median_score: number;
+  breadth: number;
+  delta_5d: number | null;
+  delta_21d: number | null;
+  phase: string | null;
+  /** Median skor sektor per sesi (terbaru terakhir) untuk grafik mini. */
+  history: number[];
+}
+
+/**
+ * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana) — berbeda
+ * dari RRG yang berbasis harga relatif.
+ */
+export interface SectorRotation {
+  as_of: string | null;
+  validated: boolean;
+  reason: string | null;
+  horizon: number | null;
+  ic_run_date: string | null;
+  lookback: number;
+  min_names: number;
+  /** Emiten berskor yang belum punya sektor sebenarnya (tidak diikutkan). */
+  unmapped_names: number;
+  sectors: SectorRotationRow[];
 }

@@ -31,6 +31,7 @@ graph LR
   subgraph Flow
     K[Foreign Flow /foreign]
     L[Sentimen /sentimen]
+    M[Aktivitas Broker /broker-activity]
   end
   subgraph Sektor
     M[Sektor /sectors]
@@ -78,8 +79,11 @@ Watchlist + notifikasi dalam satu alur "pilih saham → pasang batas → tunggu 
 ### Grup: Screening
 
 #### Screener (`/screener`)
-Filter multi-kriteria: sinyal, RSI, momentum, value, foreign-in, rasio volume.
-Hasil bisa di-klik ke detail emiten.
+Filter multi-kriteria: sinyal, RSI, momentum, value, foreign-in, rasio volume,
+serta **skor aktivitas broker** (`min_broker_score`, preset "Akumulasi Broker").
+Hasil bisa di-klik ke detail emiten. Kolom & filter broker hanya terisi bila
+skor sudah tervalidasi IC (lihat Aktivitas Broker) — sebelum itu kolomnya kosong
+dan filter menyaring habis, bukan diam-diam diabaikan.
 
 ### Grup: Analisis
 
@@ -88,6 +92,11 @@ PER/PBV per emiten beserta peers pembanding.
 
 #### Hold Check (`/hold-check`)
 Verdikt gabungan teknikal + valuasi: "saham ini masih layak dipegang?"
+
+Skor 0–100 disusun berlapis: sinyal teknikal + valuasi (dominan), lalu lapisan
+faktor IC (±10 poin), lalu lapisan **aktivitas broker** (±8 poin). Lapisan broker
+hanya aktif bila ada faktor aliran yang lolos uji IC — kalau belum, verdict-nya
+sama persis seperti sebelum fitur ini ada.
 
 #### Jejak Sinyal (`/jejak-sinyal`)
 Track record kualitas sinyal:
@@ -121,11 +130,40 @@ Arus dana asing (net buy/sell) peringkat pasar.
   (bid/offer) & absorption, lengkap dengan alasan per emiten. Dihitung dari data
   tersimpan, bukan berita.
 
+#### Aktivitas Broker (`/broker-activity`)
+Peringkat emiten berdasarkan **skor akumulasi** dari faktor aliran dana (proksi
+jejak broker) + struktur broker pasar:
+- **Peringkat skor akumulasi** — emiten dengan jejak aliran terkuat. Bobot tiap
+  faktor berasal dari uji IC, dan hanya faktor yang lulus ambang (|IC| ≥ 0,05 &
+  |ICIR| ≥ 0,5) yang diberi bobot; arahnya mengikuti tanda IC (ditentukan data,
+  bukan asumsi). Kalau belum ada faktor yang lolos, halaman menampilkan status
+  "belum tervalidasi" alih-alih skor rekaan.
+- **Uji statistik faktor (IC)** — faktor mana yang layak dipakai, beserta bobot,
+  t-stat, dan arah historisnya.
+- **Struktur broker pasar** — konsentrasi transaksi per firma broker asli
+  (CR1/CR3/CR5 + HHI), seluruh pasar, EOD.
+
+Skor dari halaman ini dipakai ulang oleh Screener (filter `min_broker_score`),
+Hold Check (lapisan verdict), kartu detail emiten, dan **rotasi sektor** di
+halaman Sektor — semuanya lewat satu snapshot yang sama, jadi angkanya tidak
+pernah berbeda antar halaman.
+
+> Catatan data: IDX tidak menyediakan breakdown broker **per saham** di endpoint
+> gratis. Sisi per emiten karena itu memakai proksi (aliran asing bernotasi +
+> ketimpangan buku intraday) dan dilabeli apa adanya; sisi struktur pasar memakai
+> data firma broker asli (`research.broker_daily`).
+
 ### Grup: Sektor
 
 #### Sektor (`/sectors`)
 Analisis sektor + **RRG** (Relative Rotation Graph) untuk melihat rotasi
-kepemimpinan sektor.
+kepemimpinan sektor dari **harga relatif** terhadap IHSG, plus **Rotasi Sektor —
+Aktivitas Broker**: rotasi dari **jejak aliran dana** (median skor broker per
+sektor + arah perubahan 5/21 sesi, breadth, dan sparkline riwayat).
+
+Dua panel itu sengaja berdampingan karena berbeda pertanyaan: RRG menunjukkan
+sektor yang harganya sudah menguat, panel broker menunjukkan sektor yang
+**alirannya** berbalik — yang kadang belum terlihat di harga.
 
 ### Grup: Belajar
 
@@ -143,7 +181,8 @@ Dashboard mutu layer `research.*`:
 
 ### Detail Emiten (`/stock/[code]`)
 Dibuka dengan klik ticker mana pun. Berisi price history, technical chart (OHLCV +
-MA/BB/RSI/MACD), broker summary per emiten, dan detail dividen (riwayat cash + split).
+MA/BB/RSI/MACD), broker summary per emiten, aktivitas broker (skor aliran +
+riwayat driver + pembanding sektor), dan detail dividen (riwayat cash + split).
 
 ## Alur Data
 
@@ -243,7 +282,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, BrokerSummary, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/watchlist/page.tsx` — daftar pantau manual + technical chart
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
@@ -260,5 +299,6 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
 - `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
 - `app/learn/page.tsx` — education / glossary page
+- `app/broker-activity/page.tsx` — aktivitas broker (skor aliran tervalidasi IC + struktur broker pasar)
 
 Full change history for both repos: see `../idx-scraper/AUDIT.md`.

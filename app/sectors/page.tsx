@@ -6,6 +6,7 @@ import { fmtPct, fmtCompact } from "@/lib/format";
 import type { SectorRow } from "@/lib/types";
 import { Card } from "@/components/Card";
 import { SectorRRGChart } from "@/components/SectorRRGChart";
+import { SectorRotationTable } from "@/components/SectorRotationTable";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -37,6 +38,8 @@ export default function SectorsPage() {
       <RegimeBanner />
 
       <SectorRRGChart />
+
+      <SectorRotationTable />
 
       <Card title="Peta Sektor" subtitle="Diurutkan dari sektor terkuat" info="Perbandingan performa antar sektor (perbankan, energi, konsumer, dll). Membantu melihat 'sektor mana yang lagi panas' — sering lebih penting daripada memilih satu saham saja.">
         {error ? (

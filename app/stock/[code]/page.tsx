@@ -8,6 +8,7 @@ import { TechnicalChart } from "@/components/TechnicalChart";
 import { HistoryTable } from "@/components/HistoryTable";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { BrokerSummary } from "@/components/BrokerSummary";
+import { BrokerActivityCard } from "@/components/BrokerActivityCard";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { EventStudyCard } from "@/components/EventStudyCard";
 
@@ -87,6 +88,7 @@ export default function StockDetailPage() {
           <div className="space-y-4">
             <SignalsPanel codes={code} />
             <BrokerSummary code={code} />
+            <BrokerActivityCard code={code} />
             <EventStudyCard code={code} />
             <HistoryTable code={code} />
           </div>

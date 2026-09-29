@@ -7,8 +7,7 @@ import { TopLeadersPanel } from "@/components/TopLeadersPanel";
 import { TopBrokersPanel } from "@/components/TopBrokersPanel";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
-import { RegimeBanner } from "@/components/RegimeBanner";
-import { RegimeTimeline } from "@/components/RegimeTimeline";
+import { MarketRegimeCard } from "@/components/MarketRegimeCard";
 import { useMarketOverview } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact } from "@/lib/format";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -41,7 +40,10 @@ function HeroIndex() {
             <DirIcon size={12} className="mr-1" aria-hidden />
             {fmtNum(chg, 2)} ({fmtPct(pct)})
           </span>
-          <LastUpdated updatedAt={data?.index?.captured_at} />
+          <LastUpdated
+            sessionDate={data?.index?.captured_at}
+            updatedAt={data?.index?.captured_at}
+          />
         </div>
         <p className="mt-1 text-4xl font-bold tracking-tight tabular-nums sm:text-5xl">
           {fmtNum(idx?.current ?? idx?.close, 2)}
@@ -83,8 +85,7 @@ export default function DashboardPage() {
       </div>
 
       <HeroIndex />
-      <RegimeBanner />
-      <RegimeTimeline />
+      <MarketRegimeCard />
       <MarketNarrationCard />
       <MarketOverview />
 

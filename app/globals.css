@@ -29,6 +29,8 @@
   --color-accent: var(--accent);
   --color-up: var(--up);
   --color-down: var(--down);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
 * {
@@ -42,10 +44,18 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   font-variant-numeric: tabular-nums;
   min-height: 100vh;
+}
+
+/* Angka & ticker: pakai Geist Mono biar kolom rapi sejajar (opt-in) */
+.font-num {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- surfaces ---------- */

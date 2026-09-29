@@ -47,10 +47,10 @@ export function MarketOverview() {
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <Card title={<><TrendingUp size={15} className="text-up" /> Top Gainers</>} info="Saham dengan kenaikan harga persentase terbesar hari ini. Naik banyak belum tentu bagus untuk dibeli — bisa jadi sudah telanjur mahal atau baru pom-pom sesaat." right={<LastUpdated updatedAt={data?.index?.captured_at} />} hover>
+      <Card title={<><TrendingUp size={15} className="text-up" /> Top Gainers</>} info="Saham dengan kenaikan harga persentase terbesar hari ini. Naik banyak belum tentu bagus untuk dibeli — bisa jadi sudah telanjur mahal atau baru pom-pom sesaat." right={<LastUpdated sessionDate={data?.index?.captured_at} updatedAt={data?.index?.captured_at} />} hover>
         {isLoading || !data ? <Skeleton className="h-40" /> : <MoverList items={data.top_gainers} kind="gain" />}
       </Card>
-      <Card title={<><TrendingDown size={15} className="text-down" /> Top Losers</>} info="Saham dengan penurunan harga persentase terbesar hari ini. Turun banyak bukan berarti murah — cek dulu alasannya sebelum tergoda 'beli di harga diskon'." right={<LastUpdated updatedAt={data?.index?.captured_at} />} hover>
+      <Card title={<><TrendingDown size={15} className="text-down" /> Top Losers</>} info="Saham dengan penurunan harga persentase terbesar hari ini. Turun banyak bukan berarti murah — cek dulu alasannya sebelum tergoda 'beli di harga diskon'." right={<LastUpdated sessionDate={data?.index?.captured_at} updatedAt={data?.index?.captured_at} />} hover>
         {isLoading || !data ? <Skeleton className="h-40" /> : <MoverList items={data.top_losers} kind="lose" />}
       </Card>
     </div>

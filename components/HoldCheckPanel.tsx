@@ -99,7 +99,7 @@ function HoldCard({
         </div>
       </div>
 
-      {/* Rincian skor: teknikal (base) vs lapisan faktor IC */}
+      {/* Rincian skor: teknikal (base) + lapisan faktor IC + lapisan broker */}
       {item.base_score !== null && item.factor_adj !== null && (
         <div className="text-muted text-[11px] tabular-nums">
           Skor teknikal {item.base_score}
@@ -112,6 +112,36 @@ function HoldCard({
           ) : (
             " (faktor IC netral)"
           )}
+          {item.broker_adj !== null && item.broker_adj !== 0 && (
+            <span style={{ color: item.broker_adj > 0 ? "var(--up)" : "var(--warn)" }}>
+              {" "}
+              {item.broker_adj > 0 ? "+" : ""}
+              {item.broker_adj} broker
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Skor aktivitas broker (proksi aliran, bobot dari uji IC) */}
+      {item.broker_score !== null && (
+        <div
+          className="text-muted text-[11px] tabular-nums"
+          title="Skor aktivitas broker 0-100 dari aliran asing bernotasi + ketimpangan buku intraday. 50 = median pasar."
+        >
+          Broker{" "}
+          <span
+            className="font-semibold"
+            style={{
+              color:
+                item.broker_score >= 60
+                  ? "var(--up)"
+                  : item.broker_score <= 40
+                    ? "var(--down)"
+                    : "var(--accent)",
+            }}
+          >
+            {item.broker_score.toFixed(0)}/100
+          </span>
         </div>
       )}
 
@@ -196,9 +226,9 @@ export function HoldCheckPanel({
   return (
     <Card
       title="Hold Check"
-      subtitle="Sinyal teknikal + valuasi z-score → skor 0–100, disesuaikan lapisan faktor IC (±10)"
+      subtitle="Sinyal teknikal + valuasi z-score → skor 0–100, disesuaikan lapisan faktor IC (±10) & aktivitas broker (±8)"
       info="Bantu jawab pertanyaan 'saham yang saya pegang masih layak ditahan atau tidak?'. Menggabungkan sinyal harga + valuasi jadi skor 0–100 dan verdict (Strong Hold / Hold / Trim / Exit). Tetap keputusan akhir di tanganmu."
-      right={<LastUpdated sessionDate={data?.date} />}
+      right={<LastUpdated sessionDate={data?.date} updatedAt={data?.generated_at} />}
     >
       {error ? (
         <ErrorState message={`Gagal memuat hold check: ${error.message}`} />
@@ -233,8 +263,11 @@ export function HoldCheckPanel({
             SMA20/50 + RSI, MACD, Bollinger, posisi harga vs band 60-hari, lalu
             lapisan faktor IC (VOL = volatilitas, LIQ = likuiditas, 52W = jarak
             dari puncak 52-minggu; persentil vs seluruh pasar) menyesuaikan
-            maksimal ±10 poin. Bobot dari IC analysis bulanan (tabel
-            research.factor_ic_history).
+            maksimal ±10 poin, lalu lapisan aktivitas broker (proksi aliran
+            asing + ketimpangan buku intraday) menyesuaikan maksimal ±8 poin.
+            Bobot dari IC analysis bulanan (tabel research.factor_ic_history);
+            lapisan broker hanya aktif bila ada faktor aliran yang lolos uji IC,
+            jadi hold-check tidak berubah selama kalibrasi IC belum dijalankan.
           </p>
         </div>
       )}

@@ -135,6 +135,7 @@ export function screenerQuery(f: ScreenerFilters): string {
   if (f.min_value !== undefined) p.set("min_value", String(f.min_value));
   if (f.foreign_in_only) p.set("foreign_in_only", "true");
   if (f.min_vol_ratio !== undefined) p.set("min_vol_ratio", String(f.min_vol_ratio));
+  if (f.min_broker_score !== undefined) p.set("min_broker_score", String(f.min_broker_score));
   if (f.min_days !== undefined) p.set("min_days", String(f.min_days));
   if (f.limit !== undefined) p.set("limit", String(f.limit));
   const q = p.toString();
