@@ -129,14 +129,14 @@ export function SignalsPanel({
       info="Sinyal beli/jual/tahan otomatis berdasarkan rumus teknikal (rata-rata harga & momentum). Ini alat bantu, BUKAN ajakan beli. Selalu cek konteks lain dan jangan ikut buta."
       right={
         <div className="flex items-center gap-2">
+          {data && data.length > 0 ? (
+            <SignalTally data={data} active={filter} onToggle={toggleFilter} />
+          ) : null}
           <LastUpdated
             dep={data}
             sessionDate={data?.[0]?.as_of}
             updatedAt={data?.[0]?.generated_at}
           />
-          {data && data.length > 0 ? (
-            <SignalTally data={data} active={filter} onToggle={toggleFilter} />
-          ) : null}
         </div>
       }
     >

@@ -4,12 +4,33 @@ import { useState } from "react";
 import { useTopBrokers } from "@/lib/hooks";
 import { fmtNum, fmtCompact } from "@/lib/format";
 import type { BrokerLeaderRow } from "@/lib/types";
+import { getBrokerType, BROKER_TYPE_META } from "@/lib/brokerType";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
 
+function BrokerTypeLegend() {
+  return (
+    <span className="inline-flex items-center gap-2 text-[10px]">
+      {(["asing", "lokal", "bumn"] as const).map((t) => (
+        <span key={t} className="inline-flex items-center gap-1">
+          <span
+            className="inline-block h-2 w-2 rounded-full"
+            style={{ backgroundColor: BROKER_TYPE_META[t].color }}
+          />
+          <span className={BROKER_TYPE_META[t].twClass}>
+            {BROKER_TYPE_META[t].label}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function BrokerItem({ r, rank }: { r: BrokerLeaderRow; rank: number }) {
   const [open, setOpen] = useState(false);
+  const type = getBrokerType(r.broker_name);
+  const typeTw = BROKER_TYPE_META[type].twClass;
   return (
     <div className="rounded-lg border border-[var(--border)] transition-colors hover:bg-white/[0.04]">
       <button
@@ -20,7 +41,7 @@ function BrokerItem({ r, rank }: { r: BrokerLeaderRow; rank: number }) {
       >
         <span className="text-muted w-4 shrink-0 text-center text-xs font-semibold tabular-nums">{rank}</span>
         <div className="flex min-w-0 flex-col">
-          <span className="text-sm font-semibold">{r.broker_code}</span>
+          <span className={`text-sm font-semibold ${typeTw}`}>{r.broker_code}</span>
           {r.broker_name && <span className="text-muted truncate text-[10px]">{r.broker_name}</span>}
         </div>
         <span className="ml-auto text-sm font-semibold tabular-nums">Rp {fmtCompact(r.value)}</span>
@@ -53,7 +74,12 @@ export function TopBrokersPanel() {
       title="Top Broker"
       subtitle="Broker teraktif per nilai transaksi"
       info="Broker dengan nilai transaksi terbesar pada sesi bursa terakhir (data akhir sesi)."
-      right={<LastUpdated sessionDate={data?.date} updatedAt={data?.captured_at} dep={data} />}
+      right={
+        <span className="inline-flex items-center gap-2.5">
+          <BrokerTypeLegend />
+          <LastUpdated sessionDate={data?.date} updatedAt={data?.captured_at} dep={data} />
+        </span>
+      }
     >
       {error ? (
         <ErrorState message={`Gagal memuat Top Broker: ${error.message}`} />
