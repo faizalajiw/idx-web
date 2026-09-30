@@ -14,6 +14,7 @@ import {
   Bell,
   Eye,
   Globe2,
+  ArrowLeftRight,
   Waves,
   Activity,
   LayoutGrid,
@@ -56,6 +57,7 @@ const GROUPS: NavGroup[] = [
     title: "Flow",
     items: [
       { href: "/foreign", label: "Foreign Flow", icon: Globe2 },
+      { href: "/flow", label: "Aliran Dana Emiten", icon: ArrowLeftRight },
       { href: "/sentimen", label: "Sentimen", icon: Waves },
       { href: "/broker-activity", label: "Aktivitas Broker", icon: Activity },
     ],

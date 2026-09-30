@@ -290,6 +290,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/screener/page.tsx` — multi-criteria stock screener
 - `app/sectors/page.tsx` — sector analysis + RRG rotation graph
 - `app/foreign/page.tsx` — foreign fund flow
+- `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
 - `app/valuation/page.tsx` — PER/PBV valuation view
 - `app/hold-check/page.tsx` — combined hold verdict
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi

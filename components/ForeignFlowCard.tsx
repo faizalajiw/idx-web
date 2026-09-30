@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -121,8 +122,8 @@ function PeerList({
   return (
     <div>
       <p className="text-muted mb-1.5 flex items-center gap-1 text-[11px]">
-        Pembanding sektor (net asing {peers[0]?.n_days ?? 10} sesi terakhir)
-        <InfoHint text="Jumlah net flow asing tiap emiten se-sektor dalam jendela pembanding. Hijau = asing sedang akumulasi, merah = distribusi. Posisi emiten ini di antara peer-nya ditandai." />
+        Pembanding sektor (net asing {peers[0]?.n_days ?? 10} sesi bernilai terakhir)
+        <InfoHint text="Jumlah net flow asing tiap emiten se-sektor dalam jendela 10 sesi bursa terakhir. Hijau = asing sedang akumulasi, merah = distribusi. Hari yang datanya belum lengkap tidak dihitung — makanya jumlah sesi bisa kurang dari 10. Posisi emiten ini di antara peer-nya ditandai." />
       </p>
       <ul className="space-y-1">
         {peers.map((p) => (
@@ -179,6 +180,14 @@ export function ForeignFlowCard({
 }) {
   const { data, error, isLoading } = useStockForeignFlow(code, 30, 10);
   const fs = data?.flip_summary;
+  // Nilai net sesi terakhir yang BERNILAI (hari tanpa data dilewati, bukan 0).
+  const lastNet = useMemo(() => {
+    for (let i = (data?.flow.length ?? 0) - 1; i >= 0; i--) {
+      const net = data?.flow[i]?.net;
+      if (net !== null && net !== undefined) return net;
+    }
+    return null;
+  }, [data?.flow]);
 
   return (
     <Card
@@ -204,14 +213,17 @@ export function ForeignFlowCard({
             <Stat
               label="Arah kini"
               value={
-                fs?.current_side === "net_buy"
-                  ? "Net Buy"
-                  : fs?.current_side === "net_sell"
-                    ? "Net Sell"
-                    : "Datar"
+                (fs?.current_side === "net_buy" || fs?.current_side === "net_sell") &&
+                lastNet !== null
+                  ? `${fs.current_side === "net_buy" ? "Net Buy" : "Net Sell"} · Rp ${fmtCompact(lastNet)}`
+                  : fs?.current_side === "net_buy"
+                    ? "Net Buy"
+                    : fs?.current_side === "net_sell"
+                      ? "Net Sell"
+                      : "Datar"
               }
               tone={fs?.current_side === "net_buy" ? "text-up" : fs?.current_side === "net_sell" ? "text-down" : ""}
-              hint="Tanda net flow asing pada sesi terakhir."
+              hint="Tanda net flow asing pada sesi terakhir beserta nilainya dalam rupiah (beli − jual)."
             />
             <Stat
               label="Streak"
