@@ -335,6 +335,62 @@ export interface StockForeignFlow {
   peer_rank: { rank: number | null; count: number; median_sum: number | null };
 }
 
+/** Konteks keputusan — sumber backend: /api/stocks/{code}/decision. */
+export interface StockDecision {
+  code: string;
+  generated_at: string;
+  /** Verdict dasar: skor 0-100, band STRONG HOLD/HOLD/TRIM/EXIT, alasan. */
+  hold_check: {
+    code: string;
+    name: string | null;
+    signal: string;
+    trend_up: boolean;
+    rsi: number | null;
+    macd_bullish: boolean;
+    bb_position: string | null;
+    z_score: number | null;
+    foreign_net: number | null;
+    score: number;
+    base_score: number;
+    factor_adj: number;
+    broker_score: number | null;
+    broker_adj: number;
+    verdict: string;
+    reasons: string[];
+  } | null;
+  regime: { regime: string | null; source: string | null; as_of: string | null; dir_hint?: string | null; adx?: number | null; vol_state?: string | null } | null;
+  /** Sentimen aliran emiten ini (bisa null saat tidak ada dasar hitung). */
+  sentiment: { code: string; score: number; label: string; reasons?: string[]; foreign_rank?: number | null } | null;
+  market_gauge: { score: number; label?: string; band?: string } | null;
+  /** Jejak asing 10 sesi terakhir. */
+  foreign_10: { date: string; net: number | null; flip: boolean | null }[];
+  last_flip: { date: string; to: "net_buy" | "net_sell" } | null;
+  /** Base rate event study: riwayat emiten vs baseline pasar. */
+  events: {
+    event: string;
+    description: string;
+    my_count: number;
+    my_last_date: string | null;
+    my_median_fwd: number | null;
+    my_median_abnormal: number | null;
+    market_count: number;
+    market_hit_rate: number | null;
+    market_median_fwd: number | null;
+    market_mean_abnormal: number | null;
+  }[];
+  /** Level invalidasi teknikal yang bisa dipegang. */
+  invalidation: {
+    close: number;
+    ma50: number | null;
+    bb_lower: number | null;
+    mean60: number | null;
+    std60: number | null;
+    rsi: number | null;
+    ma50_level: number | null;
+    mean60_level: number | null;
+  } | null;
+}
+
 export interface PriceBar {
   date: string;
   open: number | null;

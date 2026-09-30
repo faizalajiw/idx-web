@@ -20,6 +20,7 @@ import {
   LayoutGrid,
   GraduationCap,
   ShieldCheck,
+  Scale,
   X,
   Menu,
   type LucideIcon,
@@ -45,6 +46,7 @@ const GROUPS: NavGroup[] = [
   {
     title: "Analisis",
     items: [
+      { href: "/keputusan", label: "Ruang Keputusan", icon: Scale },
       { href: "/valuation", label: "Valuasi", icon: Landmark },
       { href: "/hold-check", label: "Hold Check", icon: BadgeCheck },
       { href: "/jejak-sinyal", label: "Jejak Sinyal", icon: History },

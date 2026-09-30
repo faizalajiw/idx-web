@@ -16,6 +16,7 @@ import type {
   BacktestConfig,
   BrokerActivity,
   BrokerFlow,
+  StockDecision,
   StockForeignFlow,
   StockBrokerActivity,
   SectorRotation,
@@ -115,6 +116,17 @@ export function useStockForeignFlow(code: string, days = 30, peerDays = 10) {
     fetcher,
     { refreshInterval: 300_000 },
   );
+}
+
+/**
+ * Ruang Keputusan satu emiten: verdict gabungan + konteks + level invalidasi.
+ * Verdict bergerak harian & gauge intraday menit-menit — refresh 2 menit.
+ */
+export function useStockDecision(code: string | null) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/decision`
+    : null;
+  return useSWR<StockDecision>(key, fetcher, { refreshInterval: 120_000 });
 }
 
 /**

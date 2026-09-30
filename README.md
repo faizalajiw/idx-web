@@ -293,6 +293,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
 - `app/valuation/page.tsx` — PER/PBV valuation view
 - `app/hold-check/page.tsx` — combined hold verdict
+- `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
 - `app/dividen/page.tsx` — dividend overview, trailing yields, corp-action ledger
 - `app/quality/page.tsx` — data-quality dashboard (coverage, quarantine, gaps)
