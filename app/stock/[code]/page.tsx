@@ -14,6 +14,7 @@ import { BrokerFlowCard } from "@/components/BrokerFlowCard";
 import { BrokerActivityCard } from "@/components/BrokerActivityCard";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { EventStudyCard } from "@/components/EventStudyCard";
+import { SmartMoneyBanner } from "@/components/SmartMoneyBanner";
 
 const NAV_BTN =
   "card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm transition-colors hover:bg-white/[0.03]";
@@ -83,6 +84,7 @@ export default function StockDetailPage() {
       </header>
 
       <div className="space-y-4">
+        <SmartMoneyBanner code={code} />
         <RegimeBanner />
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           <div className="xl:col-span-2">

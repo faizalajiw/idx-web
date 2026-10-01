@@ -53,6 +53,9 @@ import type {
   DividendStock,
   DividendDetail,
   CorpActionRow,
+  SmartMoneyRadar,
+  SmartMoneyStock,
+  SmartMoneyTrackRecord,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -446,4 +449,41 @@ export function useBacktestConfig() {
   return useSWR<BacktestConfig>("/api/backtest/config", fetcher, {
     refreshInterval: 300_000,
   });
+}
+
+// --------------------------------------------------------------- jejak smart money
+
+/**
+ * Radar jejak smart money: emiten dengan aliran asing terkuat di pasar.
+ * Data EOD harian — refresh 5 menit cukup.
+ */
+export function useSmartMoneyRadar(days = 10) {
+  return useSWR<SmartMoneyRadar>(
+    `/api/smart-money/radar?days=${days}`,
+    fetcher,
+    { refreshInterval: 300_000 },
+  );
+}
+
+/**
+ * Jejak smart money satu emiten: verdict, pola, level, narasi + konteks sektor.
+ * Verdict bergerak harian — refresh 5 menit.
+ */
+export function useStockSmartMoney(code: string | null) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/smart-money`
+    : null;
+  return useSWR<SmartMoneyStock>(key, fetcher, { refreshInterval: 300_000 });
+}
+
+/**
+ * Track record pola klasik jejak smart money (120 sesi terakhir).
+ * Hitungannya berat & harian — refresh 1 jam.
+ */
+export function useSmartMoneyTrackRecord() {
+  return useSWR<SmartMoneyTrackRecord>(
+    "/api/smart-money/track-record",
+    fetcher,
+    { refreshInterval: 3_600_000 },
+  );
 }

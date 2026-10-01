@@ -23,6 +23,7 @@ import {
   Scale,
   X,
   Menu,
+  Radar,
   type LucideIcon,
 } from "lucide-react";
 import { MarketBadge } from "./MarketBadge";
@@ -58,6 +59,7 @@ const GROUPS: NavGroup[] = [
   {
     title: "Flow",
     items: [
+      { href: "/radar", label: "Radar Smart Money", icon: Radar },
       { href: "/foreign", label: "Foreign Flow", icon: Globe2 },
       { href: "/flow", label: "Aliran Dana Emiten", icon: ArrowLeftRight },
       { href: "/sentimen", label: "Sentimen", icon: Waves },

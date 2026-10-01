@@ -1134,3 +1134,106 @@ export interface SectorRotation {
   unmapped_names: number;
   sectors: SectorRotationRow[];
 }
+
+// --------------------------------------------------------------- jejak smart money
+
+/** Satu baris radar: emiten dengan jejak aliran asing terkuat di jendela N. */
+export interface SmartMoneyRadarRow {
+  code: string;
+  name: string | null;
+  side: "akumulasi" | "distribusi";
+  net_sum_idr: number | null;
+  netval_pct: number | null;
+  streak: number | null;
+  window_value: number | null;
+  date: string | null;
+}
+
+export interface SmartMoneyRadar {
+  days: number;
+  date: string | null;
+  accumulation: SmartMoneyRadarRow[];
+  distribution: SmartMoneyRadarRow[];
+  scanned: number;
+}
+
+export interface SmartMoneyVerdict {
+  side: "akumulasi" | "distribusi" | "netral";
+  strength: "besar" | "menengah" | null;
+  streak: number | null;
+  streak_side: "net_buy" | "net_sell" | "flat" | null;
+  net_sum_idr: number | null;
+  netval_pct: number | null;
+  n_net_days: number | null;
+  date: string | null;
+  insufficient: boolean;
+}
+
+export interface SmartMoneyPattern {
+  id: string;
+  label: string;
+  direction: "buy-side" | "sell-side" | null;
+  note: string | null;
+}
+
+export interface SmartMoneyRange {
+  lookback: number;
+  low: number | null;
+  high: number | null;
+  support: number | null;
+  resistance: number | null;
+  range_pct: number | null;
+}
+
+export interface SmartMoneySectorContext {
+  sector: string | null;
+  comparable: boolean;
+  sector_total: number | null;
+  accumulating: number | null;
+  distributing: number | null;
+  position: string | null;
+}
+
+/** Jejak smart money satu emiten: verdict + pola + level + narasi. */
+export interface SmartMoneyStock {
+  code: string;
+  name: string | null;
+  has_data: boolean;
+  verdict: SmartMoneyVerdict | null;
+  patterns: SmartMoneyPattern[];
+  range: SmartMoneyRange | null;
+  narrative: string[];
+  sector: SmartMoneySectorContext | null;
+  date: string | null;
+}
+
+// Track record pola klasik: "pola ini terbukti tidak?" (120 sesi terakhir)
+export interface SmartMoneyTrackHorizon {
+  n: number;
+  hit_rate: number | null;
+  /** Hit rate searah pola: pola sell-side "berfungsi" bila harga turun. */
+  aligned_hit_rate: number | null;
+  mean: number | null;
+  median: number | null;
+  tstat: number | null;
+  /** Alpha vs pasar equal-weight (persen); null bila belum bisa dihitung. */
+  alpha: number | null;
+  /** Alpha dibalik tanda untuk pola sell-side — "seberapa kuat polanya bekerja". */
+  effective_alpha: number | null;
+}
+
+export interface SmartMoneyTrackPattern {
+  pattern: string;
+  label: string;
+  direction: "buy-side" | "sell-side" | null;
+  n: number;
+  n_resolved: number;
+  horizons: Record<string, SmartMoneyTrackHorizon>;
+}
+
+export interface SmartMoneyTrackRecord {
+  patterns: SmartMoneyTrackPattern[];
+  n_episodes: number;
+  history_sessions: number | null;
+  horizon_note: string | null;
+}
