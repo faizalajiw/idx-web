@@ -56,6 +56,7 @@ import type {
   SmartMoneyRadar,
   SmartMoneyStock,
   SmartMoneyTrackRecord,
+  SmartMoneyWatchList,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -485,5 +486,17 @@ export function useSmartMoneyTrackRecord() {
     "/api/smart-money/track-record",
     fetcher,
     { refreshInterval: 3_600_000 },
+  );
+}
+
+/**
+ * Verdict jejak smart money per emiten watchlist (kartu halaman Pantau).
+ * Data EOD — refresh 5 menit cukup.
+ */
+export function useSmartMoneyWatchlist() {
+  return useSWR<SmartMoneyWatchList>(
+    "/api/smart-money/verdicts",
+    fetcher,
+    { refreshInterval: 300_000 },
   );
 }

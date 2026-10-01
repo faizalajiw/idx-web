@@ -71,6 +71,10 @@ auto-refresh 30 detik. Klik baris → technical chart emiten itu.
 
 #### Pantau (`/pantau`)
 Watchlist + notifikasi dalam satu alur "pilih saham → pasang batas → tunggu Telegram":
+- **Jejak Smart Money — Watchlist** — kartu ringkas: kondisi sekarang tiap emiten
+  watchlist (ditimbun / dibuang / seimbang) + hitungannya. Alert Telegram menyala
+  otomatis begitu verdict salah satu emiten berubah (tanpa pasang aturan). Daftar
+  = baseline, jadi kamu tahu titik awalnya.
 - **Alert Rules CRUD** — pasang batas harga / RSI / volume per emiten.
 - **Telegram Status** — cek koneksi + kirim pesan tes.
 - Aturan diperiksa tiap data EOD baru masuk; notifikasi dikirim **sekali per
@@ -119,6 +123,16 @@ Registry faktor kuantitatif (momentum, volatilitas, likuiditas Amihud, foreign n
 ketimpangan order book, absorption, dll) dengan definisi & kalibrasinya.
 
 ### Grup: Flow
+
+#### Radar Smart Money (`/radar`)
+Papan seluruh pasar: emiten dengan **jejak aliran dana asing terkuat** dalam dua
+daftar — akumulasi (net buy) & distribusi (net sell) — diurutkan per **nilai
+rupiah**, dengan pilih jendela 2/5/10/21 sesi, badge streak, dan lantai
+likuiditas (nilai transaksi jendela ≥ Rp 500 jt). Klik emiten → `/radar/[code]`
+(jejak lengkap: verdict, pola, level, konteks sektor) lalu detail teknikal.
+Di bawahnya **Pola Klasik — Track Record**: seberapa sering tiap pola berhasil di
+120 sesi terakhir + alpha vs pasar, jadi klaim pola bisa dicek, bukan dipercaya
+buta.
 
 #### Foreign Flow (`/foreign`)
 Arus dana asing (net buy/sell) peringkat pasar.
@@ -180,9 +194,11 @@ Dashboard mutu layer `research.*`:
 - Deteksi duplikat (bar dengan lebih dari satu knowledge_date).
 
 ### Detail Emiten (`/stock/[code]`)
-Dibuka dengan klik ticker mana pun. Berisi price history, technical chart (OHLCV +
-MA/BB/RSI/MACD), broker summary per emiten, aktivitas broker (skor aliran +
-riwayat driver + pembanding sektor), dan detail dividen (riwayat cash + split).
+Dibuka dengan klik ticker mana pun. Paling atas: banner **Jejak Smart Money**
+(verdict hari ini + sejak kapan + ukurannya + pola + level). Lalu price history,
+technical chart (OHLCV + MA/BB/RSI/MACD), broker summary per emiten, aktivitas
+broker (skor aliran + riwayat driver + pembanding sektor), dan detail dividen
+(riwayat cash + split).
 
 ## Alur Data
 
@@ -284,6 +300,8 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
 - `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
+- `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
+- `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
 - `app/watchlist/page.tsx` — daftar pantau manual + technical chart
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
 - `app/stock/[code]/page.tsx` — per-stock technical, history, brokers, dividends

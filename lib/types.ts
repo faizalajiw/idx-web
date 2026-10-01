@@ -1237,3 +1237,22 @@ export interface SmartMoneyTrackRecord {
   history_sessions: number | null;
   horizon_note: string | null;
 }
+
+// Verdict jejak smart money per emiten watchlist (kartu halaman Pantau)
+export interface SmartMoneyWatchRow {
+  code: string;
+  name: string | null;
+  side: "akumulasi" | "distribusi" | "netral" | null;
+  insufficient: boolean;
+  net_sum_idr: number | null;
+  netval_pct: number | null;
+  streak: number | null;
+  date: string | null;
+  patterns: string[];
+}
+
+export interface SmartMoneyWatchList {
+  n: number;
+  rows: SmartMoneyWatchRow[];
+  telegram_enabled: boolean;
+}

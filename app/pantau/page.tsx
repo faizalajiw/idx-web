@@ -5,6 +5,7 @@ import { AlertRules } from "@/components/AlertRules";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { TelegramStatus } from "@/components/TelegramStatus";
 import { WatchlistTable } from "@/components/WatchlistTable";
+import { SmartMoneyWatchCard } from "@/components/SmartMoneyWatchCard";
 
 /**
  * Pantau = watchlist + notifikasi in one place. The watchlist drives both the
@@ -38,6 +39,8 @@ export default function PantauPage() {
       <WatchlistTable onSelect={setSelected} selected={selected} />
 
       <TechnicalChart code={selected} />
+
+      <SmartMoneyWatchCard />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <AlertRules />
