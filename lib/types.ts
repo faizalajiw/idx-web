@@ -1256,3 +1256,32 @@ export interface SmartMoneyWatchList {
   rows: SmartMoneyWatchRow[];
   telegram_enabled: boolean;
 }
+
+// Kepemilikan emiten & aksi pemilik (dari keterbukaan IDX, gratis)
+export interface OwnershipHolder {
+  holder_name: string;
+  category: string | null;
+  shares: number | null;
+  pct: number | null;
+  is_controller: boolean;
+}
+
+export interface OwnershipChange {
+  holder_name: string;
+  category: string | null;
+  prev_pct: number | null;
+  curr_pct: number | null;
+  delta_pct: number | null;
+  action: "tambah" | "kurang" | "baru" | "keluar";
+}
+
+export interface StockOwnership {
+  code: string;
+  has_data: boolean;
+  as_of: string | null;
+  prev_date: string | null;
+  holders: OwnershipHolder[];
+  free_float_pct: number | null;
+  controller: string[];
+  changes: OwnershipChange[];
+}

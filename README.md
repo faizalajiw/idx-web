@@ -197,8 +197,10 @@ Dashboard mutu layer `research.*`:
 Dibuka dengan klik ticker mana pun. Paling atas: banner **Jejak Smart Money**
 (verdict hari ini + sejak kapan + ukurannya + pola + level). Lalu price history,
 technical chart (OHLCV + MA/BB/RSI/MACD), broker summary per emiten, aktivitas
-broker (skor aliran + riwayat driver + pembanding sektor), dan detail dividen
-(riwayat cash + split).
+broker (skor aliran + riwayat driver + pembanding sektor), **Pemilik & Aksi
+Pemilik** (komposisi pemegang saham dari keterbukaan IDX: free float publik,
+pengendali, daftar pemilik terbesar, dan perubahan porsi vs snapshot
+sebelumnya), dan detail dividen (riwayat cash + split).
 
 ## Alur Data
 
@@ -298,7 +300,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
 - `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)

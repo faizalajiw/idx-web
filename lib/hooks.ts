@@ -57,6 +57,7 @@ import type {
   SmartMoneyStock,
   SmartMoneyTrackRecord,
   SmartMoneyWatchList,
+  StockOwnership,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -499,4 +500,15 @@ export function useSmartMoneyWatchlist() {
     fetcher,
     { refreshInterval: 300_000 },
   );
+}
+
+/**
+ * Kepemilikan emiten + aksi pemilik (keterbukaan IDX). Data berubah lambat
+ * (bulanan) — refresh 1 jam.
+ */
+export function useStockOwnership(code: string | null) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/ownership`
+    : null;
+  return useSWR<StockOwnership>(key, fetcher, { refreshInterval: 3_600_000 });
 }
