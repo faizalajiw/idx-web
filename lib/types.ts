@@ -1162,6 +1162,8 @@ export interface SmartMoneyVerdict {
   strength: "besar" | "menengah" | null;
   streak: number | null;
   streak_side: "net_buy" | "net_sell" | "flat" | null;
+  /** Sesi pertama streak berjalan — jawaban "sejak kapan" dalam tanggal. */
+  streak_start_date: string | null;
   net_sum_idr: number | null;
   netval_pct: number | null;
   n_net_days: number | null;
@@ -1169,11 +1171,40 @@ export interface SmartMoneyVerdict {
   insufficient: boolean;
 }
 
+/** Statistik satu horizon (5/10/21 hari bursa) untuk satu pola. */
+export interface SmartMoneyHorizonStats {
+  n: number;
+  aligned_hit_rate: number | null;
+  tstat: number | null;
+  effective_alpha: number | null;
+  horizon_days: number | null;
+}
+
+/**
+ * Arti historis satu pola: seberapa sering ia bekerja, di horizon berapa.
+ * `reliable: false` = horizon terbaik pun masih sampel kecil (indikatif).
+ */
+export interface SmartMoneyPatternHistory {
+  n: number | null;
+  n_resolved: number | null;
+  window_sessions: number | null;
+  horizon: string | null;
+  horizon_days: number | null;
+  aligned_hit_rate: number | null;
+  n_resolved_horizon: number | null;
+  tstat: number | null;
+  effective_alpha: number | null;
+  reliable: boolean;
+  horizons: Record<string, SmartMoneyHorizonStats>;
+}
+
 export interface SmartMoneyPattern {
   id: string;
   label: string;
   direction: "buy-side" | "sell-side" | null;
   note: string | null;
+  /** Track record pola ini — null bila polanya belum punya catatan. */
+  history: SmartMoneyPatternHistory | null;
 }
 
 export interface SmartMoneyRange {

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useStockSmartMoney } from "@/lib/hooks";
 import { fmtDateStr, fmtNum, fmtPct } from "@/lib/format";
+import type { SmartMoneyPattern } from "@/lib/types";
 import { Card } from "./Card";
 import { InfoHint } from "./InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "./States";
@@ -112,7 +113,11 @@ export function SmartMoneyBanner({ code }: { code: string }) {
               <GitCommitHorizontal size={14} aria-hidden />
               {v.streak}× berturut
             </p>
-            <p className="text-muted text-[10px]">sesi searah</p>
+            <p className="text-muted text-[10px]">
+              {v.streak_start_date
+                ? `sejak ${fmtDateStr(v.streak_start_date) ?? v.streak_start_date}`
+                : "sesi searah"}
+            </p>
           </div>
         )}
       </div>
@@ -128,24 +133,16 @@ export function SmartMoneyBanner({ code }: { code: string }) {
         </div>
       )}
 
-      {/* 3) pola klasik */}
+      {/* 3) pola klasik + rekam jejaknya */}
       {data.patterns.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {data.patterns.map((p) => {
-            const buy = p.direction === "buy-side";
-            return (
-              <span
-                key={p.id}
-                title={p.note ?? undefined}
-                className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold ${
-                  buy ? "bg-up/10 text-up" : "bg-down/10 text-down"
-                }`}
-              >
-                {buy ? <TrendingUp size={12} aria-hidden /> : <TrendingDown size={12} aria-hidden />}
-                {p.label}
-              </span>
-            );
-          })}
+        <div className="mt-3 space-y-1">
+          <p className="text-muted flex items-center gap-1 text-[11px] font-semibold tracking-wide uppercase">
+            Pola terdeteksi
+            <InfoHint text="'Cerita N hari' = di horizon itulah pola ini punya catatan terbaik. Ini bukan pilihan gaya: pola akumulasi nyaris tak berarti dalam 5 hari dan baru terbaca di ~3 minggu, sementara pola distribusi justru paling jelas dalam ~5 hari. Persentase = berapa kali arah harga benar-benar sesuai pola (dari kejadian serupa di 120 sesi terakhir); di bawah 50% artinya pola ini lebih sering meleset." />
+          </p>
+          {data.patterns.map((p) => (
+            <PatternRow key={p.id} pattern={p} />
+          ))}
         </div>
       )}
 
@@ -193,5 +190,50 @@ export function SmartMoneyBanner({ code }: { code: string }) {
         </Link>
       </div>
     </Card>
+  );
+}
+
+/**
+ * Satu pola terdeteksi + rekam jejaknya.
+ *
+ * Horizon selalu disebut ("cerita N hari"): inilah yang membedakan pola yang
+ * masih berjalan dari pola yang sudah selesai — pola akumulasi bercerita
+ * ~3 minggu, pola distribusi ~5 hari. Persentase diberi warna netral
+ * (bukan hijau/merah) karena pola jual yang terbukti bukan kabar baik:
+ * warnanya menyatakan KEKUATAN catatan, bukan arah pasar. Di bawah 50%
+ * ditampilkan apa adanya — pola itu lebih sering meleset.
+ */
+function PatternRow({ pattern }: { pattern: SmartMoneyPattern }) {
+  const buy = pattern.direction === "buy-side";
+  const h = pattern.history;
+  const rate = h?.aligned_hit_rate ?? null;
+  const hasEdge = rate !== null && rate >= 0.5;
+  return (
+    <div
+      title={pattern.note ?? undefined}
+      className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
+        buy ? "bg-up/10" : "bg-down/10"
+      }`}
+    >
+      <span className={`inline-flex items-center gap-1 ${buy ? "text-up" : "text-down"}`}>
+        {buy ? <TrendingUp size={12} aria-hidden /> : <TrendingDown size={12} aria-hidden />}
+        {pattern.label}
+      </span>
+      {h?.horizon_days && (
+        <span className="text-muted rounded bg-white/10 px-1.5 py-0.5 font-medium">
+          cerita {h.horizon_days} hari
+        </span>
+      )}
+      {rate !== null && (
+        <span className={`tabular-nums font-medium ${hasEdge ? "text-[var(--fg)]" : "text-muted"}`}>
+          {Math.round(rate * 100)}% sesuai arah
+          <span className="text-muted">
+            {" "}
+            · n={h?.n_resolved_horizon ?? 0}
+            {h && !h.reliable ? " (sampel kecil)" : ""}
+          </span>
+        </span>
+      )}
+    </div>
   );
 }

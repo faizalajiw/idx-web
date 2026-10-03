@@ -195,7 +195,10 @@ Dashboard mutu layer `research.*`:
 
 ### Detail Emiten (`/stock/[code]`)
 Dibuka dengan klik ticker mana pun. Paling atas: banner **Jejak Smart Money**
-(verdict hari ini + sejak kapan + ukurannya + pola + level). Lalu price history,
+(verdict hari ini + sejak kapan + ukurannya + pola + level). Tiap pola membawa
+**rekam jejaknya** — badge "cerita N hari" (horizon tempat pola itu punya catatan
+terbaik) dan persentase arah yang benar-benar sesuai pola; horizon selalu
+disebut karena tidak seragam antar pola. Lalu price history,
 technical chart (OHLCV + MA/BB/RSI/MACD), broker summary per emiten, aktivitas
 broker (skor aliran + riwayat driver + pembanding sektor), **Pemilik & Aksi
 Pemilik** (komposisi pemegang saham dari keterbukaan IDX: free float publik,
