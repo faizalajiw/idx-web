@@ -1195,6 +1195,11 @@ export interface SmartMoneyPatternHistory {
   tstat: number | null;
   effective_alpha: number | null;
   reliable: boolean;
+  /** Kata keyakinan dari |t| terbaik lintas horizon: tinggi/sedang/lemah. */
+  confidence: "tinggi" | "sedang" | "lemah" | null;
+  best_tstat: number | null;
+  /** |effective_alpha| di horizon terpilih — besar efek, selalu positif. */
+  edge_pct: number | null;
   horizons: Record<string, SmartMoneyHorizonStats>;
 }
 
@@ -1203,8 +1208,12 @@ export interface SmartMoneyPattern {
   label: string;
   direction: "buy-side" | "sell-side" | null;
   note: string | null;
-  /** Track record pola ini — null bila polanya belum punya catatan. */
-  history: SmartMoneyPatternHistory | null;
+  /**
+   * Track record pola ini. Opsional: hanya jalur per-emiten
+   * (`/api/stocks/{code}/smart-money`) yang menempelkannya; daftar verdict
+   * watchlist tidak.
+   */
+  history?: SmartMoneyPatternHistory | null;
 }
 
 export interface SmartMoneyRange {
@@ -1225,6 +1234,25 @@ export interface SmartMoneySectorContext {
   position: string | null;
 }
 
+/**
+ * Sebaran verdict seluruh pasar — pembanding verdict satu emiten.
+ * `distributing_share` = porsi distribusi di antara emiten yang PUNYA arah
+ * (netral & data kurang keluar dari penyebut).
+ */
+export interface SmartMoneyMarketContext {
+  date: string | null;
+  total: number | null;
+  accumulating: number | null;
+  distributing: number | null;
+  neutral: number | null;
+  insufficient: number | null;
+  sided: number | null;
+  accumulating_pct: number | null;
+  distributing_pct: number | null;
+  distributing_share: number | null;
+  position: string | null;
+}
+
 /** Jejak smart money satu emiten: verdict + pola + level + narasi. */
 export interface SmartMoneyStock {
   code: string;
@@ -1235,6 +1263,7 @@ export interface SmartMoneyStock {
   range: SmartMoneyRange | null;
   narrative: string[];
   sector: SmartMoneySectorContext | null;
+  market: SmartMoneyMarketContext | null;
   date: string | null;
 }
 

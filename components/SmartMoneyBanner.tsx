@@ -138,7 +138,7 @@ export function SmartMoneyBanner({ code }: { code: string }) {
         <div className="mt-3 space-y-1">
           <p className="text-muted flex items-center gap-1 text-[11px] font-semibold tracking-wide uppercase">
             Pola terdeteksi
-            <InfoHint text="'Cerita N hari' = di horizon itulah pola ini punya catatan terbaik. Ini bukan pilihan gaya: pola akumulasi nyaris tak berarti dalam 5 hari dan baru terbaca di ~3 minggu, sementara pola distribusi justru paling jelas dalam ~5 hari. Persentase = berapa kali arah harga benar-benar sesuai pola (dari kejadian serupa di 120 sesi terakhir); di bawah 50% artinya pola ini lebih sering meleset." />
+            <InfoHint text="'Cerita N hari' = di horizon itulah pola ini punya catatan terbaik. Ini bukan pilihan gaya: pola akumulasi nyaris tak berarti dalam 5 hari dan baru terbaca di ~3 minggu, sementara pola distribusi justru paling jelas dalam ~5 hari. Persentase = berapa kali arah harga benar-benar sesuai pola (dari kejadian serupa di 120 sesi terakhir); di bawah 50% artinya pola ini lebih sering meleset. 'Keyakinan' (dari nilai t) menyatakan seberapa kuat buktinya bukan kebetulan: tinggi / sedang / lemah. Pola diurutkan dari bukti terkuat." />
           </p>
           {data.patterns.map((p) => (
             <PatternRow key={p.id} pattern={p} />
@@ -163,7 +163,25 @@ export function SmartMoneyBanner({ code }: { code: string }) {
         </div>
       )}
 
-      {/* 5) konteks sektor */}
+      {/* 5) konteks pasar */}
+      {data.market && data.market.distributing !== null && (
+        <p className="text-muted mt-2.5 flex items-start gap-1.5 text-xs leading-snug">
+          <InfoHint text="Sebaran verdict SELURUH pasar di jendela yang sama (10 sesi), tanpa memotong emiten tipis — penyebutnya sengaja jujur. Persentase dihitung dari emiten yang punya arah (netral & data kurang tidak ikut), karena 'mayoritas pasar' harus dibaca dari yang memang bersuara. Gunanya: memisahkan 'emiten ini istimewa' dari 'seluruh pasar sedang begitu'." />
+          <span className="flex-1">
+            <strong className="text-[var(--fg)]">Konteks pasar:</strong>{" "}
+            <span className="text-down tabular-nums">{fmtNum(data.market.distributing)}</span> dibuang vs{" "}
+            <span className="text-up tabular-nums">{fmtNum(data.market.accumulating)}</span> ditimbun
+            {data.market.distributing_share !== null && (
+              <>
+                {" "}
+                — {fmtNum(data.market.distributing_share, 0)}% dari yang punya arah sedang dibuang
+              </>
+            )}
+          </span>
+        </p>
+      )}
+
+      {/* 6) konteks sektor */}
       {data.sector?.position && (
         <p className="text-muted mt-2.5 flex items-start gap-1.5 text-xs leading-snug">
           <InfoHint text="Berapa emiten di sektor yang sama yang juga searah — membedakan 'saham ini istimewa' dari 'seluruh sektor sedang begitu'. Sektor dari pemetaan kurasi; jika emiten tidak terpetakan, konteks tidak ditampilkan." />
@@ -230,7 +248,11 @@ function PatternRow({ pattern }: { pattern: SmartMoneyPattern }) {
           <span className="text-muted">
             {" "}
             · n={h?.n_resolved_horizon ?? 0}
-            {h && !h.reliable ? " (sampel kecil)" : ""}
+            {h && !h.reliable
+              ? " (sampel kecil)"
+              : h?.confidence
+                ? ` · keyakinan ${h.confidence}`
+                : ""}
           </span>
         </span>
       )}
