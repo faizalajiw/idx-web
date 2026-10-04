@@ -57,6 +57,7 @@ import type {
   SmartMoneyStock,
   SmartMoneyTrackRecord,
   SmartMoneyWatchList,
+  SmartMoneyPatternsBoard,
   StockOwnership,
 } from "./types";
 
@@ -487,6 +488,18 @@ export function useSmartMoneyTrackRecord() {
     "/api/smart-money/track-record",
     fetcher,
     { refreshInterval: 3_600_000 },
+  );
+}
+
+/**
+ * Papan "pola terkuat hari ini": pola yang menyala di sesi terakhir, kelompok
+ * urut kekuatan bukti. Data harian (EOD) — refresh 30 menit.
+ */
+export function useSmartMoneyPatternsBoard() {
+  return useSWR<SmartMoneyPatternsBoard>(
+    "/api/smart-money/patterns",
+    fetcher,
+    { refreshInterval: 1_800_000 },
   );
 }
 

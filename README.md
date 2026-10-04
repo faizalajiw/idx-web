@@ -130,7 +130,14 @@ daftar — akumulasi (net buy) & distribusi (net sell) — diurutkan per **nilai
 rupiah**, dengan pilih jendela 2/5/10/21 sesi, badge streak, dan lantai
 likuiditas (nilai transaksi jendela ≥ Rp 500 jt). Klik emiten → `/radar/[code]`
 (jejak lengkap: verdict, pola, level, konteks sektor) lalu detail teknikal.
-Di bawahnya **Pola Klasik — Track Record**: seberapa sering tiap pola berhasil di
+Di bawahnya **Pola Terkuat Hari Ini** — papan pola klasik yang menyala di sesi
+terakhir, dikelompokkan **per pola** dan diurutkan berdasar kekuatan bukti
+(kesempatan pola ber-catatan terkuat, mis. inisiasi volume, untuk terlihat tanpa
+menunggu ia kebetulan muncul di emiten yang sedang dibuka). Tiap kelompok
+membawa rekam jejaknya (persentase sesuai arah, horizon terbaik, kata keyakinan)
+dan emiten yang memicunya urut |net asing|, dengan catatan jujur berapa emiten
+yang disaring lantai likuiditas.
+Lalu **Pola Klasik — Track Record**: seberapa sering tiap pola berhasil di
 120 sesi terakhir + alpha vs pasar, jadi klaim pola bisa dicek, bukan dipercaya
 buta.
 

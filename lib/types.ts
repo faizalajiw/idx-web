@@ -1253,6 +1253,45 @@ export interface SmartMoneyMarketContext {
   position: string | null;
 }
 
+export interface SmartMoneyPatternsBoardRow {
+  code: string;
+  name: string | null;
+  side: "akumulasi" | "distribusi" | "netral" | null;
+  net_sum_idr: number | null;
+  netval_pct: number | null;
+  streak: number | null;
+  window_value: number | null;
+  date: string | null;
+}
+
+/**
+ * Satu pola + buktinya + emiten yang memicunya di sesi terakhir.
+ * `fired` = semua emiten yang memicu (termasuk yang tipis); `count` = yang
+ * lolos lantai likuiditas dan ditampilkan.
+ */
+export interface SmartMoneyPatternsBoardGroup {
+  pattern: string;
+  label: string;
+  direction: "buy-side" | "sell-side" | null;
+  confidence: "tinggi" | "sedang" | "lemah" | null;
+  horizon_days: number | null;
+  aligned_hit_rate: number | null;
+  n_resolved_horizon: number | null;
+  edge_pct: number | null;
+  fired: number;
+  count: number;
+  emitters: SmartMoneyPatternsBoardRow[];
+}
+
+/** Papan "pola terkuat hari ini" — kelompok urut kekuatan bukti. */
+export interface SmartMoneyPatternsBoard {
+  date: string | null;
+  scanned: number;
+  window_days: number;
+  min_window_value: number | null;
+  groups: SmartMoneyPatternsBoardGroup[];
+}
+
 /** Jejak smart money satu emiten: verdict + pola + level + narasi. */
 export interface SmartMoneyStock {
   code: string;

@@ -11,6 +11,7 @@ import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
 import { TickerLogo } from "@/components/TickerLogo";
 import { SmartMoneyTrackRecordCard } from "@/components/SmartMoneyTrackRecordCard";
+import { SmartMoneyPatternsBoardCard } from "@/components/SmartMoneyPatternsBoard";
 import type { SmartMoneyRadarRow } from "@/lib/types";
 
 /** Opsi jendela agregasi (hari bursa). */
@@ -196,6 +197,8 @@ export default function RadarPage() {
         rupiah = volume saham asing × close. Dipindai dari{" "}
         {fmtNum(data?.scanned)} emiten yang punya data.
       </p>
+
+      <SmartMoneyPatternsBoardCard />
 
       <SmartMoneyTrackRecordCard />
     </main>
