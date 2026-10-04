@@ -36,12 +36,6 @@ graph LR
   subgraph Sektor
     M[Sektor /sectors]
   end
-  subgraph Belajar
-    N[Belajar Quant /learn]
-  end
-  subgraph Sistem
-    O[Kualitas Data /quality]
-  end
   A -.klik ticker.-> P[Stock Detail /stock/CODE]
   B -.klik ticker.-> P
   D -.klik ticker.-> P
@@ -64,10 +58,6 @@ Ringkasan pasar hari ini dalam satu layar:
 - **Top Brokers** — broker teraktif hari ini.
 - **Signals Panel** — sinyal teknikal BUY/SELL/HOLD; klik emiten → chart di bawah.
 - **Technical Chart** — kanvas detail bersama (dipilih dari panel mana pun).
-
-#### Watchlist (`/watchlist`)
-Daftar pantau manual — tambah/hapus emiten sendiri (persisted ke `.env` backend),
-auto-refresh 30 detik. Klik baris → technical chart emiten itu.
 
 #### Pantau (`/pantau`)
 Watchlist + notifikasi dalam satu alur "pilih saham → pasang batas → tunggu Telegram":
@@ -177,28 +167,11 @@ pernah berbeda antar halaman.
 ### Grup: Sektor
 
 #### Sektor (`/sectors`)
-Analisis sektor + **RRG** (Relative Rotation Graph) untuk melihat rotasi
-kepemimpinan sektor dari **harga relatif** terhadap IHSG, plus **Rotasi Sektor —
-Aktivitas Broker**: rotasi dari **jejak aliran dana** (median skor broker per
-sektor + arah perubahan 5/21 sesi, breadth, dan sparkline riwayat).
-
-Dua panel itu sengaja berdampingan karena berbeda pertanyaan: RRG menunjukkan
-sektor yang harganya sudah menguat, panel broker menunjukkan sektor yang
-**alirannya** berbalik — yang kadang belum terlihat di harga.
-
-### Grup: Belajar
-
-#### Belajar Quant (`/learn`)
-Halaman edukasi / glosarium istilah pasar & kuantitatif.
-
-### Grup: Sistem
-
-#### Kualitas Data (`/quality`)
-Dashboard mutu layer `research.*`:
-- Overview coverage, freshness, jumlah baris.
-- Quarantine viewer (baris yang ditolak quality gate + alasannya).
-- Coverage gaps & thin days (deteksi hari scrape hilang/parsial).
-- Deteksi duplikat (bar dengan lebih dari satu knowledge_date).
+Analisis sektor per sektor (rata-rata %, breadth, nilai transaksi, arus asing),
+plus **Rotasi Sektor — Aktivitas Broker**: rotasi dari **jejak aliran dana**
+(median skor broker per sektor + arah perubahan 5/21 sesi, breadth, dan
+sparkline riwayat) — sektor yang **alirannya** berbalik, meski harganya belum
+bergerak.
 
 ### Detail Emiten (`/stock/[code]`)
 Dibuka dengan klik ticker mana pun. Paling atas: banner **Jejak Smart Money**
@@ -313,15 +286,14 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRRGChart, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
 - `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
-- `app/watchlist/page.tsx` — daftar pantau manual + technical chart
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
 - `app/stock/[code]/page.tsx` — per-stock technical, history, brokers, dividends
 - `app/screener/page.tsx` — multi-criteria stock screener
-- `app/sectors/page.tsx` — sector analysis + RRG rotation graph
+- `app/sectors/page.tsx` — sector analysis + rotasi aktivitas broker
 - `app/foreign/page.tsx` — foreign fund flow
 - `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
 - `app/valuation/page.tsx` — PER/PBV valuation view
@@ -329,11 +301,9 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
 - `app/dividen/page.tsx` — dividend overview, trailing yields, corp-action ledger
-- `app/quality/page.tsx` — data-quality dashboard (coverage, quarantine, gaps)
 - `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)
 - `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
 - `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
-- `app/learn/page.tsx` — education / glossary page
 - `app/broker-activity/page.tsx` — aktivitas broker (skor aliran tervalidasi IC + komposisi asing/lokal/BUMN + struktur broker pasar)
 
 ## Chat Commands

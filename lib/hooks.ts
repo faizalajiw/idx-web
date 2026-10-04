@@ -30,20 +30,12 @@ import type {
   ScreenerFilters,
   ScreenerRow,
   SectorAnalysis,
-  SectorRRG,
   StockBrokerSummary,
   WatchlistRow,
   Signal,
   PriceBar,
   TechnicalChart,
   ValuationResponse,
-  QualityOverview,
-  QuarantineRow,
-  QuarantineReason,
-  CoverageGaps,
-  ThinDay,
-  QualityDuplicates,
-  CorpActionSummary,
   StockEvents,
   FactorsOverview,
   RegimeHistory,
@@ -183,13 +175,6 @@ export function useSectors() {
   return useSWR<SectorAnalysis>("/api/sectors", fetcher, { refreshInterval: REFRESH });
 }
 
-export function useSectorRRG(window = 21, tailWeeks = 8) {
-  const key = `/api/sectors/rrg?window=${window}&tail_weeks=${tailWeeks}`;
-  return useSWR<SectorRRG>(key, fetcher, {
-    refreshInterval: 300_000, // weekly rotation is slow-moving
-  });
-}
-
 export function useForeignFlow(days = 20) {
   const key = `/api/foreign-flow?days=${days}`;
   return useSWR<ForeignFlow>(key, fetcher, { refreshInterval: REFRESH });
@@ -276,37 +261,7 @@ export function useRemoveFromWatchlist() {
   );
 }
 
-// ---------------------------------------------------------------- data quality
-
-export function useQualityOverview() {
-  return useSWR<QualityOverview>("/api/quality/overview", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
-
-export function useQuarantine(limit = 100) {
-  return useSWR<QuarantineRow[]>(`/api/quality/quarantine?limit=${limit}`, fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
-
-export function useQuarantineReasons() {
-  return useSWR<QuarantineReason[]>("/api/quality/quarantine-reasons", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
-
-export function useCoverageGaps() {
-  return useSWR<CoverageGaps>("/api/quality/coverage-gaps", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
-
-export function useQualityDuplicates() {
-  return useSWR<QualityDuplicates>("/api/quality/duplicates", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
+// ---------------------------------------------------------------- corporate events
 
 /** Event study per emiten (backend cache 1 jam; slow-moving). */
 export function useStockEvents(code: string | null) {
@@ -342,19 +297,6 @@ export function useSignalTrack() {
   });
 }
 
-export function useThinDays(minCodes = 100, limit = 30) {
-  return useSWR<ThinDay[]>(
-    `/api/quality/thin-days?min_codes=${minCodes}&limit=${limit}`,
-    fetcher,
-    { refreshInterval: REFRESH },
-  );
-}
-
-export function useCorpActionSummary() {
-  return useSWR<CorpActionSummary>("/api/quality/corp-actions", fetcher, {
-    refreshInterval: REFRESH,
-  });
-}
 
 // ---------------------------------------------------------------- alerts
 
@@ -403,7 +345,7 @@ export function useDividendOverview() {
 
 /**
  * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana).
- * Berbeda dari RRG yang berbasis harga relatif. Bergerak harian -> 5 menit cukup.
+ * Bergerak harian -> 5 menit cukup.
  */
 export function useSectorRotation(lookback = 60, minNames = 3) {
   return useSWR<SectorRotation>(

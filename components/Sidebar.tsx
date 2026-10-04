@@ -12,13 +12,11 @@ import {
   History,
   Coins,
   Bell,
-  Eye,
   Globe2,
   ArrowLeftRight,
   Waves,
   Activity,
   LayoutGrid,
-  GraduationCap,
   ShieldCheck,
   Scale,
   X,
@@ -36,7 +34,6 @@ const GROUPS: NavGroup[] = [
     title: "Utama",
     items: [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/watchlist", label: "Watchlist", icon: Eye },
       { href: "/pantau", label: "Pantau", icon: Bell },
     ],
   },
@@ -69,14 +66,6 @@ const GROUPS: NavGroup[] = [
   {
     title: "Sektor",
     items: [{ href: "/sectors", label: "Sektor", icon: LayoutGrid }],
-  },
-  {
-    title: "Belajar",
-    items: [{ href: "/learn", label: "Belajar Quant", icon: GraduationCap }],
-  },
-  {
-    title: "Sistem",
-    items: [{ href: "/quality", label: "Kualitas Data", icon: ShieldCheck }],
   },
 ];
 

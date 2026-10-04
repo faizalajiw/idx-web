@@ -78,20 +78,6 @@ export interface SectorAnalysis {
   sectors: SectorRow[];
 }
 
-export interface RRGPoint {
-  sector: string;
-  date: string;
-  rs_ratio: number;
-  rs_momentum: number;
-}
-
-export interface SectorRRG {
-  benchmark: string;
-  window: number;
-  date: string | null;
-  points: RRGPoint[];
-}
-
 export interface ValuationResponse {
   undervalued: ValuationRow[];
   overvalued: ValuationRow[];
@@ -453,49 +439,6 @@ export interface HoldCheckResponse {
   items: HoldCheckItem[];
 }
 
-// ---------------------------------------------------------------- data quality
-
-export interface QualityOverview {
-  raw_rows: number;
-  raw_codes: number;
-  trading_days: number;
-  first_day: string | null;
-  last_day: string | null;
-  pit_rows: number;
-  quarantine_rows: number;
-  corp_actions: number;
-  last_ingest: string | null;
-  staleness_hours: number | null;
-}
-
-export interface QuarantineRow {
-  code: string | null;
-  trade_date: string | null;
-  reason: string;
-  payload: Record<string, unknown> | null;
-  ingested_at: string | null;
-}
-
-export interface QuarantineReason {
-  reason: string;
-  count: number;
-}
-
-export interface CoverageGaps {
-  window: { first: string; last: string } | null;
-  covered_days: number;
-  missing_weekdays: string[];
-}
-
-export interface ThinDay {
-  trade_date: string;
-  codes: number;
-}
-
-export interface QualityDuplicates {
-  multi_versioned_bars: number;
-}
-
 // --------------------------------------------------------------- research UI
 
 export interface StockEventRow {
@@ -559,13 +502,7 @@ export interface RegimeHistory {
   generated_at?: string | null;
 }
 
-export interface CorpActionSummary {
-  by_type: Record<string, number>;
-  by_source: Record<string, number>;
-}
-
 // --------------------------------------------------------- sentimen (flow & buku)
-
 /** Satu emiten di daftar sorotan sentimen (akumulasi / distribusi). */
 export interface SentimentItem {
   code: string;
@@ -1119,8 +1056,7 @@ export interface SectorRotationRow {
 }
 
 /**
- * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana) — berbeda
- * dari RRG yang berbasis harga relatif.
+ * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana).
  */
 export interface SectorRotation {
   as_of: string | null;

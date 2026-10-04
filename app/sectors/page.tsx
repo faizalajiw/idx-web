@@ -5,7 +5,6 @@ import { useSectors } from "@/lib/hooks";
 import { fmtPct, fmtCompact } from "@/lib/format";
 import type { SectorRow } from "@/lib/types";
 import { Card } from "@/components/Card";
-import { SectorRRGChart } from "@/components/SectorRRGChart";
 import { SectorRotationTable } from "@/components/SectorRotationTable";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { RegimeBanner } from "@/components/RegimeBanner";
@@ -36,8 +35,6 @@ export default function SectorsPage() {
       </div>
 
       <RegimeBanner />
-
-      <SectorRRGChart />
 
       <SectorRotationTable />
 

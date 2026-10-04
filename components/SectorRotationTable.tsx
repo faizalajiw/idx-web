@@ -153,10 +153,9 @@ function RotationTable() {
 /**
  * Rotasi sektor berbasis skor aktivitas broker.
  *
- * Melengkapi RRG di atas: RRG mengukur rotasi dari HARGA relatif terhadap IHSG,
- * panel ini dari JEJAK ALIRAN (proksi akumulasi/distribusi). Sektor bisa saja
- * harganya belum bergerak padahal alirannya sudah berbalik — itu justru yang
- * dicari di sini.
+ * Rotasi sektor berbasis skor aktivitas broker, mengukur JEJAK ALIRAN
+ * (proksi akumulasi/distribusi). Sektor bisa saja harganya belum bergerak
+ * padahal alirannya sudah berbalik — itu justru yang dicari di sini.
  */
 export function SectorRotationTable() {
   const { data } = useSectorRotation(60, 3);
@@ -165,7 +164,7 @@ export function SectorRotationTable() {
     <Card
       title="Rotasi Sektor — Aktivitas Broker"
       subtitle="Median skor aliran per sektor + arah perubahannya"
-      info="Sektor mana yang aliran dananya sedang berbalik naik (akumulasi) atau turun (distribusi). Beda dari RRG di atas: RRG dari harga relatif, tabel ini dari jejak aliran broker (proksi aliran asing + buku intraday), dibobot oleh uji IC."
+      info="Sektor mana yang aliran dananya sedang berbalik naik (akumulasi) atau turun (distribusi). Dihitung dari jejak aliran broker (proksi arus asing + buku intraday), dibobot oleh uji IC."
       right={<LastUpdated sessionDate={data?.as_of} updatedAt={data?.ic_run_date} dep={data} />}
     >
       <RotationTable />
