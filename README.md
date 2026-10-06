@@ -1,4 +1,105 @@
-# Market Labs — IDX Web
+# IDX Web Frontend
+
+**Next.js + Recharts** UI for the IDX market‑data platform. All heavy calculations live in the FastAPI backend (`idx‑scraper/src/idx_scraper/api`). The frontend auto‑switches between the official IDX feed and a Yahoo Finance fallback.
+
+---
+
+## Quick Start
+
+1. **Install dependencies**
+```powershell
+cd D:\Project\market-labs\idx-web
+npm ci   # or `pnpm install` if you prefer pnpm
+```
+2. **Configure environment** – copy the example and adjust the backend URL if needed:
+```dotenv
+# .env.local (auto‑loaded by Next.js)
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+```
+3. **Run the development server**
+```powershell
+npm run dev   # starts on http://localhost:3000
+```
+   The server proxies API calls to the backend defined in `NEXT_PUBLIC_API_URL`.
+4. **Build for production**
+```powershell
+npm run build && npm start
+```
+   The build produces a static‑optimized bundle in `.next`.
+
+---
+
+## Menu & Features
+
+The sidebar groups the application into seven logical sections. Below each route is a short description of the UI elements and the data it presents.
+
+| Group | Route | Feature Summary |
+|-------|-------|-----------------|
+| **Utama** | `/` (Dashboard) | Hero panel with IHSG composite, market‑wide volume/value split (regular vs non‑regular), Regime Banner + Timeline, market narrative, top gainers/losers, liquidity leaders, broker activity, signal panel, and an interactive technical chart.
+| | `/watchlist` | Watch‑list view with real‑time price, volume, and smart‑money status per symbol. Includes a CRUD UI for alert rules (price, RSI, volume) and a Telegram status/debug panel.
+| | `/pantau` | Consolidated monitoring of watch‑list alerts, smart‑money tracks, and Telegram connectivity. Alerts fire once per crossing and reset after the condition clears.
+| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.
+| **Analisis** | `/valuation` | PER / PBV per stock with peer comparison tables.
+| | `/hold-check` | Composite “hold‑or‑sell” verdict (0‑100 score) built from technical signals, valuation, IC‑adjusted factor score, and broker‑score (when available).
+| | `/jejak-sinyal` | Signal performance dashboard – hit‑rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
+| | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
+| | `/dividen` | Dividend ledger – total, yearly breakdown, top‑yield stocks, and corporate‑action history (splits, bonuses, rights).
+| | `/faktor` | Registry of quantitative factors (momentum, Amihud, foreign net, order‑book imbalance, etc.) with definitions and calibration metadata.
+| **Flow** | `/radar` | Market‑wide smart‑money radar showing the strongest foreign‑money inflow/outflow stocks (net buy / net sell) by value, with selectable windows (2/5/10/21 sessions), streak badges, and liquidity floor filters. Clicking a tile opens `/radar/[code]` for full signal history and technical chart.
+| | `/foreign` | Ranked list of foreign‑money net flows per stock.
+| | `/sentimen` | Sentiment gauge (0‑100) derived from market breadth, IHSG direction, and foreign‑money proportion; plus ranked lists of accumulation/distribution with order‑book imbalance metrics.
+| | `/broker-activity` | Broker activity dashboard – accumulation score per stock (IC‑weighted factor scores), statistical factor validation table (IC, t‑stat, direction), and market‑wide broker concentration metrics (CR1/CR3/CR5, HHI).
+| **Sektor** | `/sectors` | Sector‑by‑sector overview (average returns, breadth, transaction value, foreign‑money flow) plus **Sector Rotation** based on broker‑score trends (median score, direction over 5/21 sessions, sparkline history).
+
+All pages share a common layout: a responsive sidebar, a header with the current market time, and a content area that adapts to desktop and mobile breakpoints.
+
+---
+
+## Framework Analisis Saham Multi‑Agen
+
+### Tim Frontend (Skills: Modern, No AI Slop)
+The frontend team guarantees visual and technical quality of the UI – the design must feel intentional, not a generic AI‑generated template.
+
+- **UI/UX Craft Agent** – defines product‑specific typography, palette, and layout; avoids default hero sections, identical icons, and placeholder copy.
+- **Interaction & Motion Agent** – designs purposeful hover, loading, and feedback animations; no decorative motion without function.
+- **Code Quality Agent** – enforces reusable, accessible, responsive component architecture; rejects copy‑pasted patterns without adaptation.
+- **Review/QA Agent** – audits the final UI against a “no AI slop” checklist (generic look, duplicated elements, brand‑inconsistent visuals).
+
+### Tim Trainer
+Responsible for continuous improvement of both trading and frontend agents.
+
+- **Evaluation Agent** – builds test suites and benchmarks to measure decision quality, design consistency, and output stability over time.
+- **Feedback Loop Agent** – collects real‑world feedback (trading performance, design reviews, user complaints) and translates it into prompt/parameter adjustments for the relevant agents.
+- **Calibration Agent** – fine‑tunes strategy or style (risk appetite, design language) based on performance trends, preventing drift from the original goals.
+
+---
+
+## Running the Frontend
+1. Ensure the **backend** (`idx‑scraper`) is running and reachable at the URL defined in `NEXT_PUBLIC_API_URL`.
+2. In a terminal, start the dev server:
+```powershell
+npm run dev
+```
+3. Open <http://localhost:3000> in a browser. The app automatically polls the backend APIs according to the schedule defined in the backend (APScheduler).
+4. For production, build and start:
+```powershell
+npm run build && npm start
+```
+   The built files are served by the built‑in Next.js server.
+
+---
+
+## Glossary
+- **IHSG** – Composite index of all listed Indonesian stocks.
+- **Regular market** – Trading during official IDX hours (09:00‑16:00 WIB).
+- **Non‑regular market** – After‑hours or pre‑market data (Yahoo fallback).
+- **Radar** – Visual board of strongest foreign‑money inflows/outflows.
+- **Broker‑score** – Weighted aggregation of validated quantitative factors (IC‑filtered) plus broker‑level market concentration.
+- **IC** – Information‑Coefficient, statistical measure of factor predictive power.
+
+---
+
+*Last updated: 2026‑10‑06*
 
 Next.js + Recharts frontend for the IDX market-data platform. Presentation-only —
 all calculations happen in the FastAPI backend
