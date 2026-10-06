@@ -26,6 +26,7 @@ import type {
   MarketOverview,
   MarketRegime,
   MarketLeaders,
+  MarketTradeSummary,
   TopBrokers,
   ScreenerFilters,
   ScreenerRow,
@@ -59,6 +60,18 @@ const REFRESH = 30_000;
 export function useMarketOverview() {
   return useSWR<MarketOverview>("/api/market/overview", fetcher, {
     refreshInterval: REFRESH,
+  });
+}
+
+/**
+ * Pasar reguler vs non-reguler (tunai + negosiasi): volume lot + value satu
+ * sesi. Angka EOD — baru final setelah pasar tutup, jadi refresh 1 menit cukup
+ * (memang tak akan berubah di tengah sesi).
+ */
+export function useMarketTradeSummary() {
+  return useSWR<MarketTradeSummary>("/api/market/trade-summary", fetcher, {
+    refreshInterval: 60_000,
+    shouldRetryOnError: false,
   });
 }
 

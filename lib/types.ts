@@ -28,6 +28,26 @@ export interface MarketOverview {
   top_losers: Mover[];
 }
 
+/** Satu segmen pasar: volume dalam lembar & lot (1 lot = 100 lembar). */
+export interface MarketTradeSegment {
+  volume_shares: number | null;
+  volume_lot: number | null;
+  value: number | null;
+  frequency: number | null;
+}
+
+/** Pasar reguler vs non-reguler (tunai + negosiasi) untuk satu sesi. */
+export interface MarketTradeSummary {
+  date: string | null;
+  captured_at: string | null;
+  stock_count: number;
+  regular: MarketTradeSegment;
+  non_regular: MarketTradeSegment;
+  total: MarketTradeSegment;
+  non_regular_share_volume: number | null;
+  non_regular_share_value: number | null;
+}
+
 /** Regime IHSG + volatilitas ter-annualisasi (banner konteks). */
 export interface MarketRegime {
   regime: "TRENDING_UP" | "TRENDING_DOWN" | "TRANSITION" | "RANGING" | null;

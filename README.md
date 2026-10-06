@@ -49,6 +49,12 @@ graph LR
 Ringkasan pasar hari ini dalam satu layar:
 - **Hero IHSG** — nilai Composite, perubahan poin & persen, volume/value/jumlah
   emiten aktif, plus waktu update terakhir.
+- **Volume & Value Pasar** (di dalam grid hero yang sama, di bawah IHSG) —
+  pemisahan **pasar reguler** vs **non-reguler** (tunai + negosiasi): value Rp,
+  volume lot & transaksi, plus porsinya terhadap total pasar. Volume/Value hero
+  jadi total pasar (reguler + non-reguler) supaya kotak reguler bukan duplikat.
+  Angka final setelah pasar tutup (sumber `GetStockSummary` IDX, agregat
+  `research.market_segment_daily`).
 - **Regime Banner + Timeline** — deteksi rezim IHSG (ADX + volatilitas realized:
   TRENDING/RANGING/TRANSISI) beserta riwayatnya.
 - **Narasi Pasar** — ringkasan otomatis (IHSG + breadth naik/turun/flat).
@@ -286,7 +292,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, RegimeTimeline, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
 - `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
