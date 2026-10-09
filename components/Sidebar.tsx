@@ -22,6 +22,7 @@ import {
   X,
   Menu,
   Radar,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 import { MarketBadge } from "./MarketBadge";
@@ -44,6 +45,7 @@ const GROUPS: NavGroup[] = [
   {
     title: "Analisis",
     items: [
+      { href: "/rekomendasi", label: "Rekomendasi Beli", icon: Target },
       { href: "/keputusan", label: "Ruang Keputusan", icon: Scale },
       { href: "/valuation", label: "Valuasi", icon: Landmark },
       { href: "/hold-check", label: "Hold Check", icon: BadgeCheck },

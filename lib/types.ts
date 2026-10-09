@@ -1340,3 +1340,115 @@ export interface StockOwnership {
   controller: string[];
   changes: OwnershipChange[];
 }
+
+// ---------------------------------------------------------------- rekomendasi beli
+
+/** Metrik mentah di balik satu kandidat beli (apa adanya, boleh null). */
+export interface RecommendationMetrics {
+  close: number | null;
+  signal: string | null;
+  trend_up: boolean;
+  rsi: number | null;
+  mom_20d: number | null;
+  atr_pct: number | null;
+  dist_52w_pct: number | null;
+  vol_ratio: number | null;
+  value: number | null;
+  z_score: number | null;
+  hist_days: number | null;
+}
+
+/** Lapisan mana yang ikut menggerakkan skor + alasannya (transparansi). */
+export interface RecommendationLayerStatus {
+  factor: boolean;
+  broker: boolean;
+  factor_note: string | null;
+  broker_note: string | null;
+  note: string | null;
+}
+
+/** Satu kandidat beli: skor + grade + level eksekusi + alasan. */
+export interface RecommendationRow {
+  code: string;
+  name: string | null;
+  score: number;
+  grade: string; // A | B | C
+  setup: string | null; // pullback | breakout | trend | netral
+  entry_low: number | null;
+  entry_high: number | null;
+  entry_ref: number | null;
+  stop: number | null;
+  target: number | null;
+  rr: number | null;
+  entry_note: string | null;
+  horizon_days: number | null;
+  confidence: string | null;
+  position_pct: number | null;
+  patterns: string[];
+  reasons: string[];
+  warnings: string[];
+  layers: Record<string, boolean>;
+  metrics: RecommendationMetrics | null;
+}
+
+/** Papan kandidat beli se-pasar untuk sesi terakhir. */
+export interface RecommendationResponse {
+  date: string | null;
+  generated_at: string | null;
+  scanned: number;
+  total_candidates: number;
+  limit: number;
+  min_grade: string;
+  layers: RecommendationLayerStatus;
+  rows: RecommendationRow[];
+}
+
+/** Kandidat beli satu emiten (mesin skor sama dengan papan se-pasar). */
+export interface StockRecommendation {
+  code: string;
+  as_of: string | null;
+  has_data: boolean;
+  candidate: RecommendationRow | null;
+  layers: RecommendationLayerStatus;
+  reason: string | null;
+  generated_at: string | null;
+}
+
+/** Statistik track record satu irisan (grade x horizon). */
+export interface RecommendationTrackStat {
+  grade: string;
+  horizon: number;
+  n: number;
+  hit_rate: number | null;
+  mean_fwd: number | null;
+  median_fwd: number | null;
+  mean_abnormal: number | null;
+  t_stat: number | null;
+  avg_mfe: number | null;
+  avg_mae: number | null;
+}
+
+export interface RecommendationTrackRecent {
+  code: string;
+  date: string;
+  grade: string;
+  score: number | null;
+  close: number | null;
+  fwd_5: number | null;
+  fwd_10: number | null;
+  fwd_21: number | null;
+}
+
+/** Track record kandidat beli (per grade & horizon). */
+export interface RecommendationTrack {
+  candidates: number;
+  grade_a: number;
+  grade_b: number;
+  grade_c: number;
+  first_date: string | null;
+  last_date: string | null;
+  horizons: number[];
+  by_grade: RecommendationTrackStat[];
+  recent: RecommendationTrackRecent[];
+  reason: string | null;
+}

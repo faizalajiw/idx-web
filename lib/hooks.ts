@@ -52,6 +52,9 @@ import type {
   SmartMoneyWatchList,
   SmartMoneyPatternsBoard,
   StockOwnership,
+  RecommendationResponse,
+  StockRecommendation,
+  RecommendationTrack,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -479,4 +482,37 @@ export function useStockOwnership(code: string | null) {
     ? `/api/stocks/${encodeURIComponent(code)}/ownership`
     : null;
   return useSWR<StockOwnership>(key, fetcher, { refreshInterval: 3_600_000 });
+}
+
+// ------------------------------------------------------------- rekomendasi beli
+
+/**
+ * Papan kandidat beli se-pasar: skor + grade + level eksekusi per emiten.
+ * Data EOD harian (hitung berat & cache 30 menit) — refresh 5 menit cukup.
+ */
+export function useRecommendations(limit = 20, minGrade = "C") {
+  return useSWR<RecommendationResponse>(
+    `/api/recommendations?limit=${limit}&min_grade=${minGrade}`,
+    fetcher,
+    { refreshInterval: 300_000 },
+  );
+}
+
+/** Kandidat beli satu emiten (mesin skor sama dengan papan se-pasar). */
+export function useStockRecommendation(code: string | null) {
+  const key = code
+    ? `/api/stocks/${encodeURIComponent(code)}/recommendation`
+    : null;
+  return useSWR<StockRecommendation>(key, fetcher, { refreshInterval: 300_000 });
+}
+
+/**
+ * Track record kandidat beli: hit rate & abnormal per grade/horizon.
+ * Hitungan mahal & harian (backend cache 1 jam) — refresh 1 jam.
+ */
+export function useRecommendationTrack() {
+  return useSWR<RecommendationTrack>("/api/recommendations/track", fetcher, {
+    refreshInterval: 3_600_000,
+    shouldRetryOnError: false,
+  });
 }

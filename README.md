@@ -14,13 +14,13 @@ npm ci   # or `pnpm install` if you prefer pnpm
 2. **Configure environment** – copy the example and adjust the backend URL if needed:
 ```dotenv
 # .env.local (auto‑loaded by Next.js)
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 3. **Run the development server**
 ```powershell
 npm run dev   # starts on http://localhost:3000
 ```
-   The server proxies API calls to the backend defined in `NEXT_PUBLIC_API_URL`.
+   The browser calls the backend directly at the URL in `NEXT_PUBLIC_API_BASE_URL`.
 4. **Build for production**
 ```powershell
 npm run build && npm start
@@ -38,9 +38,8 @@ The sidebar groups the application into seven logical sections. Below each route
 | **Utama** | `/` (Dashboard) | Hero panel with IHSG composite, market‑wide volume/value split (regular vs non‑regular), Regime Banner + Timeline, market narrative, top gainers/losers, liquidity leaders, broker activity, signal panel, and an interactive technical chart.
 | | `/watchlist` | Watch‑list view with real‑time price, volume, and smart‑money status per symbol. Includes a CRUD UI for alert rules (price, RSI, volume) and a Telegram status/debug panel.
 | | `/pantau` | Consolidated monitoring of watch‑list alerts, smart‑money tracks, and Telegram connectivity. Alerts fire once per crossing and reset after the condition clears.
-| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.
-| **Analisis** | `/valuation` | PER / PBV per stock with peer comparison tables.
-| | `/hold-check` | Composite “hold‑or‑sell” verdict (0‑100 score) built from technical signals, valuation, IC‑adjusted factor score, and broker‑score (when available).
+| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.| **Analisis** | `/rekomendasi` | **Buy candidate board** — market‑wide ranked candidates with score/grade, entry zone, stop, target, R/R, position sizing, and a per‑grade track record. |
+| | `/valuation` | PER / PBV per stock with peer comparison tables. | | `/hold-check` | Composite “hold‑or‑sell” verdict (0‑100 score) built from technical signals, valuation, IC‑adjusted factor score, and broker‑score (when available).
 | | `/jejak-sinyal` | Signal performance dashboard – hit‑rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
 | | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
 | | `/dividen` | Dividend ledger – total, yearly breakdown, top‑yield stocks, and corporate‑action history (splits, bonuses, rights).
@@ -55,27 +54,34 @@ All pages share a common layout: a responsive sidebar, a header with the current
 
 ---
 
-## Framework Analisis Saham Multi‑Agen
+## Framework Frontend (konvensi nyata, bukan agen otonom)
 
-### Tim Frontend (Skills: Modern, No AI Slop)
-The frontend team guarantees visual and technical quality of the UI – the design must feel intentional, not a generic AI‑generated template.
+Tidak ada "agen" otonom di repo ini — aturan di bawah ditegakkan lewat struktur
+kode, satu gerbang CI, dan review manual. Yang benar-benar ada:
 
-- **UI/UX Craft Agent** – defines product‑specific typography, palette, and layout; avoids default hero sections, identical icons, and placeholder copy.
-- **Interaction & Motion Agent** – designs purposeful hover, loading, and feedback animations; no decorative motion without function.
-- **Code Quality Agent** – enforces reusable, accessible, responsive component architecture; rejects copy‑pasted patterns without adaptation.
-- **Review/QA Agent** – audits the final UI against a “no AI slop” checklist (generic look, duplicated elements, brand‑inconsistent visuals).
+| Peran | Wujud nyata |
+|-------|-------------|
+| **Batas presentasi** | Frontend **presentation-only**: nol kalkulasi bisnis di web. Semua hitungan di backend FastAPI; UI hanya fetch JSON lewat SWR (`lib/hooks.ts`, auto-refresh 30 detik) lalu render. |
+| **Design system** | Token di `app/globals.css` (`--accent`, `--bg`/`--bg-elev`/`--border`, `--up`/`--down`/`--warn`/`--muted`) + primitif bersama: `.card`/`.card-hover`, `.badge` (buy/sell/hold/warn/accent/pre), `.btn`/`.btn-ghost`/`.btn-primary`, `.nav-link`, `.data-table`, `.skeleton`, `.gradient-text`, `.fade-up`. |
+| **Komponen bersama** | `Card`, `States` (`Skeleton`/`ErrorState`/`EmptyState`), `InfoHint`, `LastUpdated`, `RegimeBanner`, `Sidebar`/`Topbar`, `TickerLogo` — dipakai ulang lintas halaman; tipe mirror backend di `lib/types.ts`, klien fetch di `lib/api.ts`. |
+| **Aksesibilitas** | Atribut `aria-label` / `aria-hidden` / `aria-current` / `aria-modal` / `role` dipakai di ±31 berkas (nav, dialog mobile, tombol ikon); warna & kontras dari token `globals.css`. |
+| **Kualitas otomatis** | Satu gerbang CI (`.github/workflows/ci.yml`): `npm ci` → `tsc --noEmit` → `next build`. **Tidak ada unit/E2E test runner** di repo ini (tidak ada Vitest/Jest/Playwright di `package.json`). |
+| **"No AI slop"** | Checklist review manual (bukan agen): hindari hero generik, ikon seragam, copy placeholder, dan komponen hasil salin tanpa adaptasi. |
 
-### Tim Trainer
-Responsible for continuous improvement of both trading and frontend agents.
+### Evaluasi & kalibrasi (di backend, bukan agen frontend)
 
-- **Evaluation Agent** – builds test suites and benchmarks to measure decision quality, design consistency, and output stability over time.
-- **Feedback Loop Agent** – collects real‑world feedback (trading performance, design reviews, user complaints) and translates it into prompt/parameter adjustments for the relevant agents.
-- **Calibration Agent** – fine‑tunes strategy or style (risk appetite, design language) based on performance trends, preventing drift from the original goals.
+Peran "Trainer" (Evaluation / Feedback Loop / Calibration) **tidak ada sebagai
+kode frontend**. Yang benar-benar mengukur kualitas keputusan ada di backend:
+`research/signal_log.py` (track record sinyal), `research/recommendation_log.py`
+(track record kandidat beli), dan track record pola `smart_money` — semuanya
+mengukur outcome forward + abnormal vs pasar supaya klaim bisa dicek, bukan
+dipercaya. (`signal_log` & `recommendation_log` mempersist ke tabel;
+track record `smart_money` dihitung saat diminta.) Di sisi frontend, satu-satunya gerbang otomatis adalah `tsc` + `next build`.
 
 ---
 
 ## Running the Frontend
-1. Ensure the **backend** (`idx‑scraper`) is running and reachable at the URL defined in `NEXT_PUBLIC_API_URL`.
+1. Ensure the **backend** (`idx‑scraper`) is running and reachable at the URL defined in `NEXT_PUBLIC_API_BASE_URL`.
 2. In a terminal, start the dev server:
 ```powershell
 npm run dev
@@ -123,6 +129,7 @@ graph LR
   end
   subgraph Analisis
     E[Valuasi /valuation]
+    N[Rekomendasi Beli /rekomendasi]
     F[Hold Check /hold-check]
     G[Jejak Sinyal /jejak-sinyal]
     H[Backtest /backtest]
@@ -187,6 +194,29 @@ skor sudah tervalidasi IC (lihat Aktivitas Broker) — sebelum itu kolomnya koso
 dan filter menyaring habis, bukan diam-diam diabaikan.
 
 ### Grup: Analisis
+
+#### Rekomendasi Beli (`/rekomendasi`)
+Papan kandidat beli se-pasar: tiap baris membawa **grade** (A/B/C), skor, **zona
+entry**, **stop**, **target**, **R/R**, dan **ukuran posisi** (% modal dari
+risiko 1% per posisi). Filter grade (A saja / B ke atas / semua) dan jumlah baris.
+**Grade = peringkat relatif di dalam pool hari itu** (A 2% · B 10% · C 25%
+teratas), bukan probabilitas dan bukan ambang skor absolut.
+
+Di atasnya ada **strip lapisan** yang menyebut lapisan mana yang ikut
+menggerakkan skor: komposisi skor datang dari walk-forward (semua komponen yang
+lolos gate saat ini berbobot penalti), sementara **faktor IC** dan **aliran
+broker** hanya aktif bila lolos gate IC — kalau belum, keduanya tidak ikut dan
+halamannya bilang begitu, bukan menampilkan skor rekaan. Bukti **pola smart
+money** ditampilkan sebagai alasan/peringatan per emiten, tapi belum menimbang
+skor karena `foreign_net` baru tersedia ~50 sesi (di bawah jendela train).
+
+Di bawah papan: **Track Record Kandidat** — seberapa sering kandidat benar-benar
+berbuah, dipisah per grade dan horizon (5/10/21 hari), termasuk abnormal return
+vs pasar. Ringkasnya diukur, bukan diklaim. Tiap kandidat bisa diklik ke Ruang
+Keputusan atau detail teknikal.
+
+> Alat bantu riset, bukan rekomendasi keuangan. Kandidat tanpa level stop yang
+> bisa dihitung tidak ditampilkan.
 
 #### Valuasi (`/valuation`)
 PER/PBV per emiten beserta peers pembanding.
@@ -403,6 +433,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/sectors/page.tsx` — sector analysis + rotasi aktivitas broker
 - `app/foreign/page.tsx` — foreign fund flow
 - `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
+- `app/rekomendasi/page.tsx` — buy candidate board (grade, entry/stop/target, R/R, sizing, per-grade track record)
 - `app/valuation/page.tsx` — PER/PBV valuation view
 - `app/hold-check/page.tsx` — combined hold verdict
 - `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
