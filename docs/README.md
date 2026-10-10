@@ -77,7 +77,7 @@ flowchart LR
 
 ### Chrome Global
 
-Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas.
+Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas. Perilaku di bawah ini sudah dikonfirmasi terhadap UI yang berjalan di http://localhost:3000 (2026-10-11).
 
 | Fitur | Implementasi | Perilaku | Penyimpanan lokal |
 |---|---|---|---|
@@ -88,7 +88,7 @@ Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas.
 
 Sinkronisasi filter Screener: filter di [`app/screener/page.tsx`](../../idx-web/app/screener/page.tsx) ditulis ke query string URL (`useSearchParams` + `useRouter`), sehingga tautan hasil filter bisa dibagikan dan dibuka ulang.
 
-Logo emiten: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json) lalu memakai file lokal `public/logos/{CODE}.png`. Bila tidak ada, ditampilkan monogram kode. Dataset: 912 logo, 51 monogram (dari 963 kode). Logo milik masing-masing emiten, sumber TradingView, lisensi `[BELUM TERVERIFIKASI]`.
+Logo emiten: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json) lalu memakai file lokal `public/logos/{CODE}.png`. Bila tidak ada, ditampilkan monogram kode. Dataset: 912 logo, 51 monogram (dari 963 kode). Logo milik masing-masing emiten, sumber TradingView. Status hak cipta logo tetap `[BELUM TERVERIFIKASI]`.
 
 ## Diagram Alur Data (Menu Kompleks)
 
