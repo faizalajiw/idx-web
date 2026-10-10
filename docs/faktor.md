@@ -100,7 +100,7 @@ Harga EOD (Postgres) → research.ic (build panel, IC harian)
 - **Fallback**: bobot statis `FACTOR_WEIGHTS` bila tabel kosong.
 
 ## 6. Dependensi & Relasi Menu
-- Bobot dan status eligible dipakai [Aktivitas Broker](aktivitas-broker.md), [Hold Check](hold-check.md), [Ruang Keputusan](ruang-keputusan.md), dan [Screener](screener.md).
+- Bobot dan status eligible dipakai [Aktivitas Broker](aktivitas-broker.md), [Ruang Keputusan](ruang-keputusan.md), dan [Screener](screener.md).
 - Konteks regime berasal dari [Dashboard](dashboard.md).
 
 ## 7. Catatan Batasan & Edge Case

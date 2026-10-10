@@ -39,8 +39,8 @@ The sidebar groups the application into seven logical sections. Below each route
 | | `/watchlist` | Watch‑list view with real‑time price, volume, and smart‑money status per symbol. Includes a CRUD UI for alert rules (price, RSI, volume) and a Telegram status/debug panel.
 | | `/pantau` | Consolidated monitoring of watch‑list alerts, smart‑money tracks, and Telegram connectivity. Alerts fire once per crossing and reset after the condition clears.
 | **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.| **Analisis** | `/rekomendasi` | **Buy candidate board** — market‑wide ranked candidates with score/grade, entry zone, stop, target, R/R, position sizing, and a per‑grade track record. |
-| | `/valuation` | PER / PBV per stock with peer comparison tables. | | `/hold-check` | Composite “hold‑or‑sell” verdict (0‑100 score) built from technical signals, valuation, IC‑adjusted factor score, and broker‑score (when available).
-| | `/jejak-sinyal` | Signal performance dashboard – hit‑rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
+| | `/valuation` | PER / PBV per stock with peer comparison tables.
+| | `/jejak-sinyal` | Signal performance dashboard – hit‐rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
 | | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
 | | `/faktor` | Registry of quantitative factors (momentum, Amihud, foreign net, order‑book imbalance, etc.) with definitions and calibration metadata.
 | **Flow** | `/radar` | Market‑wide smart‑money radar showing the strongest foreign‑money inflow/outflow stocks (net buy / net sell) by value, with selectable windows (2/5/10/21 sessions), streak badges, and liquidity floor filters. Clicking a tile opens `/radar/[code]` for full signal history and technical chart.
@@ -129,7 +129,6 @@ graph LR
   subgraph Analisis
     E[Valuasi /valuation]
     N[Rekomendasi Beli /rekomendasi]
-    F[Hold Check /hold-check]
     G[Jejak Sinyal /jejak-sinyal]
     H[Backtest /backtest]
     J[Faktor & Kalibrasi /faktor]
@@ -219,14 +218,6 @@ Keputusan atau detail teknikal.
 #### Valuasi (`/valuation`)
 PER/PBV per emiten beserta peers pembanding.
 
-#### Hold Check (`/hold-check`)
-Verdikt gabungan teknikal + valuasi: "saham ini masih layak dipegang?"
-
-Skor 0–100 disusun berlapis: sinyal teknikal + valuasi (dominan), lalu lapisan
-faktor IC (±10 poin), lalu lapisan **aktivitas broker** (±8 poin). Lapisan broker
-hanya aktif bila ada faktor aliran yang lolos uji IC — kalau belum, verdict-nya
-sama persis seperti sebelum fitur ini ada.
-
 #### Jejak Sinyal (`/jejak-sinyal`)
 Track record kualitas sinyal:
 - Hit rate, mean/median forward return, abnormal return vs pasar, dan MFE/MAE per
@@ -286,7 +277,7 @@ jejak broker) + struktur broker pasar:
   (CR1/CR3/CR5 + HHI), seluruh pasar, EOD.
 
 Skor dari halaman ini dipakai ulang oleh Screener (filter `min_broker_score`),
-Hold Check (lapisan verdict), kartu detail emiten, dan **rotasi sektor** di
+skor keputusan backend (lapisan verdict), kartu detail emiten, dan **rotasi sektor** di
 halaman Sektor — semuanya lewat satu snapshot yang sama, jadi angkanya tidak
 pernah berbeda antar halaman.
 
@@ -417,7 +408,7 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
 - `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
@@ -429,7 +420,6 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
 - `app/rekomendasi/page.tsx` — buy candidate board (grade, entry/stop/target, R/R, sizing, per-grade track record)
 - `app/valuation/page.tsx` — PER/PBV valuation view
-- `app/hold-check/page.tsx` — combined hold verdict
 - `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
 - `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)

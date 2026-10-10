@@ -427,43 +427,6 @@ export interface TechnicalChart {
   bars: IndicatorBar[];
 }
 
-export interface HoldCheckItem {
-  code: string;
-  name: string | null;
-  signal: string;
-  trend_up: boolean;
-  rsi: number | null;
-  macd_bullish: boolean;
-  bb_position: string | null;
-  z_score: number | null;
-  below_target_pct: number | null;
-  foreign_net: number | null;
-  score: number;
-  /** Skor teknikal+valuasi sebelum lapisan faktor IC (null = lapisan tidak aktif). */
-  base_score: number | null;
-  /** Penyesuaian skor dari lapisan faktor IC, poin (-10..+10). */
-  factor_adj: number | null;
-  /** Skor aktivitas broker 0-100; null = lapisan broker tidak aktif. */
-  broker_score: number | null;
-  /** Penyesuaian skor dari lapisan aktivitas broker, poin (-8..+8); 0 = tidak aktif. */
-  broker_adj: number | null;
-  /** Percentile cross-sectional pasar per faktor (0..1); null = emiten di luar coverage ranking. */
-  factor_pct: {
-    vol_pct: number;
-    turnover_pct: number;
-    dist_52w_pct: number;
-  } | null;
-  verdict: string;
-  reasons: string[];
-}
-
-export interface HoldCheckResponse {
-  date: string | null;
-  /** Jam backend menghitung hold check (WIB, ISO). */
-  generated_at?: string | null;
-  items: HoldCheckItem[];
-}
-
 // --------------------------------------------------------------- research UI
 
 export interface StockEventRow {

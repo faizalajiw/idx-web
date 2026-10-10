@@ -319,7 +319,7 @@ export function BrokerActivityCard({ code }: { code: string }) {
     <Card
       title="Aktivitas Broker"
       subtitle="Skor proksi aliran terkuat + riwayat driver-nya"
-      info="Skor 0-100 dari aliran asing bernotasi + ketimpangan buku intraday, dibobot oleh uji IC. 50 = median pasar. Skor dipakai ulang oleh Screener dan Hold Check, jadi angkanya konsisten antar halaman. Pembanding sektor memakai emiten sektor yang sama yang sudah punya skor."
+      info="Skor 0-100 dari aliran asing bernotasi + ketimpangan buku intraday, dibobot oleh uji IC. 50 = median pasar. Skor dipakai ulang oleh Screener dan Ruang Keputusan, jadi angkanya konsisten antar halaman. Pembanding sektor memakai emiten sektor yang sama yang sudah punya skor."
       right={<LastUpdated sessionDate={data?.as_of} updatedAt={data?.ic_run_date} dep={data} />}
     >
       {error ? (

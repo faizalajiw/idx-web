@@ -229,13 +229,13 @@ export default function FaktorPage() {
         </h1>
         <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Hasil IC analysis bulanan: faktor mana yang benar-benar predictive di
-          data IDX, dan bobot yang dipakai composite Hold Check.
+          data IDX, dan bobot yang dipakai composite skor keputusan.
           <LastUpdated sessionDate={data?.latest_run} />
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card title="Bobot Composite Aktif" subtitle="Dari run IC terbaru — otomatis dipakai Hold Check" info="Seberapa besar 'suara' tiap faktor (momentum, valuasi, dll) dalam skor gabungan. Bobot lebih besar = faktor itu dianggap lebih andal belakangan ini. Dihitung otomatis dari data.">
+        <Card title="Bobot Composite Aktif" subtitle="Dari run IC terbaru — otomatis dipakai skor keputusan" info="Seberapa besar 'suara' tiap faktor (momentum, valuasi, dll) dalam skor gabungan. Bobot lebih besar = faktor itu dianggap lebih andal belakangan ini. Dihitung otomatis dari data.">
           <WeightsCard />
         </Card>
         <Card title="Regime IHSG Historis" subtitle="Distribusi regime + transisi (backfill otomatis)" info="Rekap seberapa sering pasar berada di tiap kondisi (tren naik/turun/sideways) dan seberapa sering berpindah. Membantu paham karakter pasar dari waktu ke waktu.">

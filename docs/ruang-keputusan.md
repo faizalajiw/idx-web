@@ -1,7 +1,7 @@
 # Ruang Keputusan (`/keputusan`, `/keputusan/[code]`)
 
 ## 1. Ringkasan Fungsi
-Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan verdict hold-check sebagai dasar, lalu memperkaya dengan konteks yang **tidak mengubah verdict** (regime, sentimen aliran, jejak asing, base rate event, level pembatalan). Pengguna: trader/analis yang butuh ringkasan keputusan + alasan. Dipakai saat mau memutuskan hold/trim/exit satu emiten.
+Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan skor keputusan dasar (lapisan verdict backend) sebagai dasar, lalu memperkaya dengan konteks yang **tidak mengubah verdict** (regime, sentimen aliran, jejak asing, base rate event, level pembatalan). Pengguna: trader/analis yang butuh ringkasan keputusan + alasan. Dipakai saat mau memutuskan hold/trim/exit satu emiten.
 
 ## 2. Route & Berkas
 - URL: `/keputusan` (pemilih emiten) → [`app/keputusan/page.tsx`](../../idx-web/app/keputusan/page.tsx); `/keputusan/[code]` → workspace
@@ -16,8 +16,8 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Nama card | Ruang Keputusan — `{code}` |
 | Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (`VerdictBadge`, `MiniBar`) |
 | Fungsi | Verdict gabungan teknikal + valuasi + lapisan IC/broker; skor N/100 + alasan |
-| Sumber data | `GET /api/stocks/{code}/decision` ([app.py:367](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_stock_decision` ([analytics.py:1143](../../idx-scraper/src/idx_scraper/api/analytics.py)); dasar dari `services.get_hold_check` ([services.py:772](../../idx-scraper/src/idx_scraper/api/services.py)) |
-| Rumus/Logika | Verdict = hold-check; `score = base_score + factor_adj + broker_adj`; verdict merek: STRONG HOLD / HOLD / TRIM / EXIT |
+| Sumber data | `GET /api/stocks/{code}/decision` ([app.py:367](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_stock_decision` ([analytics.py:1143](../../idx-scraper/src/idx_scraper/api/analytics.py)); dasar dari `services.get_hold_check` (endpoint `/api/hold-check` tetap dipakai backend) ([services.py:772](../../idx-scraper/src/idx_scraper/api/services.py)) |
+| Rumus/Logika | Verdict = skor dasar backend; `score = base_score + factor_adj + broker_adj`; verdict merek: STRONG HOLD / HOLD / TRIM / EXIT |
 | Periode/Window | Verdict bergerak harian; cache 30 menit |
 | Interaksi | Ganti emiten lewat StockPicker |
 | Empty/Loading/Error | Empty "Emiten tidak ditemukan / histori tidak cukup untuk verdict" |
@@ -82,11 +82,11 @@ EOD ingest → Postgres (prices_pit / latest_pit, stock_summary_daily)
 - **On-demand**: dihitung saat request, **bukan** precomputed job.
 - **Cache**: 30 menit (`_research_cache`), kunci `stock_decision:{code}`.
 - **Refresh UI**: SWR 120 detik.
-- **Idempotensi**: verdict dari satu sumber (hold-check); konteks dibaca ulang tiap request.
-- **Fallback**: mengikuti hold-check (lihat [Hold Check](hold-check.md)).
+- **Idempotensi**: verdict dari satu sumber (skor dasar backend); konteks dibaca ulang tiap request.
+- **Fallback**: mengikuti skor dasar backend.
 
 ## 6. Dependensi & Relasi Menu
-- Bergantung pada [Hold Check](hold-check.md) (verdict dasar), [Sentimen](sentimen.md), regime IHSG, dan event study.
+- Bergantung pada skor dasar backend (verdict), [Sentimen](sentimen.md), regime IHSG, dan event study.
 - Menautkan ke `/stock/[code]` dan `/flow/[code]`.
 
 ## 7. Catatan Batasan & Edge Case

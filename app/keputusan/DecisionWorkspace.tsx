@@ -259,7 +259,7 @@ export function DecisionWorkspace({ code }: { code: string | null }) {
             <Card
               title={`Ruang Keputusan — ${code}`}
               subtitle="Verdict gabungan teknikal + valuasi + lapisan IC/broker"
-              info="Satu verdict dari Hold Check (satu sumber kebenaran skor). Konteks di bawah (regime, sentimen, base rate) tidak mengubah verdict — mereka membantu lo menilai seberapa besar percaya diri terhadap verdict itu. Alat bantu riset, bukan rekomendasi beli/jual."
+              info="Satu verdict dari skor keputusan backend (satu sumber kebenaran skor). Konteks di bawah (regime, sentimen, base rate) tidak mengubah verdict — mereka membantu lo menilai seberapa besar percaya diri terhadap verdict itu. Alat bantu riset, bukan rekomendasi beli/jual."
             >
               {!hc ? (
                 <EmptyState message="Emiten tidak ditemukan / histori tidak cukup untuk verdict." />

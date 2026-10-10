@@ -17,7 +17,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Nama card | Peringkat Skor Akumulasi |
 | Komponen | [broker-activity/page.tsx](../../idx-web/app/broker-activity/page.tsx) ~baris 355–363 |
 | Fungsi | Daftar emiten urut skor 0–100 dari faktor aliran yang tervalidasi |
-| Sumber data | `GET /api/broker-activity` → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` (satu sumber bersama Screener dan Hold Check) |
+| Sumber data | `GET /api/broker-activity` → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` (satu sumber bersama Screener dan Ruang Keputusan) |
 | Rumus/Logika | Composite faktor yang lolos gate: \|mean IC\| ≥ 0,05 dan \|ICIR\| ≥ 0,5; arah mengikuti tanda IC. Skor relatif terhadap pasar hari itu. Pilih emiten untuk timeline (klik baris) |
 | Periode/Window | Lookback panel 60 hari; horizon bobot = `WEIGHT_HORIZON` |
 | Interaksi | Klik baris → timeline aliran dana muncul di bawah |
@@ -67,7 +67,7 @@ Ingest broker EOD + harga + foreign → Postgres (broker_daily, latest_pit, stoc
   → broker_activity_snapshot (cache 1 jam) → get_broker_activity
   → GET /api/broker-activity?limit=25 → useBrokerActivity (300 s) → tabel + kartu
 ```
-Snapshot yang sama juga dipakai [Screener](screener.md) (`min_broker_score`) dan [Hold Check](hold-check.md).
+Snapshot yang sama juga dipakai [Screener](screener.md) (`min_broker_score`) dan [Ruang Keputusan](ruang-keputusan.md).
 
 ## 5. Cara Pengambilan / Update Data
 - **Precomputed sebagian**: data broker EOD diisi job `refresh_s2` (16:05) dan backfill broker 16:30 WIB ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)). IC diisi job `daily_ic` (Senin–Jumat 06:30 WIB).
@@ -79,7 +79,7 @@ Snapshot yang sama juga dipakai [Screener](screener.md) (`min_broker_score`) dan
 
 ## 6. Dependensi & Relasi Menu
 - Bergantung pada [Faktor & Kalibrasi](faktor.md) (gate IC dan bobot).
-- Ditampilkan juga di [Screener](screener.md) dan [Hold Check](hold-check.md).
+- Ditampilkan juga di [Screener](screener.md) dan [Ruang Keputusan](ruang-keputusan.md).
 - Timeline membuka [Aliran Dana Emiten](aliran-dana-emiten.md).
 
 ## 7. Catatan Batasan & Edge Case

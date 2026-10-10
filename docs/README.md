@@ -50,7 +50,7 @@ flowchart LR
 | Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
 | Analisis | `/keputusan` | Ruang Keputusan | Verdict per emiten + event study | 5 | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
 | Analisis | `/valuation` | Valuasi | Z-score band statistik undervalued/overvalued | 2 | `research.latest_pit` | on-demand + SWR 300s |
-| Analisis | `/hold-check` | Hold Check | Skor 0–100 tahan/jual | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
+| Analisis | `/ruang-keputusan` | Ruang Keputusan | Skor keputusan + konteks | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
 | Analisis | `/jejak-sinyal` | Jejak Sinyal | Track record sinyal vs pasar | 4 | `research.signal_log` | job `idx signal-log` |
 | Analisis | `/backtest` | Backtest | Simulasi point-in-time | 8 | `research.prices_pit` | on-demand (POST, tanpa tulis DB) |
 | Analisis | `/faktor` | Faktor & Kalibrasi | Bobot IC, regime, registry faktor | 6 | `research.factor_ic_history`, `regime_daily` | job `idx ic` (harian 06:30) |
@@ -189,7 +189,6 @@ sequenceDiagram
 | Rekomendasi | `/api/stocks/{code}/recommendation` | `analytics.get_stock_recommendation` | `research.recommendation_log` | on-demand |
 | Ruang Keputusan | `/api/stocks/{code}/decision` | `analytics.get_stock_decision` | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
 | Valuasi | `/api/valuation` | `analytics.get_valuation` | `research.latest_pit` | on-demand |
-| Hold Check | `/api/hold-check` | `services.get_hold_check` | `research.latest_pit`, `orderbook` | on-demand |
 | Jejak Sinyal | `/api/signals/track` | `analytics.get_signal_track` | `research.signal_log` | job `idx signal-log` |
 | Backtest | `/api/backtest/config` + `/run` | `simulation` | `research.prices_pit` | on-demand (POST) |
 | Faktor | `/api/factors/overview` | `analytics.get_factors_overview` | `research.factor_ic_history` | job harian `daily_ic` 06:30 |
@@ -263,7 +262,6 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 - [rekomendasi.md](./rekomendasi.md)
 - [ruang-keputusan.md](./ruang-keputusan.md)
 - [valuasi.md](./valuasi.md)
-- [hold-check.md](./hold-check.md)
 - [jejak-sinyal.md](./jejak-sinyal.md)
 - [backtest.md](./backtest.md)
 - [faktor.md](./faktor.md)

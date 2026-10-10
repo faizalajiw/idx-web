@@ -87,7 +87,7 @@ IDX (EOD / intraday) → cf_transport / ingest → Postgres (stock_quotes, price
 
 ## 6. Dependensi & Relasi Menu
 - Bergantung pada snapshot `stock_quotes` (dari job refresh EOD) dan `prices_adjusted`.
-- Menyediakan emiten terpilih ke [Jejak Sinyal](jejak-sinyal.md), [Hold Check](hold-check.md), dan halaman detail `/stock/[code]`.
+- Menyediakan emiten terpilih ke [Jejak Sinyal](jejak-sinyal.md), [Ruang Keputusan](ruang-keputusan.md), dan halaman detail `/stock/[code]`.
 
 ## 7. Catatan Batasan & Edge Case
 - Alert hanya bunyi setelah data EOD baru masuk; di luar jam bursa tidak ada evaluasi baru.

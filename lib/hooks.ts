@@ -21,7 +21,6 @@ import type {
   StockBrokerActivity,
   SectorRotation,
   ForeignFlow,
-  HoldCheckResponse,
   MarketNarration,
   MarketOverview,
   MarketRegime,
@@ -156,15 +155,6 @@ export function useSignals(codes?: string, minDays = 25) {
   return useSWR<Signal[]>(key, fetcher, { refreshInterval: REFRESH });
 }
 
-export function useHoldCheck(codes?: string) {
-  const key = `/api/hold-check${
-    codes ? `?codes=${encodeURIComponent(codes)}` : ""
-  }`;
-  return useSWR<HoldCheckResponse>(key, fetcher, {
-    refreshInterval: 300_000, // verdicts are slow-moving; 5 min is plenty
-  });
-}
-
 export function useTechnical(code: string | null) {
   const key = code ? `/api/stocks/${encodeURIComponent(code)}/technical` : null;
   return useSWR<TechnicalChart>(key, fetcher, { refreshInterval: REFRESH });
@@ -237,7 +227,6 @@ function invalidateDerived(mutate: ReturnType<typeof useSWRConfig>["mutate"]) {
     (key) =>
       typeof key === "string" &&
       (key.startsWith("/api/signals") ||
-        key.startsWith("/api/hold-check") ||
         key.startsWith("/api/stocks") ||
         key.startsWith("/api/screener") ||
         key.startsWith("/api/valuation")),

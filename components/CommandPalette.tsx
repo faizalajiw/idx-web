@@ -26,7 +26,6 @@ const NAV_ACTIONS: Action[] = [
   { id: "rekomendasi", label: "Rekomendasi Beli", href: "/rekomendasi", keywords: "rekomendasi beli sinyal" },
   { id: "keputusan", label: "Ruang Keputusan", href: "/keputusan", keywords: "keputusan decision" },
   { id: "valuation", label: "Valuasi", href: "/valuation", keywords: "valuasi valuation fair" },
-  { id: "hold-check", label: "Hold Check", href: "/hold-check", keywords: "hold cek" },
   { id: "jejak-sinyal", label: "Jejak Sinyal", href: "/jejak-sinyal", keywords: "jejak sinyal history" },
   { id: "backtest", label: "Backtest", href: "/backtest", keywords: "backtest simulasi strategi" },
   { id: "faktor", label: "Faktor & Kalibrasi", href: "/faktor", keywords: "faktor kalibrasi ic" },
