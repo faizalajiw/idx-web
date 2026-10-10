@@ -24,7 +24,7 @@ from pypdf import PdfReader
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Market-Labs-Dokumentasi-Menu.pdf"
-MERMAID_JS = HERE / "node_modules" / "mermaid" / "dist" / "mermaid.min.js"
+MERMAID_JS = HERE.parents[1] / "node_modules" / "mermaid" / "dist" / "mermaid.min.js"
 ORDER = ["README.md"] + sorted(
     p.name for p in HERE.glob("*.md") if p.name != "README.md"
 )
@@ -188,7 +188,7 @@ def _dest_pages(pdf: Path) -> dict[str, int]:
 
 def main() -> None:
     if not MERMAID_JS.exists():
-        raise SystemExit("mermaid tidak ditemukan. Jalankan: npm install (di docs/menu)")
+        raise SystemExit("mermaid tidak ditemukan. Jalankan: npm install --no-save mermaid@11 (di idx-web)")
     body, headings = render_markdown()
     date_str = datetime.now().strftime("%d %B %Y %H:%M")
     tmp = HERE / "_build.html"
