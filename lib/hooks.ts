@@ -42,10 +42,6 @@ import type {
   RegimeHistory,
   SentimentResponse,
   SignalTrack,
-  DividendOverview,
-  DividendStock,
-  DividendDetail,
-  CorpActionRow,
   SmartMoneyRadar,
   SmartMoneyStock,
   SmartMoneyTrackRecord,
@@ -347,17 +343,7 @@ export function useDeleteAlert() {
   );
 }
 
-// --------------------------------------------------- dividends & corp actions
-
-/**
- * Dividend totals, history by year, recent payouts and the top yields.
- * Dividends only change when a new ex-date is ingested, so 5 minutes is plenty.
- */
-export function useDividendOverview() {
-  return useSWR<DividendOverview>("/api/dividends/overview", fetcher, {
-    refreshInterval: 300_000,
-  });
-}
+// ------------------------------------------------------------------- sectors
 
 /**
  * Rotasi sektor berbasis skor aktivitas broker (proksi aliran dana).
@@ -369,38 +355,6 @@ export function useSectorRotation(lookback = 60, minNames = 3) {
     fetcher,
     { refreshInterval: 300_000 },
   );
-}
-
-/** Every emiten that has ever paid cash, with its trailing yield. */
-export function useDividendStocks(
-  minYield = 0,
-  sort: "yield" | "cash" | "recent" = "yield",
-  limit = 200,
-) {
-  const key =
-    `/api/dividends/stocks?sort=${sort}&limit=${limit}` +
-    (minYield > 0 ? `&min_yield=${minYield}` : "");
-  return useSWR<DividendStock[]>(key, fetcher, {
-    refreshInterval: 300_000,
-    keepPreviousData: true,
-  });
-}
-
-/** One emiten's dividend + split history. 404s are a normal "never paid". */
-export function useStockDividends(code: string | null) {
-  const key = code ? `/api/stocks/${encodeURIComponent(code)}/dividends` : null;
-  return useSWR<DividendDetail>(key, fetcher, {
-    refreshInterval: 300_000,
-    shouldRetryOnError: false,
-  });
-}
-
-/** Raw corporate-action ledger, optionally filtered to one action type. */
-export function useCorpActions(actionType?: string, limit = 40) {
-  const key =
-    `/api/corporate-actions?limit=${limit}` +
-    (actionType ? `&action_type=${encodeURIComponent(actionType)}` : "");
-  return useSWR<CorpActionRow[]>(key, fetcher, { refreshInterval: 300_000 });
 }
 
 // ---------------------------------------------------------------- backtest

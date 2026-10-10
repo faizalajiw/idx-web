@@ -42,7 +42,6 @@ The sidebar groups the application into seven logical sections. Below each route
 | | `/valuation` | PER / PBV per stock with peer comparison tables. | | `/hold-check` | Composite “hold‑or‑sell” verdict (0‑100 score) built from technical signals, valuation, IC‑adjusted factor score, and broker‑score (when available).
 | | `/jejak-sinyal` | Signal performance dashboard – hit‑rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
 | | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
-| | `/dividen` | Dividend ledger – total, yearly breakdown, top‑yield stocks, and corporate‑action history (splits, bonuses, rights).
 | | `/faktor` | Registry of quantitative factors (momentum, Amihud, foreign net, order‑book imbalance, etc.) with definitions and calibration metadata.
 | **Flow** | `/radar` | Market‑wide smart‑money radar showing the strongest foreign‑money inflow/outflow stocks (net buy / net sell) by value, with selectable windows (2/5/10/21 sessions), streak badges, and liquidity floor filters. Clicking a tile opens `/radar/[code]` for full signal history and technical chart.
 | | `/foreign` | Ranked list of foreign‑money net flows per stock.
@@ -133,7 +132,6 @@ graph LR
     F[Hold Check /hold-check]
     G[Jejak Sinyal /jejak-sinyal]
     H[Backtest /backtest]
-    I[Dividen /dividen]
     J[Faktor & Kalibrasi /faktor]
   end
   subgraph Flow
@@ -241,10 +239,6 @@ Simulator strategi point-in-time: equity curve + metrik, cost model (komisi, paj
 slippage), frekuensi rebalance yang bisa diatur, dan perbandingan gross/net vs
 buy & hold. Backend tidak menyimpan apa pun → aman dijalankan berulang saat tuning.
 
-#### Dividen (`/dividen`)
-Overview dividen (total, riwayat tahunan, top trailing yield) + ledger corporate
-action (split, reverse split, bonus, rights, dividen).
-
 #### Faktor & Kalibrasi (`/faktor`)
 Registry faktor kuantitatif (momentum, volatilitas, likuiditas Amihud, foreign net,
 ketimpangan order book, absorption, dll) dengan definisi & kalibrasinya.
@@ -323,7 +317,7 @@ technical chart (OHLCV + MA/BB/RSI/MACD), broker summary per emiten, aktivitas
 broker (skor aliran + riwayat driver + pembanding sektor), **Pemilik & Aksi
 Pemilik** (komposisi pemegang saham dari keterbukaan IDX: free float publik,
 pengendali, daftar pemilik terbesar, dan perubahan porsi vs snapshot
-sebelumnya), dan detail dividen (riwayat cash + split).
+sebelumnya).
 
 ## Alur Data
 
@@ -423,12 +417,12 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `lib/api.ts` — typed fetch client + SWR fetcher
 - `lib/hooks.ts` — SWR hooks (30s auto-refresh)
 - `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, DividendYearChart, DividendDetailPanel, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
+- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, HoldCheckPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
 - `app/page.tsx` — dashboard composition
 - `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
 - `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
 - `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
-- `app/stock/[code]/page.tsx` — per-stock technical, history, brokers, dividends
+- `app/stock/[code]/page.tsx` — per-stock technical, history, brokers
 - `app/screener/page.tsx` — multi-criteria stock screener
 - `app/sectors/page.tsx` — sector analysis + rotasi aktivitas broker
 - `app/foreign/page.tsx` — foreign fund flow
@@ -438,7 +432,6 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/hold-check/page.tsx` — combined hold verdict
 - `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
-- `app/dividen/page.tsx` — dividend overview, trailing yields, corp-action ledger
 - `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)
 - `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
 - `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
