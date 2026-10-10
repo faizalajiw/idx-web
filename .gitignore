@@ -9,3 +9,5 @@ npm-debug.log*
 next-env.d.ts
 .vercel
 *.tsbuildinfo
+
+docs/menu/node_modules/
