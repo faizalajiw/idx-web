@@ -25,45 +25,53 @@ function hashColor(code: string): string {
 type ManifestEntry = { code: string; status: string; file: string | null };
 
 // Manifest di-fetch sekali per sesi browser, lalu dibagi ke semua instance.
-let logoMapPromise: Promise<Map<string, string>> | null = null;
+const logoMapPromises = new Map<string, Promise<Map<string, string>>>();
 
-function loadLogoMap(): Promise<Map<string, string>> {
-  if (!logoMapPromise) {
-    logoMapPromise = fetch("/logos/manifest.json", { cache: "no-store" })
+function loadLogoMap(basePath: string): Promise<Map<string, string>> {
+  let promise = logoMapPromises.get(basePath);
+  if (!promise) {
+    promise = fetch(`${basePath}/manifest.json`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { entries: [] }))
       .then((data: { entries?: ManifestEntry[] }) => {
         const map = new Map<string, string>();
         for (const e of data.entries ?? []) {
-          if (e.status === "ok" && e.file) map.set(e.code, `/logos/${e.file}`);
+          if (e.status === "ok" && e.file) map.set(e.code, `${basePath}/${e.file}`);
         }
         return map;
       })
       .catch(() => new Map<string, string>());
+    logoMapPromises.set(basePath, promise);
   }
-  return logoMapPromise;
+  return promise;
 }
 
+/**
+ * Logo kode saham (emiten) atau broker. `basePath` menentukan folder aset
+ * dan manifest-nya; default ke emiten. Tanpa logo, tampil monogram.
+ */
 export function TickerLogo({
   code,
   size = 24,
   className = "",
+  basePath = "/logos",
 }: {
   code: string;
   size?: number;
   className?: string;
+  basePath?: string;
 }) {
   const upper = code.toUpperCase();
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    loadLogoMap().then((map) => {
+    loadLogoMap(basePath).then((map) => {
       if (active) setSrc(map.get(upper) ?? null);
     });
     return () => {
       active = false;
     };
-  }, [upper]);
+  }, [upper, basePath]);
 
   if (src) {
     return (

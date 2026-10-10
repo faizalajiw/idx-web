@@ -9,6 +9,7 @@ import type { BrokerFlowCategory } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
+import { TickerLogo } from "./TickerLogo";
 
 /**
  * Kategori prioritas dari backend (map kurasi kode broker). Fallback ke
@@ -53,6 +54,7 @@ function BrokerItem({ r, rank }: { r: BrokerLeaderRow; rank: number }) {
         className="flex w-full items-center gap-2.5 px-3 py-2 text-left"
       >
         <span className="text-muted w-4 shrink-0 text-center text-xs font-semibold tabular-nums">{rank}</span>
+        <TickerLogo code={r.broker_code} basePath="/logos/brokers" size={22} />
         <div className="flex min-w-0 flex-col">
           <span className={`text-sm font-semibold ${typeTw}`}>{r.broker_code}</span>
           {r.broker_name && <span className="text-muted truncate text-[10px]">{r.broker_name}</span>}
