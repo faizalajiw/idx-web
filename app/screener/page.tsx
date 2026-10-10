@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useScreener, useBrokerActivity } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact } from "@/lib/format";
 import type { ScreenerFilters, ScreenerRow } from "@/lib/types";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
+import { screenerQuery } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { TickerLogo } from "@/components/TickerLogo";
@@ -75,6 +77,47 @@ function signalBadge(sig: string): string {
   if (sig === "BUY") return "badge badge-buy";
   if (sig === "SELL") return "badge badge-sell";
   return "badge badge-hold";
+}
+
+/**
+ * Baca filter dari query string URL. Field kosong/tidak valid diabaikan,
+ * jadi link hasil screening bisa dibagikan dan dibuka ulang persis sama.
+ */
+function filtersFromParams(sp: URLSearchParams): ScreenerFilters {
+  const num = (k: string): number | undefined => {
+    const v = sp.get(k);
+    if (v === null || v === "") return undefined;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  };
+  const out: ScreenerFilters = {};
+  const signal = sp.get("signal");
+  if (signal) out.signal = signal;
+  for (const k of [
+    "rsi_min",
+    "rsi_max",
+    "min_momentum",
+    "max_momentum",
+    "min_value",
+    "min_vol_ratio",
+    "min_broker_score",
+    "min_days",
+    "limit",
+  ] as const) {
+    const v = num(k);
+    if (v !== undefined) out[k] = v;
+  }
+  if (sp.get("foreign_in_only") === "true") out.foreign_in_only = true;
+  return out;
+}
+
+/** Perbandingan dangkal dua filter — untuk deteksi perubahan tanpa loop. */
+function sameFilters(a: ScreenerFilters, b: ScreenerFilters): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)] as (keyof ScreenerFilters)[]);
+  for (const k of keys) {
+    if ((a[k] as unknown) !== (b[k] as unknown)) return false;
+  }
+  return true;
 }
 
 /** Kolom tabel — dipakai untuk render, sort, dan toggle visibilitas. */
@@ -180,8 +223,14 @@ const COLUMNS: ColumnDef[] = [
 
 const DEFAULT_VISIBLE = COLUMNS.map((c) => c.key);
 
-export default function ScreenerPage() {
-  const [filters, setFilters] = useState<ScreenerFilters>(PRESETS[0].filters);
+function ScreenerView() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [filters, setFilters] = useState<ScreenerFilters>(() => {
+    const fromUrl = filtersFromParams(new URLSearchParams(searchParams));
+    return Object.keys(fromUrl).length > 0 ? fromUrl : PRESETS[0].filters;
+  });
   const [active, setActive] = useState(0);
   const { data, error, isLoading } = useScreener(filters);
 
@@ -195,6 +244,27 @@ export default function ScreenerPage() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [visible, setVisible] = useState<Set<SortKey>>(new Set(DEFAULT_VISIBLE));
   const [showCols, setShowCols] = useState(false);
+
+  const queryStr = screenerQuery(filters);
+
+  // URL -> state: dukung tombol back/forward browser & link yang dibagikan.
+  useEffect(() => {
+    const fromUrl = filtersFromParams(new URLSearchParams(searchParams));
+    setFilters((prev) => (sameFilters(prev, fromUrl) ? prev : fromUrl));
+  }, [searchParams]);
+
+  // state -> URL: replace (bukan push) supaya tiap keystroke tidak membanjiri history.
+  useEffect(() => {
+    const next = queryStr.replace(/^\?/, "");
+    if (searchParams.toString() !== next) {
+      router.replace(next ? `/screener?${next}` : "/screener", { scroll: false });
+    }
+  }, [queryStr, searchParams, router]);
+
+  // Sorot tab preset yang cocok — null = filter custom (tidak ada tab aktif).
+  useEffect(() => {
+    setActive(PRESETS.findIndex((p) => sameFilters(p.filters, filters)));
+  }, [filters]);
 
   function apply(i: number) {
     setActive(i);
@@ -409,5 +479,17 @@ export default function ScreenerPage() {
         )}
       </Card>
     </main>
+  );
+}
+
+/**
+ * useSearchParams butuh Suspense boundary saat prerender; default export
+ * hanya membungkus view supaya build statis tetap lolos.
+ */
+export default function ScreenerPage() {
+  return (
+    <Suspense fallback={<Skeleton className="mx-auto mt-10 h-72 max-w-4xl" />}>
+      <ScreenerView />
+    </Suspense>
   );
 }

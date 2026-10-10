@@ -9,6 +9,7 @@ import type {
   MarketNarration,
   ScreenerFilters,
   ScreenerRow,
+  StockSearchResult,
   SectorAnalysis,
   StockBrokerSummary,
   ForeignFlow,
@@ -50,6 +51,14 @@ async function get<T>(path: string): Promise<T> {
 
 // SWR-compatible fetcher (key is the API path).
 export const fetcher = <T>(path: string): Promise<T> => get<T>(path);
+
+/**
+ * Cari emiten by kode atau nama (untuk command palette). Q kosong -> [].
+ */
+export async function searchStocks(q: string, limit = 8): Promise<StockSearchResult[]> {
+  const p = new URLSearchParams({ q, limit: String(limit) });
+  return get<StockSearchResult[]>(`/api/search?${p}`);
+}
 
 /** Add tickers to the persisted watchlist; returns the updated rows. */
 export async function addToWatchlist(codes: string[]): Promise<WatchlistRow[]> {

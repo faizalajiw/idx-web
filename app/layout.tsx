@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar, Topbar } from "@/components/Sidebar";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
           <Topbar />
           {children}
         </div>
+        <CommandPalette />
       </body>
     </html>
   );

@@ -144,6 +144,11 @@ export interface MarketNarration {
   sections: NarrationSection[];
 }
 
+export interface StockSearchResult {
+  code: string;
+  name: string | null;
+}
+
 export interface ScreenerRow {
   code: string;
   name: string | null;

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { MarketBadge } from "./MarketBadge";
 import { ThemeToggle } from "./ThemeToggle";
+import { GlobalLastUpdated } from "./GlobalLastUpdated";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 type NavGroup = { title: string; items: NavItem[] };
@@ -168,6 +169,7 @@ export function Topbar() {
         <Brand />
       </span>
       <div className="flex items-center gap-2">
+        <GlobalLastUpdated />
         <ThemeToggle />
         <MarketBadge />
       </div>
