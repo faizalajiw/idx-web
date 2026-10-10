@@ -88,7 +88,12 @@ Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas. 
 
 Sinkronisasi filter Screener: filter di [`app/screener/page.tsx`](../../idx-web/app/screener/page.tsx) ditulis ke query string URL (`useSearchParams` + `useRouter`), sehingga tautan hasil filter bisa dibagikan dan dibuka ulang.
 
-Logo emiten: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json) lalu memakai file lokal `public/logos/{CODE}.png`. Bila tidak ada, ditampilkan monogram kode. Dataset: 912 logo, 51 monogram (dari 963 kode). Logo milik masing-masing emiten, sumber TradingView. Status hak cipta logo tetap `[BELUM TERVERIFIKASI]`.
+Logo emiten dan broker: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca `manifest.json` dari folder yang ditunjuk prop `basePath`, lalu memakai file lokal di folder tersebut. Bila file tidak ada, ditampilkan monogram kode.
+
+- Emiten: `basePath="/logos"` (default), file `public/logos/{CODE}.png`, manifest [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json). Dataset: 912 logo, 51 monogram (dari 963 kode). Sumber TradingView. Dipakai di Top Leaders, Market Overview, Watchlist, Radar, Screener, Valuation, Foreign Flow, dan Smart Money.
+- Broker: `basePath="/logos/brokers"`, file `public/logos/brokers/{CODE}.jpg`, manifest [`public/logos/brokers/manifest.json`](../../idx-web/public/logos/brokers/manifest.json). Dataset: 88 logo (dari 88 kode di `research.broker_daily`), tanpa fallback. Sumber `idx.co.id/StaticData/Brokers/Logo/{CODE}.jpg`, diambil lewat `scripts/fetch_broker_logos.py` (butuh Chrome; lihat README idx-scraper). Dipakai di panel Top Broker ([`components/TopBrokersPanel.tsx`](../../idx-web/components/TopBrokersPanel.tsx)).
+
+Status hak cipta logo (emiten maupun broker) tetap `[BELUM TERVERIFIKASI]`. Kode broker `PC` disimpan sebagai `.bmp` (sumber mengembalikan BMP di balik URL `.jpg`) dan tetap tampil normal karena UI memakai field `file` dari manifest.
 
 ## Diagram Alur Data (Menu Kompleks)
 

@@ -74,8 +74,8 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Field | Isi |
 |---|---|
 | Nama card | Top Broker |
-| Komponen | [TopBrokersPanel.tsx](../../idx-web/components/TopBrokersPanel.tsx) |
-| Fungsi | Broker teraktif per nilai transaksi |
+| Komponen | [TopBrokersPanel.tsx](../../idx-web/components/TopBrokersPanel.tsx); logo kode broker lewat [TickerLogo.tsx](../../idx-web/components/TickerLogo.tsx) `basePath="/logos/brokers"`, monogram bila file tidak ada |
+| Fungsi | Broker teraktif per nilai transaksi, dengan logo di samping kode broker |
 | Sumber data | `GET /api/market/top-brokers` ([app.py:215](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_top_brokers` ([services.py:507](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.broker_daily` |
 | Rumus/Logika | Rank value per `broker_code` pada `trade_date` terbaru |
 | Periode/Window | EOD harian seluruh pasar |
