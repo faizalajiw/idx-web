@@ -1,18 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { domainFor } from "@/lib/tickerDomains";
-
-/**
- * Logo emiten IDX. Strategi (semua gratis, tanpa API key):
- *   1. File statis lokal  → /logos/{CODE}.png (kalau kamu drop file sendiri)
- *   2. Clearbit Logo API  → logo.clearbit.com/{domain} untuk kode yang punya
- *      domain di lib/tickerDomains.ts
- *   3. Monogram fallback  → lingkaran warna dari hash kode + inisial
- *
- * Kalau sumber 1/2 gagal load (404/timeout), otomatis turun ke monogram —
- * jadi tidak pernah ada gambar rusak.
- */
+import { useEffect, useState } from "react";
 
 // Palet warna monogram (nyambung ke tema flat terminal).
 const PALETTE = [
@@ -34,6 +22,27 @@ function hashColor(code: string): string {
   return PALETTE[h % PALETTE.length];
 }
 
+type ManifestEntry = { code: string; status: string; file: string | null };
+
+// Manifest di-fetch sekali per sesi browser, lalu dibagi ke semua instance.
+let logoMapPromise: Promise<Map<string, string>> | null = null;
+
+function loadLogoMap(): Promise<Map<string, string>> {
+  if (!logoMapPromise) {
+    logoMapPromise = fetch("/logos/manifest.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { entries: [] }))
+      .then((data: { entries?: ManifestEntry[] }) => {
+        const map = new Map<string, string>();
+        for (const e of data.entries ?? []) {
+          if (e.status === "ok" && e.file) map.set(e.code, `/logos/${e.file}`);
+        }
+        return map;
+      })
+      .catch(() => new Map<string, string>());
+  }
+  return logoMapPromise;
+}
+
 export function TickerLogo({
   code,
   size = 24,
@@ -44,48 +53,46 @@ export function TickerLogo({
   className?: string;
 }) {
   const upper = code.toUpperCase();
-  const domain = domainFor(upper);
+  const [src, setSrc] = useState<string | null>(null);
 
-  // Urutan sumber gambar yang dicoba; naik ke tahap berikutnya saat error.
-  const sources = [
-    `/logos/${upper}.png`,
-    domain ? `https://logo.clearbit.com/${domain}?size=64` : null,
-  ].filter(Boolean) as string[];
+  useEffect(() => {
+    let active = true;
+    loadLogoMap().then((map) => {
+      if (active) setSrc(map.get(upper) ?? null);
+    });
+    return () => {
+      active = false;
+    };
+  }, [upper]);
 
-  const [srcIdx, setSrcIdx] = useState(0);
-  const failed = srcIdx >= sources.length;
-
-  const style = { width: size, height: size } as const;
-
-  if (failed || sources.length === 0) {
-    const initials = upper.slice(0, 2);
+  if (src) {
     return (
-      <span
-        aria-hidden
-        className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white ${className}`}
-        style={{
-          ...style,
-          background: hashColor(upper),
-          fontSize: size * 0.4,
-          lineHeight: 1,
-        }}
-      >
-        {initials}
-      </span>
+      // eslint-disable-next-line @next/next/no-img-element -- logo lokal kecil dari public/
+      <img
+        src={src}
+        alt=""
+        width={size}
+        height={size}
+        className={`shrink-0 rounded-full bg-white object-contain ${className}`}
+        style={{ width: size, height: size }}
+        onError={() => setSrc(null)}
+      />
     );
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={sources[srcIdx]}
-      alt={`${upper} logo`}
-      width={size}
-      height={size}
-      loading="lazy"
-      onError={() => setSrcIdx((i) => i + 1)}
-      className={`shrink-0 rounded-full bg-white object-contain ${className}`}
-      style={style}
-    />
+    <span
+      aria-hidden
+      className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white ${className}`}
+      style={{
+        width: size,
+        height: size,
+        background: hashColor(upper),
+        fontSize: size * 0.4,
+        lineHeight: 1,
+      }}
+    >
+      {upper.slice(0, 2)}
+    </span>
   );
 }
