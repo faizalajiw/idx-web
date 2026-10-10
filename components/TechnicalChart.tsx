@@ -23,8 +23,8 @@ function badgeClass(sig: string): string {
   return "badge badge-hold";
 }
 
-const AXIS = "#8b93a7";
-const GRID = "rgba(255,255,255,0.06)";
+const AXIS = "var(--chart-axis)";
+const GRID = "var(--chart-grid)";
 
 function shortDate(d: string): string {
   return d.slice(5); // MM-DD
@@ -92,8 +92,8 @@ export function TechnicalChart({ code }: { code: string | null }) {
                   type="monotone"
                   dataKey="bb_upper"
                   name="BB Upper"
-                  stroke="rgba(99,102,241,0.35)"
-                  fill="rgba(99,102,241,0.06)"
+                  stroke="var(--chart-area-stroke)"
+                  fill="var(--chart-area-fill)"
                   strokeWidth={1}
                   dot={false}
                   connectNulls
@@ -102,15 +102,15 @@ export function TechnicalChart({ code }: { code: string | null }) {
                   type="monotone"
                   dataKey="bb_lower"
                   name="BB Lower"
-                  stroke="rgba(99,102,241,0.35)"
-                  fill="rgba(99,102,241,0.06)"
+                  stroke="var(--chart-area-stroke)"
+                  fill="var(--chart-area-fill)"
                   strokeWidth={1}
                   dot={false}
                   connectNulls
                 />
-                <Line type="monotone" dataKey="close" name="Close" stroke="#e6e9ef" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="ma_short" name="MA20" stroke="#16c784" strokeWidth={1.5} dot={false} connectNulls />
-                <Line type="monotone" dataKey="ma_long" name="MA50" stroke="#f5a623" strokeWidth={1.5} dot={false} connectNulls />
+                <Line type="monotone" dataKey="close" name="Close" stroke="var(--chart-close)" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="ma_short" name="MA20" stroke="var(--chart-ma-fast)" strokeWidth={1.5} dot={false} connectNulls />
+                <Line type="monotone" dataKey="ma_long" name="MA50" stroke="var(--chart-ma-slow)" strokeWidth={1.5} dot={false} connectNulls />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -124,7 +124,7 @@ export function TechnicalChart({ code }: { code: string | null }) {
                 <XAxis dataKey="date" tickFormatter={shortDate} stroke={AXIS} fontSize={11} minTickGap={24} />
                 <YAxis stroke={AXIS} fontSize={11} domain={[0, 100]} ticks={[30, 50, 70]} width={52} />
                 <Tooltip content={<ChartTooltip />} />
-                <Line type="monotone" dataKey="rsi" name="RSI" stroke="#6366f1" strokeWidth={1.5} dot={false} connectNulls />
+                <Line type="monotone" dataKey="rsi" name="RSI" stroke="var(--chart-rsi)" strokeWidth={1.5} dot={false} connectNulls />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -139,8 +139,8 @@ export function TechnicalChart({ code }: { code: string | null }) {
                 <YAxis stroke={AXIS} fontSize={11} width={52} tickFormatter={(v) => fmtNum(v)} />
                 <Tooltip content={<ChartTooltip />} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="macd" name="MACD" stroke="#16c784" strokeWidth={1.5} dot={false} connectNulls />
-                <Line type="monotone" dataKey="macd_signal" name="Signal" stroke="#ea3943" strokeWidth={1.5} dot={false} connectNulls />
+                <Line type="monotone" dataKey="macd" name="MACD" stroke="var(--chart-macd)" strokeWidth={1.5} dot={false} connectNulls />
+                <Line type="monotone" dataKey="macd_signal" name="Signal" stroke="var(--chart-signal)" strokeWidth={1.5} dot={false} connectNulls />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

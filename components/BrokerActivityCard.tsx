@@ -20,9 +20,9 @@ import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
 
-const AXIS = "#8b93a7";
-const GRID = "rgba(255,255,255,0.06)";
-const SCORE_LINE = "#2962ff";
+const AXIS = "var(--chart-axis)";
+const GRID = "var(--chart-grid)";
+const SCORE_LINE = "var(--chart-score)";
 
 /** Berapa sesi riwayat driver yang ditampilkan di daftar (bukan di chart). */
 const DRIVER_ROWS = 10;
@@ -146,7 +146,7 @@ function ScoreHistory({ data }: { data: StockBrokerActivity }) {
             width={28}
           />
           <Tooltip content={<ScoreTooltip />} />
-          <ReferenceLine y={50} stroke="rgba(148,163,184,0.35)" strokeDasharray="4 4" />
+          <ReferenceLine y={50} stroke="var(--chart-ref)" strokeDasharray="4 4" />
           <Line
             type="monotone"
             dataKey="score"

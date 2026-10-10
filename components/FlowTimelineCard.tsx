@@ -16,10 +16,10 @@ import { useStockBrokerActivity } from "@/lib/hooks";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 
-const AXIS = "#8b93a7";
-const GRID = "rgba(255,255,255,0.06)";
-const SCORE_LINE = "#2962ff";
-const MEDIAN_LINE = "rgba(148,163,184,0.55)";
+const AXIS = "var(--chart-axis)";
+const GRID = "var(--chart-grid)";
+const SCORE_LINE = "var(--chart-score)";
+const MEDIAN_LINE = "var(--chart-median)";
 
 /** Pilihan zoom sesi bursa. */
 const ZOOMS = [5, 20, 60, 120] as const;
@@ -72,7 +72,8 @@ function phaseColor(score: number, median: number | null): string {
   const delta = score - ref;
   const intensity = Math.min(Math.abs(delta) / 25, 1); // 25 poin = penuh
   const alpha = 0.25 + 0.6 * intensity;
-  return delta >= 0 ? `rgba(34,197,94,${alpha.toFixed(2)})` : `rgba(239,68,68,${alpha.toFixed(2)})`;
+  const base = delta >= 0 ? "var(--chart-up)" : "var(--chart-down)";
+  return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(0)}%, transparent)`;
 }
 
 /** Strip panas di bawah chart: satu blok per sesi, warna = fase + intensitas. */
@@ -191,7 +192,7 @@ export function FlowTimelineCard({
                 width={28}
               />
               <Tooltip content={<TimelineTooltip />} />
-              <ReferenceLine y={50} stroke="rgba(148,163,184,0.3)" strokeDasharray="4 4" />
+              <ReferenceLine y={50} stroke="var(--chart-ref-soft)" strokeDasharray="4 4" />
               <Area
                 type="monotone"
                 dataKey="score"

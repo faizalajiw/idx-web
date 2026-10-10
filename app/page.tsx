@@ -27,7 +27,7 @@ function SegmentBox({
 }) {
   return (
     <div
-      className="rounded-lg border border-[var(--border)] px-4 py-3 text-center sm:text-left"
+      className="stat-box px-4 py-3 text-center sm:text-left"
       title="1 lot = 100 lembar"
     >
       <p
@@ -107,7 +107,7 @@ function HeroIndex() {
           {stats.map((s) => (
             <div
               key={s.label}
-              className="rounded-lg border border-[var(--border)] px-4 py-3 text-center sm:text-left"
+              className="stat-box px-4 py-3 text-center sm:text-left"
             >
               <p className="text-muted text-[10px] font-medium tracking-widest uppercase">
                 {s.label}

@@ -18,6 +18,41 @@
   --neutral: #787b86;
   --warn: #f5a623;
   --rail-w: 4rem;
+  --r-sm: 8px;
+  --r: 12px;
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --elev-2: 0 6px 18px rgba(0, 0, 0, 0.34), 0 2px 6px rgba(0, 0, 0, 0.22);
+  --glass-bg: rgba(19, 23, 34, 0.72);
+  --glow-1: rgba(41, 98, 255, 0.1);
+  --glow-2: rgba(38, 166, 154, 0.07);
+
+  /* Palet chart (mode gelap) — dikalibrasi ulang di html.light. Dipakai lewat
+     var() langsung di atribut SVG recharts, jadi ikut tema tanpa re-render. */
+  --chart-axis: #8b93a7;
+  --chart-grid: rgba(255, 255, 255, 0.06);
+  --chart-ref: rgba(148, 163, 184, 0.35);
+  --chart-ref-soft: rgba(148, 163, 184, 0.3);
+  --chart-cursor: rgba(255, 255, 255, 0.05);
+  --chart-up: #22c55e;
+  --chart-down: #ef4444;
+  --chart-flip: #f59e0b;
+  --chart-net-up: #26a69a;
+  --chart-net-down: #ef5350;
+  --chart-close: #e6e9ef;
+  --chart-ma-fast: #16c784;
+  --chart-ma-slow: #f5a623;
+  --chart-rsi: #6366f1;
+  --chart-macd: #16c784;
+  --chart-signal: #ea3943;
+  --chart-strategy: #2962ff;
+  --chart-benchmark: #8f97ab;
+  --chart-score: #2962ff;
+  --chart-median: rgba(148, 163, 184, 0.55);
+  --chart-foreign: #3b82f6;
+  --chart-local: #a855f7;
+  --chart-bumn: #ef4444;
+  --chart-area-stroke: rgba(99, 102, 241, 0.35);
+  --chart-area-fill: rgba(99, 102, 241, 0.06);
 }
 
 html.light {
@@ -35,6 +70,38 @@ html.light {
   --down: #e03e3e;
   --neutral: #8b94a1;
   --warn: #b26a00;
+  --elev-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.05);
+  --elev-2: 0 6px 18px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glow-1: rgba(41, 98, 255, 0.07);
+  --glow-2: rgba(0, 137, 123, 0.05);
+
+  /* Palet chart mode terang — kontras lebih tinggi di latar putih. */
+  --chart-axis: #64748b;
+  --chart-grid: rgba(15, 23, 42, 0.08);
+  --chart-ref: rgba(15, 23, 42, 0.25);
+  --chart-ref-soft: rgba(15, 23, 42, 0.2);
+  --chart-cursor: rgba(15, 23, 42, 0.05);
+  --chart-up: #16a34a;
+  --chart-down: #dc2626;
+  --chart-flip: #d97706;
+  --chart-net-up: #0f9d8a;
+  --chart-net-down: #e03e3e;
+  --chart-close: #1e293b;
+  --chart-ma-fast: #0f9d8a;
+  --chart-ma-slow: #d97706;
+  --chart-rsi: #4f46e5;
+  --chart-macd: #0f9d8a;
+  --chart-signal: #dc2626;
+  --chart-strategy: #1d4ed8;
+  --chart-benchmark: #64748b;
+  --chart-score: #1d4ed8;
+  --chart-median: rgba(15, 23, 42, 0.4);
+  --chart-foreign: #2563eb;
+  --chart-local: #7c3aed;
+  --chart-bumn: #dc2626;
+  --chart-area-stroke: rgba(79, 70, 229, 0.45);
+  --chart-area-fill: rgba(79, 70, 229, 0.08);
   color-scheme: light;
 }
 
@@ -52,8 +119,11 @@ html.light {
   --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
-* {
-  border-color: var(--border);
+@layer base {
+  /* Taruh di layer base supaya utility border-color Tailwind (mis. border-[var(--accent)]) tetap menang. */
+  * {
+    border-color: var(--border);
+  }
 }
 
 html {
@@ -61,7 +131,11 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(1100px 520px at 12% -8%, var(--glow-1), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, var(--glow-2), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--fg);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
@@ -82,16 +156,21 @@ body {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  transition: border-color 0.15s ease;
+  border-radius: var(--r);
+  box-shadow: var(--elev-1);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+/* Catatan: tanpa transform/lift karena animasi fade-up (fill: both) menimpanya. */
 .card-hover:hover {
   border-color: var(--border-strong);
+  box-shadow: var(--elev-2);
 }
 
 .glass-strong {
-  background: var(--bg-card);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
 }
 
 /* ---------- typography helpers ---------- */
@@ -374,9 +453,52 @@ html.light [class~="hover:bg-white/[0.04]"]:hover { background-color: rgba(15, 2
 html.light [class~="hover:bg-white/[0.05]"]:hover { background-color: rgba(15, 23, 42, 0.06); }
 html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 23, 42, 0.07); }
 
-/* Recharts memakai warna gelap hardcoded -> sesuaikan di mode terang. */
-html.light .recharts-cartesian-grid line { stroke: rgba(15, 23, 42, 0.08); }
-html.light .recharts-reference-line line { stroke: rgba(15, 23, 42, 0.25); }
-html.light .recharts-tooltip-cursor { fill: rgba(15, 23, 42, 0.06); }
-html.light .recharts-cartesian-axis-tick-value { fill: var(--fg-muted); }
-html.light .recharts-line-curve[stroke="#e6e9ef"] { stroke: #0f172a; }
+/* Teks sumbu chart mengikuti warna tema (recharts mengesetnya sebagai atribut). */
+.recharts-cartesian-axis-tick-value { fill: var(--chart-axis); }
+
+/* ---------- polish: komponen dasar ---------- */
+
+/* Kotak pesan error (dipakai ErrorState) */
+.alert-error {
+  border: 1px solid rgba(239, 83, 80, 0.35);
+  border-left: 3px solid var(--down);
+  border-radius: var(--r-sm);
+  background: rgba(239, 83, 80, 0.08);
+}
+
+::selection { background: rgba(41, 98, 255, 0.3); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chip { border-radius: 999px; }
+.badge { border-radius: 999px; padding: 3px 9px; }
+.input { border-radius: var(--r-sm); }
+.btn { border-radius: var(--r-sm); }
+.nav-link { border-radius: var(--r-sm); }
+
+.btn-primary {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(41, 98, 255, 0.25);
+}
+.btn:active { transform: translateY(1px); }
+
+/* Kotak ringkasan angka (hero/stat) di dalam kartu */
+.stat-box {
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.stat-box:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.data-table thead th { border-bottom-color: var(--border-strong); }
+.data-table tbody tr:hover { background: rgba(148, 163, 184, 0.07); }
+
+/* Scrollbar lebih ramping */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { border-width: 1px; }

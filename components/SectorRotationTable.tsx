@@ -47,13 +47,13 @@ function Sparkline({ values }: { values: number[] }) {
         x2={w}
         y1={y(50)}
         y2={y(50)}
-        stroke="rgba(148,163,184,0.3)"
+        stroke="var(--chart-ref-soft)"
         strokeDasharray="2 2"
       />
       <polyline
         points={points}
         fill="none"
-        stroke={last >= 50 ? "var(--up)" : "var(--down)"}
+        stroke={last >= 50 ? "var(--chart-up)" : "var(--chart-down)"}
         strokeWidth={1.5}
       />
     </svg>

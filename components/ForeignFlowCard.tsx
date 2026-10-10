@@ -20,9 +20,9 @@ import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
 import { InfoHint } from "./InfoHint";
 
-const UP = "#22c55e"; // net buy (akumulasi asing)
-const DOWN = "#ef4444"; // net sell (distribusi asing)
-const FLIP = "#f59e0b"; // hari pergantian arah
+const UP = "var(--chart-up)"; // net buy (akumulasi asing)
+const DOWN = "var(--chart-down)"; // net sell (distribusi asing)
+const FLIP = "var(--chart-flip)"; // hari pergantian arah
 
 /** Satu ringkasan angka di strip atas kartu. */
 function Stat({
@@ -68,7 +68,7 @@ function FlowChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={points} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
         <XAxis dataKey="label" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
         <YAxis
           tickFormatter={(v: number) => `${v} M`}
@@ -78,7 +78,7 @@ function FlowChart({
           width={40}
         />
         <Tooltip
-          cursor={{ fill: "rgba(255,255,255,0.05)" }}
+          cursor={{ fill: "var(--chart-cursor)" }}
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             const d = payload[0].payload as (typeof points)[number];
@@ -99,7 +99,7 @@ function FlowChart({
             );
           }}
         />
-        <ReferenceLine y={0} stroke="rgba(255,255,255,0.25)" />
+        <ReferenceLine y={0} stroke="var(--chart-ref)" />
         <Bar dataKey="net" maxBarSize={22}>
           {points.map((p, i) => (
             <Cell key={i} fill={p.flip ? FLIP : p.raw > 0 ? UP : DOWN} />

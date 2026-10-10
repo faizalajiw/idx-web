@@ -90,13 +90,13 @@ export default function ForeignFlowPage() {
           ) : (
             <ResponsiveContainer width="100%" height={190}>
               <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                <XAxis dataKey="date" stroke="#8f97ab" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#8f97ab" fontSize={10} tickLine={false} axisLine={false} width={44} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(148,163,184,0.06)" }} />
-                <ReferenceLine y={0} stroke="rgba(148,163,184,0.3)" />
+                <XAxis dataKey="date" stroke="var(--chart-axis)" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--chart-axis)" fontSize={10} tickLine={false} axisLine={false} width={44} />
+                <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--chart-cursor)" }} />
+                <ReferenceLine y={0} stroke="var(--chart-ref-soft)" />
                 <Bar dataKey="net" radius={[4, 4, 0, 0]} maxBarSize={26}>
                   {chartData.map((d, i) => (
-                    <Cell key={i} fill={(d.net ?? 0) >= 0 ? "#26a69a" : "#ef5350"} />
+                    <Cell key={i} fill={(d.net ?? 0) >= 0 ? "var(--chart-net-up)" : "var(--chart-net-down)"} />
                   ))}
                 </Bar>
               </BarChart>

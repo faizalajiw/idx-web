@@ -20,9 +20,9 @@ import { InfoHint } from "./InfoHint";
 
 // Warna konsisten dengan legenda broker di seluruh dashboard (lihat lib/brokerType).
 const CAT_META: Record<BrokerFlowCategory, { label: string; color: string }> = {
-  asing: { label: "Asing", color: "#3b82f6" },
-  lokal: { label: "Lokal", color: "#a855f7" },
-  bumn: { label: "BUMN", color: "#ef4444" },
+  asing: { label: "Asing", color: "var(--chart-foreign)" },
+  lokal: { label: "Lokal", color: "var(--chart-local)" },
+  bumn: { label: "BUMN", color: "var(--chart-bumn)" },
 };
 const CATS: BrokerFlowCategory[] = ["asing", "lokal", "bumn"];
 
@@ -136,7 +136,7 @@ function HistoryChart({ history }: { history: BrokerFlowDay[] }) {
       </p>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={points} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey="label" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
           <YAxis
             domain={[0, 100]}
@@ -147,7 +147,7 @@ function HistoryChart({ history }: { history: BrokerFlowDay[] }) {
             width={34}
           />
           <Tooltip
-            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            cursor={{ fill: "var(--chart-cursor)" }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
               const d = payload[0].payload as (typeof points)[number];

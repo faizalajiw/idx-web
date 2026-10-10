@@ -14,10 +14,10 @@ import {
 import type { EquityPoint } from "@/lib/types";
 import { fmtCompact } from "@/lib/format";
 
-const AXIS = "#8b93a7";
-const GRID = "rgba(255,255,255,0.06)";
-const STRATEGY = "#2962ff";
-const BENCHMARK = "#8f97ab";
+const AXIS = "var(--chart-axis)";
+const GRID = "var(--chart-grid)";
+const STRATEGY = "var(--chart-strategy)";
+const BENCHMARK = "var(--chart-benchmark)";
 
 interface TooltipEntry {
   color?: string;
@@ -77,7 +77,7 @@ export function EquityCurveChart({
         <Legend wrapperStyle={{ fontSize: 11 }} />
         <ReferenceLine
           y={initialCash}
-          stroke="rgba(148,163,184,0.35)"
+          stroke="var(--chart-ref)"
           strokeDasharray="4 4"
           label={{ value: "modal awal", position: "insideTopLeft", fill: AXIS, fontSize: 10 }}
         />

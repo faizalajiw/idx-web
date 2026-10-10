@@ -11,10 +11,11 @@ import { RegimeBanner } from "@/components/RegimeBanner";
 import { LastUpdated } from "@/components/LastUpdated";
 
 function heatColor(pct: number | null): string {
-  if (pct === null) return "rgba(143,151,171,0.15)";
+  if (pct === null) return "var(--bg-elev)";
   const clamped = Math.max(-3, Math.min(3, pct));
-  if (clamped >= 0) return `rgba(38,166,154,${0.1 + (clamped / 3) * 0.4})`;
-  return `rgba(239,83,80,${0.1 + (-clamped / 3) * 0.4})`;
+  const share = (10 + (Math.abs(clamped) / 3) * 40).toFixed(0);
+  const base = clamped >= 0 ? "var(--chart-net-up)" : "var(--chart-net-down)";
+  return `color-mix(in srgb, ${base} ${share}%, transparent)`;
 }
 
 export default function SectorsPage() {

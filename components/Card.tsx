@@ -21,9 +21,9 @@ export function Card({
     <section className={`card p-4 sm:p-5 ${hover ? "card-hover" : ""} ${className}`}>
       {(title || right) && (
         <header className="mb-4 flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             {title && (
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold tracking-wide">
+              <h2 className="flex items-center gap-1.5 text-[13px] font-semibold tracking-tight">
                 {title}
                 {info && <InfoHint text={info} />}
               </h2>
