@@ -38,8 +38,7 @@ The sidebar groups the application into seven logical sections. Below each route
 | **Utama** | `/` (Dashboard) | Hero panel with IHSG composite, market‑wide volume/value split (regular vs non‑regular), Regime Banner + Timeline, market narrative, top gainers/losers, liquidity leaders, broker activity, signal panel, and an interactive technical chart.
 | | `/watchlist` | Watch‑list view with real‑time price, volume, and smart‑money status per symbol. Includes a CRUD UI for alert rules (price, RSI, volume) and a Telegram status/debug panel.
 | | `/pantau` | Consolidated monitoring of watch‑list alerts, smart‑money tracks, and Telegram connectivity. Alerts fire once per crossing and reset after the condition clears.
-| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.| **Analisis** | `/rekomendasi` | **Buy candidate board** — market‑wide ranked candidates with score/grade, entry zone, stop, target, R/R, position sizing, and a per‑grade track record. |
-| | `/valuation` | PER / PBV per stock with peer comparison tables.
+| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.| **Analisis** | `/rekomendasi` | **Buy candidate board** — market‐wide ranked candidates with score/grade, entry zone, stop, target, R/R, position sizing, and a per‐grade track record. |
 | | `/jejak-sinyal` | Signal performance dashboard – hit‐rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
 | | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
 | | `/faktor` | Registry of quantitative factors (momentum, Amihud, foreign net, order‑book imbalance, etc.) with definitions and calibration metadata.
@@ -127,8 +126,7 @@ graph LR
     D[Screener /screener]
   end
   subgraph Analisis
-    E[Valuasi /valuation]
-    N[Rekomendasi Beli /rekomendasi]
+    E[Rekomendasi Beli /rekomendasi]
     G[Jejak Sinyal /jejak-sinyal]
     H[Backtest /backtest]
     J[Faktor & Kalibrasi /faktor]
@@ -214,9 +212,6 @@ Keputusan atau detail teknikal.
 
 > Alat bantu riset, bukan rekomendasi keuangan. Kandidat tanpa level stop yang
 > bisa dihitung tidak ditampilkan.
-
-#### Valuasi (`/valuation`)
-PER/PBV per emiten beserta peers pembanding.
 
 #### Jejak Sinyal (`/jejak-sinyal`)
 Track record kualitas sinyal:
@@ -419,7 +414,6 @@ If you serve on a different port (e.g. 3100), add it to the backend's
 - `app/foreign/page.tsx` — foreign fund flow
 - `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
 - `app/rekomendasi/page.tsx` — buy candidate board (grade, entry/stop/target, R/R, sizing, per-grade track record)
-- `app/valuation/page.tsx` — PER/PBV valuation view
 - `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
 - `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
 - `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)

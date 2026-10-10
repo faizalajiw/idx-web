@@ -13,8 +13,7 @@ import type {
   SectorAnalysis,
   StockBrokerSummary,
   ForeignFlow,
-  ValuationResponse,
-  WatchlistRow,
+    WatchlistRow,
 } from "./types";
 
 export const API_BASE =

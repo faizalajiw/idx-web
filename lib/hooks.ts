@@ -35,7 +35,6 @@ import type {
   Signal,
   PriceBar,
   TechnicalChart,
-  ValuationResponse,
   StockEvents,
   FactorsOverview,
   RegimeHistory,
@@ -193,11 +192,6 @@ export function useSentiment(limit = 15) {
   });
 }
 
-export function useValuation() {
-  return useSWR<ValuationResponse>("/api/valuation", fetcher, {
-    refreshInterval: 300_000,
-  });
-}
 
 export function useScreener(filters: ScreenerFilters) {
   const key = `/api/screener${screenerQuery(filters)}`;
@@ -228,8 +222,7 @@ function invalidateDerived(mutate: ReturnType<typeof useSWRConfig>["mutate"]) {
       typeof key === "string" &&
       (key.startsWith("/api/signals") ||
         key.startsWith("/api/stocks") ||
-        key.startsWith("/api/screener") ||
-        key.startsWith("/api/valuation")),
+                key.startsWith("/api/screener")),
     undefined,
   );
 }

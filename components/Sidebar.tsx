@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Filter,
-  Landmark,
-  FlaskConical,
+    FlaskConical,
   History,
   Bell,
   Globe2,
@@ -46,7 +45,7 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/rekomendasi", label: "Rekomendasi Beli", icon: Target },
       { href: "/keputusan", label: "Ruang Keputusan", icon: Scale },
-      { href: "/valuation", label: "Valuasi", icon: Landmark },
+      
       { href: "/jejak-sinyal", label: "Jejak Sinyal", icon: History },
       { href: "/backtest", label: "Backtest", icon: FlaskConical },
       { href: "/faktor", label: "Faktor & Kalibrasi", icon: ShieldCheck },

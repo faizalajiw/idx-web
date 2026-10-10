@@ -49,7 +49,6 @@ flowchart LR
 | Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + SWR 30s |
 | Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
 | Analisis | `/keputusan` | Ruang Keputusan | Verdict per emiten + event study | 5 | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
-| Analisis | `/valuation` | Valuasi | Z-score band statistik undervalued/overvalued | 2 | `research.latest_pit` | on-demand + SWR 300s |
 | Analisis | `/ruang-keputusan` | Ruang Keputusan | Skor keputusan + konteks | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
 | Analisis | `/jejak-sinyal` | Jejak Sinyal | Track record sinyal vs pasar | 4 | `research.signal_log` | job `idx signal-log` |
 | Analisis | `/backtest` | Backtest | Simulasi point-in-time | 8 | `research.prices_pit` | on-demand (POST, tanpa tulis DB) |
@@ -90,7 +89,7 @@ Sinkronisasi filter Screener: filter di [`app/screener/page.tsx`](../../idx-web/
 
 Logo emiten dan broker: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca `manifest.json` dari folder yang ditunjuk prop `basePath`, lalu memakai file lokal di folder tersebut. Bila file tidak ada, ditampilkan monogram kode.
 
-- Emiten: `basePath="/logos"` (default), file `public/logos/{CODE}.png`, manifest [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json). Dataset: 912 logo, 51 monogram (dari 963 kode). Sumber TradingView. Dipakai di Top Leaders, Market Overview, Watchlist, Radar, Screener, Valuation, Foreign Flow, dan Smart Money.
+- Emiten: `basePath="/logos"` (default), file `public/logos/{CODE}.png`, manifest [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json). Dataset: 912 logo, 51 monogram (dari 963 kode). Sumber TradingView. Dipakai di Top Leaders, Market Overview, Watchlist, Radar, Screener, Foreign Flow, dan Smart Money.
 - Broker: `basePath="/logos/brokers"`, file `public/logos/brokers/{CODE}.jpg`, manifest [`public/logos/brokers/manifest.json`](../../idx-web/public/logos/brokers/manifest.json). Dataset: 88 logo (dari 88 kode di `research.broker_daily`), tanpa fallback. Sumber `idx.co.id/StaticData/Brokers/Logo/{CODE}.jpg`, diambil lewat `scripts/fetch_broker_logos.py` (butuh Chrome; lihat README idx-scraper). Dipakai di panel Top Broker ([`components/TopBrokersPanel.tsx`](../../idx-web/components/TopBrokersPanel.tsx)).
 
 Status hak cipta logo (emiten maupun broker) tetap `[BELUM TERVERIFIKASI]`. Kode broker `PC` disimpan sebagai `.bmp` (sumber mengembalikan BMP di balik URL `.jpg`) dan tetap tampil normal karena UI memakai field `file` dari manifest.
@@ -188,7 +187,7 @@ sequenceDiagram
 | Rekomendasi | `/api/recommendations/track` | `analytics.get_recommendation_track` | `research.recommendation_log` | job harian |
 | Rekomendasi | `/api/stocks/{code}/recommendation` | `analytics.get_stock_recommendation` | `research.recommendation_log` | on-demand |
 | Ruang Keputusan | `/api/stocks/{code}/decision` | `analytics.get_stock_decision` | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
-| Valuasi | `/api/valuation` | `analytics.get_valuation` | `research.latest_pit` | on-demand |
+| Valuasi (endpoint backend, tanpa halaman UI) | `/api/valuation` | `analytics.get_valuation` | `research.latest_pit` | on-demand |
 | Jejak Sinyal | `/api/signals/track` | `analytics.get_signal_track` | `research.signal_log` | job `idx signal-log` |
 | Backtest | `/api/backtest/config` + `/run` | `simulation` | `research.prices_pit` | on-demand (POST) |
 | Faktor | `/api/factors/overview` | `analytics.get_factors_overview` | `research.factor_ic_history` | job harian `daily_ic` 06:30 |
@@ -261,7 +260,6 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 - [screener.md](./screener.md)
 - [rekomendasi.md](./rekomendasi.md)
 - [ruang-keputusan.md](./ruang-keputusan.md)
-- [valuasi.md](./valuasi.md)
 - [jejak-sinyal.md](./jejak-sinyal.md)
 - [backtest.md](./backtest.md)
 - [faktor.md](./faktor.md)

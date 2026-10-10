@@ -98,11 +98,6 @@ export interface SectorAnalysis {
   sectors: SectorRow[];
 }
 
-export interface ValuationResponse {
-  undervalued: ValuationRow[];
-  overvalued: ValuationRow[];
-}
-
 export interface ForeignFlowDay {
   date: string;
   buy: number | null;
@@ -118,17 +113,6 @@ export interface ForeignFlow {
   days: ForeignFlowDay[];
   top_net_in: { code: string; name: string | null; net: number | null; percent: number | null }[];
   top_net_out: { code: string; name: string | null; net: number | null; percent: number | null }[];
-}
-
-export interface ValuationRow {
-  code: string;
-  name: string | null;
-  close: number | null;
-  z_score: number | null;
-  momentum_pct: number | null;
-  rsi: number | null;
-  trend_up: boolean;
-  target_price: number | null;
 }
 
 export interface NarrationSection {
