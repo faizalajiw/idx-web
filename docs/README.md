@@ -1,6 +1,6 @@
 # Market Labs — Dokumentasi Menu
 
-Dokumentasi teknis-fungsional per menu untuk aplikasi **Market Labs** (platform data pasar saham IDX). Sumber kebenaran daftar menu adalah [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (GROUPS, baris 34–78).
+Dokumentasi teknis-fungsional per menu untuk aplikasi **Market Labs** (platform data pasar saham IDX). Sumber kebenaran daftar menu adalah [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (GROUPS, baris 33–70).
 
 Dokumen ini dipakai oleh tiga audiens:
 
@@ -13,6 +13,7 @@ Dokumen ini dipakai oleh tiga audiens:
 - **`idx-web`** — Frontend Next.js (App Router) + Recharts + Tailwind. **Presentation-only**: nol kalkulasi bisnis. Semua data di-fetch sebagai JSON lewat SWR ([`lib/hooks.ts`](../../idx-web/lib/hooks.ts), interval default 30 detik). Tipe mirror di [`lib/types.ts`](../../idx-web/lib/types.ts), fetch client di [`lib/api.ts`](../../idx-web/lib/api.ts).
 - **`idx-scraper`** — Backend Python/FastAPI + PostgreSQL + APScheduler (timezone WIB). Sumber kalkulasi & penyimpanan. API di [`src/idx_scraper/api/`](../../idx-scraper/src/idx_scraper/api/), scheduler di [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py).
 - Base URL backend: `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`).
+- **Chrome global** (dipasang di semua halaman): sidebar bisa diciutkan menjadi rail, tema terang/gelap, badge kesegaran data, dan command palette (Ctrl/Cmd+K). Rincian di bagian [Chrome Global](#chrome-global).
 
 ```mermaid
 flowchart LR
@@ -68,8 +69,26 @@ flowchart LR
 | `/keputusan/[code]` | Dinamis | Workspace keputusan per emiten (verdict, jejak asing, level pembatalan, base rate) |
 | `/flow/[code]` | Dinamis | Workspace aliran dana per emiten (ForeignFlowCard, FlowTimelineCard, BrokerFlowCard) |
 | `/radar/[code]` | Dinamis | SmartMoneyBanner + track record + back-link |
+| (semua) `error` | Status | [`app/error.tsx`](../../idx-web/app/error.tsx): tampilan galat dengan tombol coba lagi dan `ThemeToggle` |
+| (semua) `loading` | Status | [`app/loading.tsx`](../../idx-web/app/loading.tsx): skeleton saat route dimuat |
+| (semua) `not-found` | Status | [`app/not-found.tsx`](../../idx-web/app/not-found.tsx): halaman 404 dengan tautan kembali |
 
 > Route `/watchlist` tidak terdaftar di `Sidebar.tsx` — watchlist diakses via menu **Pantau**.
+
+### Chrome Global
+
+Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas.
+
+| Fitur | Implementasi | Perilaku | Penyimpanan lokal |
+|---|---|---|---|
+| Sidebar rail | [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (`SIDEBAR_KEY`, baris 73) | Sidebar bisa diciutkan menjadi rail ikon. Grup: Utama, Screening, Analisis, Flow, Sektor | `ml-sidebar-collapsed` (`1` = ciut) |
+| Tema terang/gelap | [`components/ThemeToggle.tsx`](../../idx-web/components/ThemeToggle.tsx) (`KEY`, baris 8) | Default gelap. Skrip inline di [`app/layout.tsx`](../../idx-web/app/layout.tsx) (`THEME_SCRIPT`) menerapkan kelas sebelum render agar tidak ada kilatan (anti-FOUC) | `ml-theme` (`dark` / `light`) |
+| Badge kesegaran data | [`components/GlobalLastUpdated.tsx`](../../idx-web/components/GlobalLastUpdated.tsx), dirender di Topbar lewat `Sidebar.tsx` (baris 172) | Menampilkan waktu data terakhir dari `useMarketOverview()` ([`lib/hooks.ts`](../../idx-web/lib/hooks.ts), baris 59) memakai komponen `LastUpdated`. Teks awal: "Memuat data..." | — |
+| Command palette | [`components/CommandPalette.tsx`](../../idx-web/components/CommandPalette.tsx), dipasang di [`app/layout.tsx`](../../idx-web/app/layout.tsx) | Buka dengan Ctrl/Cmd+K, tutup dengan Esc. Berisi daftar menu (dengan kata kunci) dan pencarian emiten lewat `searchStocks()` → `GET /api/search` | — |
+
+Sinkronisasi filter Screener: filter di [`app/screener/page.tsx`](../../idx-web/app/screener/page.tsx) ditulis ke query string URL (`useSearchParams` + `useRouter`), sehingga tautan hasil filter bisa dibagikan dan dibuka ulang.
+
+Logo emiten: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json) lalu memakai file lokal `public/logos/{CODE}.png`. Bila tidak ada, ditampilkan monogram kode. Dataset: 912 logo, 51 monogram (dari 963 kode). Logo milik masing-masing emiten, sumber TradingView, lisensi `[BELUM TERVERIFIKASI]`.
 
 ## Diagram Alur Data (Menu Kompleks)
 
@@ -185,6 +204,7 @@ sequenceDiagram
 | Sektor | `/api/sectors` | `analytics.get_sector_analysis` | `research.latest_pit` | on-demand |
 | Sektor | `/api/sectors/rotation` | `analytics.get_sector_rotation` | `research.latest_pit` | on-demand |
 | (semua) | `/api/cache/clear` | `analytics.clear_research_cache` | — | dipanggil job refresh |
+| Command Palette (semua) | `/api/search?q=&limit=` | `analytics.search_stocks` ([`analytics.py`](../../idx-scraper/src/idx_scraper/api/analytics.py) baris 1626) | `research.latest_pit` | on-demand, saat mengetik di palette |
 | (semua) | `/health` | — | — | — |
 
 ## Penjadwalan (APScheduler, WIB)
