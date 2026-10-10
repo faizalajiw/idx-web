@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar, Topbar, SidebarProvider } from "@/components/Sidebar";
+import { Sidebar, Topbar } from "@/components/Sidebar";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+// Dijalankan sebelum paint supaya tema & state sidebar tidak berkedip (FOUC).
+const THEME_SCRIPT = `(function(){try{var r=document.documentElement;var t=localStorage.getItem('ml-theme');var dark=t?t==='dark':true;r.classList.toggle('dark',dark);r.classList.toggle('light',!dark);if(localStorage.getItem('ml-sidebar-collapsed')==='1'){r.classList.add('sidebar-collapsed');}}catch(e){}})();`;
+
 export const metadata: Metadata = {
   title: "Market Labs",
   description:
@@ -25,15 +28,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
       <body>
-        <SidebarProvider>
-          <Sidebar />
-          <div className="lg:pl-60">
-            <Topbar />
-            {children}
-          </div>
-        </SidebarProvider>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <Sidebar />
+        <div className="app-main">
+          <Topbar />
+          {children}
+        </div>
       </body>
     </html>
   );

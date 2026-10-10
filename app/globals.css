@@ -17,6 +17,25 @@
   --down: #ef5350;
   --neutral: #787b86;
   --warn: #f5a623;
+  --rail-w: 4rem;
+}
+
+html.light {
+  --bg: #f6f7f9;
+  --bg-elev: #eceff3;
+  --bg-card: #ffffff;
+  --bg-card-solid: #ffffff;
+  --border: #e3e6ea;
+  --border-strong: #c9d0d9;
+  --fg: #161b22;
+  --fg-muted: #5b6572;
+  --accent: #2962ff;
+  --accent-2: #00897b;
+  --up: #0f9d8a;
+  --down: #e03e3e;
+  --neutral: #8b94a1;
+  --warn: #b26a00;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -264,3 +283,100 @@ body {
   border: 2px solid var(--bg);
 }
 ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.35); }
+
+/* ---------- app shell: sidebar penuh / rail ikon ---------- */
+
+.app-main {
+  padding-left: var(--rail-w);
+  transition: padding-left 0.2s ease;
+}
+
+.app-sidebar {
+  width: var(--rail-w);
+  transition: width 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  .app-main { padding-left: 15rem; }
+  html.sidebar-collapsed .app-main { padding-left: var(--rail-w); }
+  .app-sidebar { width: 15rem; }
+  html.sidebar-collapsed .app-sidebar { width: var(--rail-w); }
+}
+
+/* Header: brand + tombol toggle (toggle hanya relevan di desktop) */
+.sidebar-header { justify-content: center; }
+.brand-text { display: none; }
+.topbar-brand .brand-text { display: inline; }
+.sidebar-toggle-btn { display: none; padding: 8px; }
+.sidebar-toggle-btn .icon-rail { display: none; }
+
+@media (min-width: 1024px) {
+  .sidebar-header { justify-content: space-between; }
+  .sidebar-toggle-btn { display: inline-flex; }
+  html:not(.sidebar-collapsed) .brand-text { display: inline; }
+  html.sidebar-collapsed .brand-link { display: none; }
+  html.sidebar-collapsed .sidebar-header { justify-content: center; }
+  html.sidebar-collapsed .sidebar-toggle-btn .icon-expanded { display: none; }
+  html.sidebar-collapsed .sidebar-toggle-btn .icon-rail { display: block; }
+  html.sidebar-collapsed .topbar-brand { display: inline-flex; }
+}
+
+/* Nav: judul grup & label hanya tampil saat sidebar penuh */
+.app-sidebar .nav-group-title,
+.app-sidebar .nav-label { display: none; }
+.app-sidebar .nav-link { justify-content: center; padding-left: 0; padding-right: 0; }
+.app-sidebar .nav-link-active { box-shadow: none; }
+
+@media (min-width: 1024px) {
+  html:not(.sidebar-collapsed) .app-sidebar .nav-group-title { display: block; }
+  html:not(.sidebar-collapsed) .app-sidebar .nav-label { display: inline; }
+  html:not(.sidebar-collapsed) .app-sidebar .nav-link { justify-content: flex-start; padding-left: 12px; padding-right: 12px; }
+  html:not(.sidebar-collapsed) .app-sidebar .nav-link-active { box-shadow: inset 2px 0 0 var(--accent); }
+}
+
+/* ---------- penyesuaian mode terang ---------- */
+
+html.light body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.light .nav-link-active,
+html.light .nav-link-active:hover {
+  color: var(--fg);
+}
+
+html.light .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.04) 25%,
+    rgba(15, 23, 42, 0.08) 37%,
+    rgba(15, 23, 42, 0.04) 63%
+  );
+  background-size: 400% 100%;
+}
+
+html.light ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.18); }
+html.light ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.3); }
+
+/* Overlay putih (didesain untuk latar gelap) dibalik jadi overlay gelap. */
+html.light [class~="bg-white/[0.02]"],
+html.light [class~="odd:bg-white/[0.02]"]:nth-child(odd) { background-color: rgba(15, 23, 42, 0.03); }
+html.light [class~="bg-white/[0.03]"] { background-color: rgba(15, 23, 42, 0.04); }
+html.light [class~="bg-white/[0.04]"] { background-color: rgba(15, 23, 42, 0.05); }
+html.light [class~="bg-white/[0.06]"] { background-color: rgba(15, 23, 42, 0.07); }
+html.light [class~="bg-white/5"] { background-color: rgba(15, 23, 42, 0.06); }
+html.light [class~="bg-white/10"] { background-color: rgba(15, 23, 42, 0.1); }
+html.light [class~="bg-white/20"] { background-color: rgba(15, 23, 42, 0.18); }
+html.light [class~="bg-white/30"] { background-color: rgba(15, 23, 42, 0.28); }
+
+html.light [class~="hover:bg-white/[0.03]"]:hover { background-color: rgba(15, 23, 42, 0.04); }
+html.light [class~="hover:bg-white/[0.04]"]:hover { background-color: rgba(15, 23, 42, 0.05); }
+html.light [class~="hover:bg-white/[0.05]"]:hover { background-color: rgba(15, 23, 42, 0.06); }
+html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 23, 42, 0.07); }
+
+/* Recharts memakai warna gelap hardcoded -> sesuaikan di mode terang. */
+html.light .recharts-cartesian-grid line { stroke: rgba(15, 23, 42, 0.08); }
+html.light .recharts-reference-line line { stroke: rgba(15, 23, 42, 0.25); }
+html.light .recharts-tooltip-cursor { fill: rgba(15, 23, 42, 0.06); }
+html.light .recharts-cartesian-axis-tick-value { fill: var(--fg-muted); }
+html.light .recharts-line-curve[stroke="#e6e9ef"] { stroke: #0f172a; }

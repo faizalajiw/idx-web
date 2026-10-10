@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useState } from "react";
 import {
   LayoutDashboard,
   Filter,
@@ -18,13 +17,14 @@ import {
   LayoutGrid,
   ShieldCheck,
   Scale,
-  X,
-  Menu,
   Radar,
   Target,
+  PanelLeftClose,
+  PanelLeftOpen,
   type LucideIcon,
 } from "lucide-react";
 import { MarketBadge } from "./MarketBadge";
+import { ThemeToggle } from "./ThemeToggle";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 type NavGroup = { title: string; items: NavItem[] };
@@ -69,22 +69,25 @@ const GROUPS: NavGroup[] = [
   },
 ];
 
-// ---- mobile drawer open/close shared between top bar and sidebar ----
-const SidebarCtx = createContext<{ open: boolean; setOpen: (v: boolean) => void }>({
-  open: false,
-  setOpen: () => {},
-});
+const SIDEBAR_KEY = "ml-sidebar-collapsed";
 
-export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return <SidebarCtx.Provider value={{ open, setOpen }}>{children}</SidebarCtx.Provider>;
+/** Buka/tutup sidebar desktop. Status disimpan sebagai kelas di <html> +
+ *  localStorage supaya konsisten dengan script inline di layout (tanpa kedip). */
+function toggleSidebar() {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  const next = !root.classList.contains("sidebar-collapsed");
+  root.classList.toggle("sidebar-collapsed", next);
+  try {
+    localStorage.setItem(SIDEBAR_KEY, next ? "1" : "0");
+  } catch {}
 }
 
 function Brand() {
   return (
-    <Link href="/" className="flex items-center gap-2.5 px-1">
+    <Link href="/" className="brand-link flex items-center gap-2.5 px-1" aria-label="Market Labs">
       <span
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-white"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white"
         style={{ background: "var(--accent)" }}
         aria-hidden
       >
@@ -94,18 +97,18 @@ function Brand() {
           <path d="M6.5 14h11" />
         </svg>
       </span>
-      <span className="gradient-text text-lg font-bold tracking-tight">Market Labs</span>
+      <span className="brand-text gradient-text text-lg font-bold tracking-tight">Market Labs</span>
     </Link>
   );
 }
 
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+function NavList() {
   const pathname = usePathname();
   return (
     <nav className="flex flex-col gap-5" aria-label="Navigasi utama">
       {GROUPS.map((group) => (
         <div key={group.title}>
-          <p className="text-muted mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em]">
+          <p className="nav-group-title text-muted mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em]">
             {group.title}
           </p>
           <ul className="space-y-0.5">
@@ -116,12 +119,12 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={onNavigate}
+                    title={item.label}
                     aria-current={active ? "page" : undefined}
                     className={`nav-link ${active ? "nav-link-active" : ""}`}
                   >
                     <Icon size={17} strokeWidth={2} aria-hidden />
-                    <span>{item.label}</span>
+                    <span className="nav-label">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -133,71 +136,41 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-/** Fixed sidebar (desktop) + slide-in drawer (mobile). */
+/** Sidebar selalu tampil: penuh di desktop, rail ikon saat disembunyikan / di layar kecil. */
 export function Sidebar() {
-  const { open, setOpen } = useContext(SidebarCtx);
-
   return (
-    <>
-      {/* Desktop */}
-      <aside className="glass-strong fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-[var(--border)] lg:flex">
-        <div className="flex h-16 items-center border-b border-[var(--border)] px-4">
-          <Brand />
-        </div>
-        <div className="flex-1 overflow-y-auto px-3 py-5">
-          <NavList />
-        </div>
-      </aside>
-
-      {/* Mobile drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-            aria-hidden
-          />
-          <aside className="glass-strong fade-up absolute inset-y-0 left-0 flex w-64 flex-col border-r border-[var(--border)]">
-            <div className="flex h-16 items-center justify-between border-b border-[var(--border)] px-4">
-              <Brand />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="btn btn-ghost"
-                aria-label="Tutup menu"
-              >
-                <X size={18} aria-hidden />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-3 py-5">
-              <NavList onNavigate={() => setOpen(false)} />
-            </div>
-          </aside>
-        </div>
-      )}
-    </>
+    <aside className="app-sidebar glass-strong fixed inset-y-0 left-0 z-40 flex flex-col border-r border-[var(--border)]">
+      <div className="sidebar-header flex h-16 items-center border-b border-[var(--border)] px-3">
+        <Brand />
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="btn btn-ghost sidebar-toggle-btn"
+          aria-label="Sembunyikan atau tampilkan sidebar"
+          title="Sembunyikan / tampilkan sidebar"
+        >
+          <PanelLeftClose size={18} className="icon-expanded" aria-hidden />
+          <PanelLeftOpen size={18} className="icon-rail" aria-hidden />
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto px-2 py-5">
+        <NavList />
+      </div>
+    </aside>
   );
 }
 
-/** Slim top bar shown on all breakpoints; holds hamburger (mobile) + market badge. */
+/** Top bar: brand (mobile / saat sidebar jadi rail) di kiri, kontrol di kanan. */
 export function Topbar() {
-  const { setOpen } = useContext(SidebarCtx);
   return (
     <header className="glass-strong sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-[var(--border)] px-4 sm:px-6">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="btn btn-ghost lg:hidden"
-          aria-label="Buka menu navigasi"
-        >
-          <Menu size={18} aria-hidden />
-        </button>
-        <span className="lg:hidden">
-          <Brand />
-        </span>
+      <span className="topbar-brand lg:hidden">
+        <Brand />
+      </span>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <MarketBadge />
       </div>
-      <MarketBadge />
     </header>
   );
 }
