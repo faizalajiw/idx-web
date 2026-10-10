@@ -10,4 +10,4 @@ next-env.d.ts
 .vercel
 *.tsbuildinfo
 
-docs/menu/node_modules/
+docs/node_modules/

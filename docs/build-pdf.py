@@ -1,7 +1,7 @@
-"""Build Market-Labs-Dokumentasi-Menu.pdf dari docs/menu/*.md.
+"""Build Market-Labs-Dokumentasi-Menu.pdf dari docs/*.md.
 
-Jalankan dari folder docs/menu:
-    ..\\..\\..\\idx-scraper\\.venv\\Scripts\\python.exe build-pdf.py
+Jalankan dari folder docs:
+    ..\\..\\idx-scraper\\.venv\\Scripts\\python.exe build-pdf.py
 
 Alur: Markdown -> HTML (markdown-it-py) -> Mermaid dirender di Chromium
 (Playwright, mermaid.min.js lokal dari node_modules) -> page.pdf().
@@ -24,7 +24,7 @@ from pypdf import PdfReader
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Market-Labs-Dokumentasi-Menu.pdf"
-MERMAID_JS = HERE.parents[1] / "node_modules" / "mermaid" / "dist" / "mermaid.min.js"
+MERMAID_JS = HERE.parent / "node_modules" / "mermaid" / "dist" / "mermaid.min.js"
 ORDER = ["README.md"] + sorted(
     p.name for p in HERE.glob("*.md") if p.name != "README.md"
 )
@@ -119,7 +119,7 @@ def build_html(
   <h1>Market Labs</h1>
   <div class="sub">Dokumentasi Teknis-Fungsional Per Menu</div>
   <div class="sub">Build: {date_str} &middot; Versi dokumen: 1.0</div>
-  <div class="sub">Sumber: docs/menu/*.md &middot; idx-web &amp; idx-scraper</div>
+  <div class="sub">Sumber: docs/*.md &middot; idx-web &amp; idx-scraper</div>
 </div>
 <div class="toc"><h1 style="page-break-before:auto">Daftar Isi</h1><ul>{toc}</ul></div>
 {body}

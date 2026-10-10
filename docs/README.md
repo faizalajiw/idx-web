@@ -253,7 +253,7 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 ## Build PDF
 
 ```powershell
-cd d:\Project\market-labs\docs\menu
+cd d:\Project\market-labs\idx-web\docs
 & "d:\Project\market-labs\idx-scraper\.venv\Scripts\python.exe" build-pdf.py
 ```
 
