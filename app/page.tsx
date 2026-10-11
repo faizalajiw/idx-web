@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MarketOverview } from "@/components/MarketOverview";
-import { MarketNarrationCard } from "@/components/MarketNarration";
+import { LatestNewsCard } from "@/components/NewsCards";
 import { TopLeadersPanel } from "@/components/TopLeadersPanel";
 import { TopBrokersPanel } from "@/components/TopBrokersPanel";
 import { SignalsPanel } from "@/components/SignalsPanel";
@@ -225,7 +225,7 @@ export default function DashboardPage() {
       {/* Hero IHSG: volume/value total + rincian pasar reguler vs non-reguler */}
       <HeroIndex />
       <MarketRegimeCard />
-      <MarketNarrationCard />
+      <LatestNewsCard />
       <MarketOverview />
 
       {/* Leaderboard likuiditas: realtime saat jam bursa, EOD di luar jam */}

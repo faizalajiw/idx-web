@@ -1,4 +1,4 @@
-# Market Labs — Dokumentasi Menu
+﻿# Market Labs — Dokumentasi Menu
 
 Dokumentasi teknis-fungsional per menu untuk aplikasi **Market Labs** (platform data pasar saham IDX). Sumber kebenaran daftar menu adalah [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (GROUPS, baris 33–70).
 
@@ -44,7 +44,7 @@ flowchart LR
 
 | Group | Route | Menu | Fungsi (1 baris) | Card | Sumber data utama | Update |
 |---|---|---|---|---|---|---|
-| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, narasi, leaderboard, sinyal | 8 | `index_quotes`, `index_summary_daily`, `research.latest_pit` | on-demand + SWR 30s |
+| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 8 | `index_quotes`, `index_summary_daily`, `research.latest_pit` | on-demand + SWR 30s |
 | Utama | `/pantau` | Pantau | Watchlist + alert + chart | 5 | `watchlist`, `stock_quotes` | on-demand + SWR 30s |
 | Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + SWR 30s |
 | Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
@@ -179,7 +179,7 @@ sequenceDiagram
 | Dashboard | `/api/market/top-brokers` | `services.get_top_brokers` | `research.broker_daily` | EOD refresh |
 | Dashboard | `/api/signals` | `services.get_signals` | `research.latest_pit` | on-demand |
 | Dashboard | `/api/stocks/{code}/technical` | `services.get_technical_chart` | `stock_daily`, `stock_quotes` | interval `wl` |
-| Dashboard | `/api/market/narration` | `analytics.get_market_narration` | `research.latest_pit` | on-demand |
+| Dashboard | `/api/news/latest` | `news.latest` | `news_items` | on-demand |
 | Pantau | `/api/watchlist` (GET/POST/PUT/DELETE) | `services.get_watchlist` | `watchlist` | interval `wl` 60s |
 | Pantau | `/api/alerts` (+ test) | `alerts` | alert store | interval `alerts` 300s (bila Telegram aktif) |
 | Screener | `/api/screener` | `analytics.get_screener` | `research.latest_pit` | on-demand |
@@ -290,3 +290,4 @@ cd d:\Project\market-labs\idx-web\docs
 ```
 
 Output: [`Market-Labs-Dokumentasi-Menu.pdf`](./Market-Labs-Dokumentasi-Menu.pdf)
+

@@ -6,7 +6,7 @@ import type {
   BacktestRequest,
   BacktestResult,
   MarketOverview,
-  MarketNarration,
+    NewsList,
   ScreenerFilters,
   ScreenerRow,
   StockSearchResult,

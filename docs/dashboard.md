@@ -1,7 +1,7 @@
-# Dashboard (`/`)
+﻿# Dashboard (`/`)
 
 ## 1. Ringkasan Fungsi
-Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menampilkan IHSG, regime volatilitas, narasi pasar, ringkasan breadth, leaderboard likuiditas, sinyal teknikal, dan chart emiten terpilih. Pengguna: semua (trader, analis, PM). Dipakai saat membuka aplikasi / cek cepat kondisi sesi.
+Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menampilkan IHSG, regime volatilitas, berita terbaru, ringkasan breadth, leaderboard likuiditas, sinyal teknikal, dan chart emiten terpilih. Pengguna: semua (trader, analis, PM). Dipakai saat membuka aplikasi / cek cepat kondisi sesi.
 
 ## 2. Route & Berkas
 - URL: `/` → [`app/page.tsx`](../../idx-web/app/page.tsx)
@@ -34,18 +34,17 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Interaksi | — |
 | Empty/Loading/Error | Skeleton/Empty/Error via [States.tsx](../../idx-web/components/States.tsx) |
 
-### Narasi Pasar
+### MarLabs News
 | Field | Isi |
 |---|---|
-| Nama card | Narasi Pasar |
-| Komponen | [MarketNarration.tsx](../../idx-web/components/MarketNarration.tsx) |
-| Fungsi | Ringkasan teks kondisi pasar (breadth, foreign, top movers) |
-| Sumber data | `GET /api/market/narration` ([app.py:512](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_market_narration` ([analytics.py:1323](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit` |
-| Rumus/Logika | Agregasi qty value/volume/foreign_net per `trade_date` ([analytics.py:1344-1365](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
-| Periode/Window | Sesi terbaru |
-| Interaksi | — |
-| Empty/Loading/Error | Skeleton/Empty/Error |
-
+| Nama card | MarLabs News |
+| Komponen | [NewsCards.tsx](../../idx-web/components/NewsCards.tsx) (LatestNewsCard) |
+| Fungsi | Judul terbaru dari Stockbit Snips (7 hari terakhir), Top 3 di kartu. Tombol "Lihat semua" membuka modal berisi semua berita; klik judul membuka sumber di tab baru |
+| Sumber data | GET /api/news/latest?limit=20 → `news.latest` → tabel `news_items` (sumber: snips.stockbit.com) |
+| Rumus/Logika | Urut published_at desc; retensi 7 hari (auto-prune) |
+| Periode/Window | Real-time (ingest tiap NEWS_INTERVAL, default 900 detik) |
+| Interaksi | Tombol "Lihat semua" → modal; klik judul buka sumber di tab baru |
+| Empty/Loading/Error | Skeleton/Empty/Error; SWR refresh 120s |
 ### Ringkasan Pasar (Breadth)
 | Field | Isi |
 |---|---|
@@ -112,7 +111,7 @@ IDX/DataIDX → `cf_transport.py` → `live_capture.py` → PostgreSQL (`index_q
 ## 5. Cara Pengambilan / Update Data
 - **Kapan dibuat**: campuran — `overview`/`leaders` on-demand dari snapshot terbaru; `trade-summary` dari agregat EOD.
 - **Job**: interval `idx` (60s, refresh index), `wl` (60s, watchlist/leaders). Cron EOD `refresh_s2` 16:05 mengisi snapshot harian. Lihat [cli.py](../../idx-scraper/src/idx_scraper/cli.py).
-- **Refresh UI**: SWR 30s (overview/leaders/signals/technical), 60s (trade-summary/narration), 300s (regime).
+- **Refresh UI**: SWR 30s (overview/leaders/signals/technical), 60s (trade-summary), 120s (news), 300s (regime).
 - **Idempotensi**: upsert pada `trade_date`/`code`.
 - **Fallback**: breadth dari `research.latest_pit` bila `index_summary_daily` kosong.
 
@@ -123,3 +122,5 @@ Feed ke hampir semua menu lain (klik emiten → `/stock/[code]`). Bergantung pad
 - Angka volume/value final hanya setelah pasar tutup.
 - Data delayed ~5–15 menit (label UI).
 - `stock_quotes` (live) bisa stale di luar jam bursa; leaderboard jatuh ke EOD.
+
+

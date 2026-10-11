@@ -21,7 +21,7 @@ import type {
   StockBrokerActivity,
   SectorRotation,
   ForeignFlow,
-  MarketNarration,
+  NewsList,
   MarketOverview,
   MarketRegime,
   MarketLeaders,
@@ -166,9 +166,9 @@ export function useHistory(code: string | null, limit = 120) {
   return useSWR<PriceBar[]>(key, fetcher, { refreshInterval: REFRESH });
 }
 
-export function useNarration() {
-  return useSWR<MarketNarration>("/api/market/narration", fetcher, {
-    refreshInterval: 60_000,
+export function useLatestNews() {
+  return useSWR<NewsList>("/api/news/latest?limit=20", fetcher, {
+    refreshInterval: 120_000,
   });
 }
 

@@ -115,17 +115,15 @@ export interface ForeignFlow {
   top_net_out: { code: string; name: string | null; net: number | null; percent: number | null }[];
 }
 
-export interface NarrationSection {
+export interface NewsItem {
   title: string;
-  icon: string;
-  tone: "up" | "down" | "neutral";
-  text: string;
+  source: string;
+  url: string;
+  published_at: string;
 }
 
-export interface MarketNarration {
-  date: string | null;
-  generated_at: string | null;
-  sections: NarrationSection[];
+export interface NewsList {
+  items: NewsItem[];
 }
 
 export interface StockSearchResult {
