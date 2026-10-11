@@ -246,6 +246,15 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 5. **Biarkan scheduler berjalan minimal satu siklus EOD** (`refresh_s2` 16:05 WIB) agar `raw_eod`/`prices_pit`/`broker_daily` terisi.
 6. **Backfill manual** bila perlu: `idx eod <YYYYMMDD>`, `idx ic`, `idx signal-log`, `idx recommend`.
 
+## Delete-Zone (Fitur UI yang Sengaja Dihapus)
+
+Jangan dibuat ulang tanpa keputusan baru. Backend terkait tetap dipakai oleh fitur lain.
+
+| Path / konsep | Dihapus pada | Alasan | Backend yang tetap | Syarat buat ulang |
+|---|---|---|---|---|
+| `app/valuation/`, `docs/valuasi.md`, `useValuation` | 2026-10-11 (commit `7a08ca3`) | Fitur UI Valuasi dihapus | `GET /api/valuation` tetap (dipakai screener & Hold Check) | Keputusan baru + ADR |
+| `app/hold-check/`, `components/HoldCheckPanel.tsx`, `docs/hold-check.md` | 2026-10-11 (commit `4ae0dcc`) | Fitur UI Hold Check dihapus | `GET /api/hold-check` tetap (dipakai Ruang Keputusan) | Keputusan baru + ADR |
+
 ## Konvensi
 
 - **Versi padat**: satu file per menu dengan struktur 7 bagian baku; detail identik tidak diulang antar menu.
