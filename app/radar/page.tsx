@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Radar, TrendingUp, TrendingDown } from "lucide-react";
+import { Radar, TrendingUp, TrendingDown, ChevronRight } from "lucide-react";
 import { useSmartMoneyRadar } from "@/lib/hooks";
-import { fmtCompact, fmtDateStr, fmtNum } from "@/lib/format";
-import { Card } from "@/components/Card";
+import { fmtCompact, fmtNum } from "@/lib/format";
 import { InfoHint } from "@/components/InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -14,193 +13,202 @@ import { SmartMoneyTrackRecordCard } from "@/components/SmartMoneyTrackRecordCar
 import { SmartMoneyPatternsBoardCard } from "@/components/SmartMoneyPatternsBoard";
 import type { SmartMoneyRadarRow } from "@/lib/types";
 
-/** Opsi jendela agregasi (hari bursa). */
+/** Jendela waktu agregasi (hari bursa). */
 const WINDOWS = [
-  { days: 1, label: "1 sesi" },
-  { days: 5, label: "5 sesi" },
-  { days: 10, label: "10 sesi" },
+  { days: 1, label: "Hari ini" },
+  { days: 5, label: "1 minggu" },
+  { days: 10, label: "2 minggu" },
   { days: 21, label: "1 bulan" },
 ];
 
-function RadarTable({
-  rows,
-  side,
-  days,
-}: {
-  rows: SmartMoneyRadarRow[];
-  side: "akumulasi" | "distribusi";
-  days: number;
-}) {
+type Side = "akumulasi" | "distribusi";
+
+const SIDES: { key: Side; label: string; hint: string; icon: typeof TrendingUp }[] = [
+  { key: "akumulasi", label: "Asing sedang borong", hint: "Dana asing net beli", icon: TrendingUp },
+  { key: "distribusi", label: "Asing sedang lepas", hint: "Dana asing net jual", icon: TrendingDown },
+];
+
+function RadarList({ rows, side, days }: { rows: SmartMoneyRadarRow[]; side: Side; days: number }) {
   const isAcc = side === "akumulasi";
   const maxAbs = Math.max(...rows.map((r) => Math.abs(r.net_sum_idr ?? 0)), 1);
+
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        message={`Belum ada emiten yang ${isAcc ? "diborong" : "dilepas"} asing dalam ${
+          WINDOWS.find((w) => w.days === days)?.label.toLowerCase() ?? `${days} sesi`
+        } terakhir.`}
+      />
+    );
+  }
+
   return (
-    <div>
-      <ul className="space-y-1.5">
-        {rows.map((r, i) => (
+    <ul className="divide-y divide-[var(--border)]">
+      {rows.map((r, i) => {
+        const value = Math.abs(r.net_sum_idr ?? 0);
+        return (
           <li key={r.code}>
             <Link
               href={`/radar/${r.code}`}
-              className="card card-hover flex items-center gap-2.5 p-2.5 transition-colors hover:bg-white/[0.03]"
+              className="group flex items-center gap-3 px-2 py-3 transition-colors hover:bg-white/[0.03] sm:px-3"
             >
-              <span className="text-muted w-5 shrink-0 text-center text-xs tabular-nums">
-                {i + 1}
-              </span>
-              <TickerLogo code={r.code} size={26} />
+              <span className="text-muted w-5 shrink-0 text-center text-xs tabular-nums">{i + 1}</span>
+              <TickerLogo code={r.code} size={32} />
               <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-baseline gap-2">
                   <span className="text-sm font-bold">{r.code}</span>
                   {r.name && (
-                    <span className="text-muted hidden truncate text-[11px] sm:inline">
-                      {r.name}
-                    </span>
+                    <span className="text-muted hidden truncate text-xs sm:inline">{r.name}</span>
                   )}
                 </span>
-                {/* bar relatif terhadap nilai terbesar di daftar */}
-                <span className="relative mt-1 block h-1 overflow-hidden rounded-full bg-white/5">
+                <span className="relative mt-1.5 block h-1.5 overflow-hidden rounded-full bg-white/5">
                   <span
                     className={`absolute inset-y-0 left-0 rounded-full ${isAcc ? "bg-up" : "bg-down"}`}
-                    style={{ width: `${(Math.abs(r.net_sum_idr ?? 0) / maxAbs) * 100}%` }}
+                    style={{ width: `${(value / maxAbs) * 100}%` }}
                   />
                 </span>
               </span>
               <span className="flex shrink-0 flex-col items-end">
                 <span className={`text-sm font-bold tabular-nums ${isAcc ? "text-up" : "text-down"}`}>
-                  {isAcc ? "+" : "−"}Rp {fmtCompact(Math.abs(r.net_sum_idr ?? 0))}
+                  {isAcc ? "+" : "−"}Rp {fmtCompact(value)}
                 </span>
-                <span className="text-muted flex items-center gap-1 text-[11px] tabular-nums">
-                  {fmtNum(r.netval_pct, 1)}% transaksi
+                <span className="text-muted flex items-center gap-1.5 text-[11px] tabular-nums">
+                  {fmtNum(r.netval_pct, 1)}% dari transaksi
                   {(r.streak ?? 0) >= 3 && (
                     <span
-                      className={`rounded bg-white/10 px-1 font-semibold ${
-                        isAcc ? "text-up" : "text-down"
-                      }`}
+                      className={`rounded bg-white/10 px-1 font-semibold ${isAcc ? "text-up" : "text-down"}`}
                       title={`${r.streak} sesi berturut-turut`}
                     >
-                      {r.streak}×
+                      {r.streak} hari berturut
                     </span>
                   )}
                 </span>
               </span>
+              <ChevronRight size={16} className="text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
             </Link>
           </li>
-        ))}
-      </ul>
-      {rows.length === 0 && <EmptyState message={`Tidak ada emiten ${side} di jendela ${days} sesi.`} />}
-    </div>
+        );
+      })}
+    </ul>
   );
 }
 
 export default function RadarPage() {
   const [days, setDays] = useState(10);
+  const [side, setSide] = useState<Side>("akumulasi");
   const { data, error, isLoading } = useSmartMoneyRadar(days);
   const acc = data?.accumulation ?? [];
   const dist = data?.distribution ?? [];
   const hasAny = acc.length > 0 || dist.length > 0;
+  const rows = side === "akumulasi" ? acc : dist;
 
   return (
-    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <Radar size={28} className="text-accent" aria-hidden />
-            Radar <span className="gradient-text">Smart Money</span>
-          </h1>
-          <p className="text-muted mt-0.5 text-sm">
-            Emiten dengan jejak aliran dana asing terkuat di seluruh pasar
-            {data ? (
-              <LastUpdated sessionDate={data.date} />
-            ) : null}
-          </p>
-        </div>
+    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:py-8">
+      {/* Header */}
+      <header className="space-y-1">
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <Radar size={26} className="text-accent" aria-hidden />
+          Radar <span className="gradient-text">Smart Money</span>
+        </h1>
+        <p className="text-muted text-sm">
+          Saham yang sedang paling banyak diborong atau dilepas investor asing.
+          {data && <LastUpdated sessionDate={data.date} />}
+        </p>
+      </header>
 
-        {/* pemilih jendela */}
-        <div
-          className="flex items-center gap-1 rounded-lg border border-[var(--border)] p-1"
-          role="group"
-          aria-label="Jendela agregasi"
-        >
-          {WINDOWS.map((w) => (
-            <button
-              key={w.days}
-              type="button"
-              onClick={() => setDays(w.days)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                days === w.days
-                  ? "bg-[var(--accent)] text-white"
-                  : "text-muted hover:bg-white/[0.06]"
-              }`}
-              aria-pressed={days === w.days}
-            >
-              {w.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="text-muted flex items-start gap-1.5 rounded-lg border border-[var(--border)] bg-white/[0.02] p-3 text-xs leading-relaxed">
-        <InfoHint text="Smart money di sini = investor asing (IDX menggabungkan semua firma asing; tidak ada breakdown per firma di data gratis). Verdict dari porsi nilai transaksi yang dibelani asing, bukan skor. Lantai likuiditas: nilai transaksi jendela >= Rp 500 juta, supaya emiten yang nyaris tak diperdagangkan tidak naik ke papan. Ini alat riset, bukan rekomendasi jual/beli." />
+      {/* Panduan singkat */}
+      <div className="text-muted flex items-start gap-2 rounded-xl border border-[var(--border)] bg-white/[0.02] p-3.5 text-sm leading-relaxed">
         <span className="flex-1">
-          <strong className="text-[var(--fg)]">Cara baca:</strong> hijau = asing net
-          <em> beli</em> (akumulasi), merah = net <em>jual</em> (distribusi). Angka di
-          kanan = total net dalam {days} sesi terakhir; "% transaksi" = porsi dari
-          total nilai transaksi. Badge <span className="font-semibold">N×</span> =
-          N sesi berturut-turut searah. Klik emiten untuk detail jejaknya.
+          Tap emiten untuk melihat detail jejaknya. Angka di kanan adalah total
+          uang asing yang masuk (hijau) atau keluar (merah) dalam periode yang
+          kamu pilih.
         </span>
+        <InfoHint text="Smart money di sini = investor asing (IDX menggabungkan semua firma asing; tidak ada breakdown per firma di data gratis). Verdict dari porsi nilai transaksi yang dibeli/dijual asing, bukan skor. Lantai likuiditas: nilai transaksi periode >= Rp 500 juta. Ini alat riset, bukan rekomendasi jual/beli." />
       </div>
 
+      {/* Pemilih periode */}
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Periode">
+        {WINDOWS.map((w) => (
+          <button
+            key={w.days}
+            type="button"
+            onClick={() => setDays(w.days)}
+            aria-pressed={days === w.days}
+            className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+              days === w.days
+                ? "bg-[var(--accent)] text-white"
+                : "border border-[var(--border)] text-muted hover:text-[var(--fg)]"
+            }`}
+          >
+            {w.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid min-w-0 grid-cols-1 items-stretch gap-5 lg:grid-cols-2">
       {error ? (
         <ErrorState message={`Gagal memuat radar: ${error.message}`} />
       ) : isLoading || !data ? (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Skeleton className="h-80" />
-          <Skeleton className="h-80" />
-        </div>
+        <Skeleton className="h-80" />
       ) : !hasAny ? (
-        <EmptyState message="Belum ada data aliran asing yang cukup (data EOD diisi lewat `idx serve`)." />
+        <EmptyState message="Belum ada data aliran asing yang cukup. Data EOD perlu diisi lewat `idx serve`." />
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card
-            title={
-              <>
-                <TrendingUp size={16} className="text-up" /> Akumulasi
-              </>
-            }
-            subtitle={`Asing net buy terbesar · ${days} sesi`}
-            right={
-              <span className="rounded-full bg-up/15 px-2 py-0.5 text-xs font-bold text-up">
-                {acc.length}
-              </span>
-            }
-          >
-            <RadarTable rows={acc} side="akumulasi" days={days} />
-          </Card>
-          <Card
-            title={
-              <>
-                <TrendingDown size={16} className="text-down" /> Distribusi
-              </>
-            }
-            subtitle={`Asing net sell terbesar · ${days} sesi`}
-            right={
-              <span className="rounded-full bg-down/15 px-2 py-0.5 text-xs font-bold text-down">
-                {dist.length}
-              </span>
-            }
-          >
-            <RadarTable rows={dist} side="distribusi" days={days} />
-          </Card>
-        </div>
+        <section className="card overflow-hidden p-0">
+          {/* Tab sisi: akumulasi vs distribusi */}
+          <div role="tablist" aria-label="Arah aliran asing" className="grid grid-cols-2 border-b border-[var(--border)]">
+            {SIDES.map((s) => {
+              const active = side === s.key;
+              const count = s.key === "akumulasi" ? acc.length : dist.length;
+              const Icon = s.icon;
+              const tone = s.key === "akumulasi" ? "text-up" : "text-down";
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setSide(s.key)}
+                  className={`flex items-center justify-center gap-2 px-3 py-3.5 text-sm font-semibold transition-colors ${
+                    active
+                      ? "border-b-2 border-[var(--accent)] text-[var(--fg)]"
+                      : "border-b-2 border-transparent text-muted hover:text-[var(--fg)]"
+                  }`}
+                >
+                  <Icon size={16} className={tone} aria-hidden />
+                  <span>{s.label}</span>
+                  <span
+                    className={`rounded-full px-1.5 text-[10px] font-bold tabular-nums ${
+                      active ? `${tone} bg-white/10` : "bg-white/5 text-muted"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-muted px-4 pt-3 text-xs">
+            {SIDES.find((s) => s.key === side)?.hint} · {WINDOWS.find((w) => w.days === days)?.label.toLowerCase()} terakhir
+          </p>
+          <div className="px-1 pb-2 sm:px-2">
+            <RadarList rows={rows} side={side} days={days} />
+          </div>
+        </section>
       )}
 
+      <div className="min-w-0">
+        <SmartMoneyPatternsBoardCard className="h-full" />
+      </div>
+
+      <div className="min-w-0 lg:col-span-2">
+        <SmartMoneyTrackRecordCard />
+      </div>
+      </div>
+
       <p className="text-muted text-xs leading-relaxed">
-        Data dari EOD IDX (delayed ~5–15 menit, diperbarui tiap hari bursa). Nilai
-        rupiah = volume saham asing × close. Dipindai dari{" "}
-        {fmtNum(data?.scanned)} emiten yang punya data.
+        Data EOD IDX (delayed ~5–15 menit, diperbarui tiap hari bursa). Nilai rupiah = volume saham asing × harga penutupan
+        {data ? ` · dipindai dari ${fmtNum(data.scanned)} emiten` : ""}.
       </p>
-
-      <SmartMoneyPatternsBoardCard />
-
-      <SmartMoneyTrackRecordCard />
     </main>
   );
 }

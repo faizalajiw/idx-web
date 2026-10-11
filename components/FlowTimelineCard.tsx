@@ -24,6 +24,7 @@ const MEDIAN_LINE = "var(--chart-median)";
 /** Pilihan zoom sesi bursa. */
 const ZOOMS = [5, 20, 60, 120] as const;
 type Zoom = (typeof ZOOMS)[number];
+const ZOOM_LABEL: Record<Zoom, string> = { 5: "5 hari", 20: "1 bulan", 60: "3 bulan", 120: "6 bulan" };
 
 interface TimelinePoint {
   date: string;
@@ -92,11 +93,9 @@ function PhaseStrip({ view }: { view: TimelinePoint[] }) {
         ))}
       </div>
       <div className="text-muted mt-1 flex items-center justify-between text-[10px]">
-        <span>distribusi</span>
-        <span>
-          fase per sesi — makin pekat makin jauh dari median pasar
-        </span>
-        <span>akumulasi</span>
+        <span>Dilepas (jual)</span>
+        <span>Warna per hari: makin pekat, makin kuat tekanannya</span>
+        <span>Dikumpulkan (beli)</span>
       </div>
     </div>
   );
@@ -106,7 +105,7 @@ function PhaseStrip({ view }: { view: TimelinePoint[] }) {
 export function FlowTimelineCard({
   code,
   lookback = 120,
-  title = "Timeline Aliran Dana",
+  title = "Riwayat Aliran Dana",
   className = "",
 }: {
   code: string;
@@ -134,10 +133,10 @@ export function FlowTimelineCard({
       title={title}
       subtitle={
         data?.as_of
-          ? `Skor akumulasi harian — s/d sesi ${data.as_of}`
-          : "Skor akumulasi harian"
+          ? `Seberapa kuat tekanan beli vs jual dari broker, sampai ${data.as_of}`
+          : "Seberapa kuat tekanan beli vs jual dari broker"
       }
-      info="Bagaimana skor aktivitas broker emiten ini bergerak hari ke hari. Skor bersifat relatif (50 = median pasar hari itu): di atas garis abu-abu = fase akumulasi relatif, di bawah = distribusi relatif. Strip warna di bawah chart merangkum fasenya per sesi."
+      info="Skor 0–100 menunjukkan arah tekanan broker. Di atas garis putus-putus (50) berarti lebih banyak yang mengumpulkan saham; di bawah berarti lebih banyak yang melepas. Garis abu-abu = rata-rata pasar hari itu sebagai pembanding."
       right={
         <div className="flex items-center gap-1">
           {ZOOMS.map((z) => (
@@ -149,7 +148,7 @@ export function FlowTimelineCard({
                 zoom === z ? "bg-[var(--accent)] text-white" : "text-muted hover:bg-white/[0.06]"
               }`}
             >
-              {z}h
+              {ZOOM_LABEL[z]}
             </button>
           ))}
         </div>
@@ -163,12 +162,17 @@ export function FlowTimelineCard({
         <EmptyState message="Belum ada riwayat skor yang cukup untuk timeline (butuh ≥ 2 sesi berskor; faktor aliran juga harus tervalidasi IC)." />
       ) : (
         <div>
-          <p className="text-muted mb-1 text-[11px]">
-            <span style={{ color: "var(--up)" }}>Hijau</span> = di atas median pasar
-            (akumulasi relatif) · <span style={{ color: "var(--down)" }}>merah</span> = di
-            bawah (distribusi relatif)
-          </p>
-          <ResponsiveContainer width="100%" height={190}>
+          <div className="text-muted mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block h-2 w-3 rounded-sm" style={{ backgroundColor: SCORE_LINE }} />
+              Skor emiten
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 border-t border-dashed" style={{ borderColor: MEDIAN_LINE }} />
+              Rata-rata pasar
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={view} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="flowTimelineFill" x1="0" y1="0" x2="0" y2="1">

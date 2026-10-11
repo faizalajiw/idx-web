@@ -14,7 +14,7 @@ import type {
   BrokerActivityFactor,
   BrokerActivityRow,
 } from "@/lib/types";
-import { Check, Info } from "lucide-react";
+import { Activity, Check, Info } from "lucide-react";
 
 const f4 = (v: number | null) => (v === null ? "-" : v.toFixed(4));
 const f2 = (v: number | null) => (v === null ? "-" : v.toFixed(2));
@@ -311,9 +311,10 @@ export default function BrokerActivityPage() {
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Aktivitas <span className="gradient-text">Broker</span>
-        </h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  <Activity size={26} className="text-accent" aria-hidden />
+                  Aktivitas <span className="gradient-text">Broker</span>
+                </h1>
         <p className="text-muted mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
           Emiten dengan jejak aliran dana terkuat hari ini, diperingkatkan oleh
           skor yang bobotnya berasal dari uji statistik — bukan feeling.

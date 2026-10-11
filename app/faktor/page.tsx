@@ -4,7 +4,7 @@ import { useFactorsOverview, useRegimeHistory } from "@/lib/hooks";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { fmtNum } from "@/lib/format";
-import { Check } from "lucide-react";
+import { Check, ShieldCheck } from "lucide-react";
 import { LastUpdated } from "@/components/LastUpdated";
 
 const f4 = (v: number | null) => (v === null ? "-" : v.toFixed(4));
@@ -224,7 +224,8 @@ export default function FaktorPage() {
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <ShieldCheck size={26} className="text-accent" aria-hidden />
           Faktor &amp; <span className="gradient-text">Kalibrasi</span>
         </h1>
         <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">

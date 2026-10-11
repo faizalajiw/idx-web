@@ -5,7 +5,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 
 ## 2. Route & Berkas
 - URL: `/jejak-sinyal` → [`app/jejak-sinyal/page.tsx`](../../idx-web/app/jejak-sinyal/page.tsx) (233 baris)
-- Komponen: `SummaryStrip`, `HorizonPills`, `StatTable` (di file page), [LastUpdated](../../idx-web/components/LastUpdated.tsx), [States](../../idx-web/components/States.tsx)
+- Komponen: `HorizonTabs`, `SignalResultCard`, `RegimeCard`, `SummaryStrip` (di file page), [LastUpdated](../../idx-web/components/LastUpdated.tsx), [States](../../idx-web/components/States.tsx)
 - Hooks: `useSignalTrack()` (600 s) ([hooks.ts](../../idx-web/lib/hooks.ts))
 
 ## 3. Penjelasan Per-Card
@@ -26,12 +26,12 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Field | Isi |
 |---|---|
 | Nama card | Kinerja per Sinyal |
-| Komponen | [jejak-sinyal/page.tsx:157](../../idx-web/app/jejak-sinyal/page.tsx) + `StatTable` |
+| Komponen | [jejak-sinyal/page.tsx](../../idx-web/app/jejak-sinyal/page.tsx) (`SignalResultCard`, `RegimeCard`) |
 | Fungsi | Rata-rata return, excess return vs equal-weight, t-stat (Newey-West lag 5), max runup/drawdown per sinyal |
 | Sumber data | `analytics.signal_track` → `research.signal_log` (2024, 2034) + `research.latest_pit` untuk harga |
 | Rumus/Logika | Entry = close T+1; excess = return sinyal − return pasar equal-weight window sama; t-stat Newey-West lag 5 |
-| Periode/Window | Horizon 5 / 10 / 21 sesi (pill `HorizonPills`) |
-| Interaksi | Pilih horizon (5h/10h/21h) |
+| Periode/Window | Horizon 5 / 10 / 21 hari bursa, tampil sebagai tab "1 minggu / 2 minggu / 1 bulan" |
+| Interaksi | Pilih jangka waktu (1 minggu / 2 minggu / 1 bulan) |
 | Empty/Loading/Error | Skeleton; tabel kosong bila belum ada sinyal |
 
 ### Kinerja per Regime IHSG
@@ -42,7 +42,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Fungsi | Membandingkan kinerja sinyal saat trending / ranging / transisi |
 | Sumber data | `analytics.signal_track` → `research.signal_log` join `research.regime_daily` |
 | Rumus/Logika | Sinyal dikelompokkan berdasarkan `regime` pada tanggal sinyal |
-| Periode/Window | Horizon mengikuti pill aktif |
+| Periode/Window | Horizon mengikuti tab aktif |
 | Interaksi | Horizon bersama dengan kartu sebelumnya |
 | Empty/Loading/Error | Skeleton / kosong bila `regime_daily` belum terisi |
 
@@ -51,7 +51,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 |---|---|
 | Nama card | Sinyal Terbaru |
 | Komponen | [jejak-sinyal/page.tsx:180](../../idx-web/app/jejak-sinyal/page.tsx) (tabel) |
-| Fungsi | Daftar sinyal terbaru + return realisasi 5h/10h/21h |
+| Fungsi | Daftar sinyal terbaru + return realisasi 1 minggu / 2 minggu / 1 bulan |
 | Sumber data | `analytics.signal_track` → `research.signal_log` |
 | Rumus/Logika | Return terealisasi dari close entry; kosong bila horizon belum selesai |
 | Periode/Window | 5 / 10 / 21 sesi |

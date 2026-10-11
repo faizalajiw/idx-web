@@ -1,5 +1,6 @@
 "use client";
 
+import { LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useSectors } from "@/lib/hooks";
 import { fmtPct, fmtCompact } from "@/lib/format";
@@ -25,9 +26,10 @@ export default function SectorsPage() {
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Analisis <span className="gradient-text">Sektor</span>
-        </h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  <LayoutGrid size={26} className="text-accent" aria-hidden />
+                  Analisis <span className="gradient-text">Sektor</span>
+                </h1>
         <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Rata-rata pergerakan, nilai transaksi, dan arus asing per sektor ·{" "}
           {data?.date ?? "-"}

@@ -519,14 +519,28 @@ html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 2
 
 /* Kotak ringkasan angka (hero/stat) di dalam kartu */
 .stat-box {
-  border-radius: var(--r-sm);
+  --stat-c: var(--accent);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r);
   border: 1px solid var(--border);
-  background: var(--bg-elev);
-  transition: border-color 0.18s ease, transform 0.18s ease;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--stat-c) 9%, transparent) 0%, transparent 65%),
+    var(--bg-card);
+  box-shadow: var(--elev-1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-box::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--stat-c);
+  opacity: 0.85;
 }
 .stat-box:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--stat-c) 35%, var(--border));
+  box-shadow: var(--elev-2);
 }
 
 .data-table thead th { border-bottom-color: var(--border-strong); }

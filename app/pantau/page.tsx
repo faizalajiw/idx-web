@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bell } from "lucide-react";
 import { AlertRules } from "@/components/AlertRules";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { TelegramStatus } from "@/components/TelegramStatus";
@@ -19,7 +20,8 @@ export default function PantauPage() {
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <Bell size={26} className="text-accent" aria-hidden />
           Pantau & <span className="gradient-text">Notifikasi</span>
         </h1>
         <p className="text-muted mt-0.5 text-sm">

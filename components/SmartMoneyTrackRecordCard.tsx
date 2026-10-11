@@ -9,9 +9,9 @@ import { InfoHint } from "./InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 
 const HORIZONS = [
-  { key: "fwd1", label: "1 sesi" },
-  { key: "fwd5", label: "5 sesi" },
-  { key: "fwd10", label: "10 sesi" },
+  { key: "fwd1", label: "Hari ini" },
+  { key: "fwd5", label: "1 minggu" },
+  { key: "fwd10", label: "2 minggu" },
   { key: "fwd21", label: "1 bulan" },
 ];
 

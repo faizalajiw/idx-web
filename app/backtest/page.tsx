@@ -1,6 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  BarChart3,
+  BookOpen,
+  Coins,
+  Info,
+  LineChart,
+  Play,
+  FlaskConical,
+  ScrollText,
+  Settings2,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
 import { useBacktestConfig, useWatchlist } from "@/lib/hooks";
 import { runBacktest } from "@/lib/api";
 import { fmtCompact } from "@/lib/format";
@@ -52,12 +65,42 @@ const COST_PRESETS: { id: string; label: string; desc: string; value: CostPct }[
   },
 ];
 
-const COST_FIELDS: { key: keyof CostPct; label: string; step: number }[] = [
-  { key: "commission", label: "Komisi (%/sisi)", step: 0.05 },
-  { key: "tax", label: "Pajak jual (%)", step: 0.05 },
-  { key: "slippage", label: "Slippage (%/sisi)", step: 0.05 },
-  { key: "adv", label: "Cap likuiditas (% ADTV)", step: 0.5 },
+const COST_FIELDS: { key: keyof CostPct; label: string; hint: string; step: number }[] = [
+  {
+    key: "commission",
+    label: "Komisi (%/sisi)",
+    hint: "Biaya jasa sekuritas tiap kali membeli atau menjual.",
+    step: 0.05,
+  },
+  {
+    key: "tax",
+    label: "Pajak jual (%)",
+    hint: "Pajak penjualan saham 0,1% yang dipotong saat menjual.",
+    step: 0.05,
+  },
+  {
+    key: "slippage",
+    label: "Slippage (%/sisi)",
+    hint: "Selisih harga beli/jual nyata dari harga yang diharapkan.",
+    step: 0.05,
+  },
+  {
+    key: "adv",
+    label: "Cap likuiditas (% ADTV)",
+    hint: "Batas porsi order terhadap nilai transaksi harian emiten; 0 berarti tanpa batas.",
+    step: 0.5,
+  },
 ];
+
+const TABS: { id: TabId; label: string; hint: string; icon: LucideIcon }[] = [
+  { id: "ringkasan", label: "Ringkasan", hint: "Hasil utama", icon: Trophy },
+  { id: "kurva", label: "Kurva Modal", hint: "Pertumbuhan modal", icon: LineChart },
+  { id: "perbandingan", label: "Perbandingan", hint: "Strategi vs beli-tahan", icon: BarChart3 },
+  { id: "biaya", label: "Biaya", hint: "Yang menggerus untung", icon: Coins },
+  { id: "ledger", label: "Jejak Transaksi", hint: "Tiap sesi rebalance", icon: ScrollText },
+];
+
+type TabId = "ringkasan" | "kurva" | "perbandingan" | "biaya" | "ledger";
 
 function costPctFromDefaults(d: CostModelInfo): CostPct {
   return {
@@ -104,6 +147,12 @@ function pct(v: number | null | undefined, digits = 2): string {
   return `${v > 0 ? "+" : ""}${(v * 100).toFixed(digits)}%`;
 }
 
+/** Unsigned percent — for values where the sign is already implied by the label. */
+function pctMag(v: number | null | undefined, digits = 2): string {
+  if (v === null || v === undefined) return "-";
+  return `${(Math.abs(v) * 100).toFixed(digits)}%`;
+}
+
 function decimals(v: number | null | undefined, digits = 2): string {
   if (v === null || v === undefined) return "-";
   return v.toFixed(digits);
@@ -114,12 +163,86 @@ function toneOf(v: number | null | undefined): Tone {
   return v > 0 ? "up" : "down";
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: Tone }) {
-  const cls = tone === "up" ? "text-up" : tone === "down" ? "text-down" : "";
+function toneClass(tone?: Tone): string {
+  if (tone === "up") return "text-up";
+  if (tone === "down") return "text-down";
+  return "";
+}
+
+function Stat({
+  label,
+  value,
+  tone,
+  hint,
+}: {
+  label: string;
+  value: string;
+  tone?: Tone;
+  hint?: string;
+}) {
   return (
     <div className="card p-4">
-      <p className="text-muted text-xs">{label}</p>
-      <p className={`mt-1 text-xl font-bold tabular-nums ${cls}`}>{value}</p>
+      <p className="text-muted flex items-center gap-1 text-xs">
+        {label}
+        {hint && <InfoDot text={hint} />}
+      </p>
+      <p className={`mt-1 text-xl font-bold tabular-nums ${toneClass(tone)}`}>{value}</p>
+    </div>
+  );
+}
+
+/** Tiny hoverable explanation marker — avoids jargon walls in the layout. */
+function InfoDot({ text }: { text: string }) {
+  return (
+    <span
+      tabIndex={0}
+      role="button"
+      aria-label={text}
+      title={text}
+      className="text-muted inline-flex cursor-help items-center align-middle"
+    >
+      <Info className="h-3 w-3" />
+    </span>
+  );
+}
+
+/** Plain-language verdict so a lay user knows if the result is even worth reading. */
+function VerdictCard({ result, alpha, costErosion }: { result: BacktestResult; alpha: number; costErosion: number }) {
+  const beatBenchmark = alpha > 0;
+  const beatAfterCost = result.metrics.total_return > 0;
+  const label = beatBenchmark
+    ? "Strategi menang dari beli-tahan"
+    : beatAfterCost
+      ? "Untung, tapi kalah dari beli-tahan"
+      : "Strategi belum menghasilkan untung";
+  const tone: Tone = beatBenchmark ? "up" : beatAfterCost ? "neutral" : "down";
+  const accent =
+    tone === "up"
+      ? "var(--up)"
+      : tone === "down"
+        ? "var(--down)"
+        : "var(--border-strong)";
+
+  return (
+    <div className="card p-4" style={{ borderLeft: `3px solid ${accent}` }}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className={`text-base font-bold ${toneClass(tone)}`}>{label}</p>
+        <p className="text-muted text-xs tabular-nums">
+          Rp {fmtCompact(result.initial_cash)} → Rp {fmtCompact(result.metrics.final_equity)}
+        </p>
+      </div>
+      <p className="text-muted mt-2 text-sm leading-relaxed">
+        Strategi <span className="font-semibold text-[var(--fg)]">{result.strategy_name}</span>{" "}
+        menghasilkan <span className={`font-semibold ${toneClass(toneOf(result.metrics.total_return))}`}>{pct(result.metrics.total_return)}</span>{" "}
+        dalam {result.days} hari bursa, sementara beli-tahan semua emiten{" "}
+        <span className="font-semibold text-[var(--fg)]">{pct(result.benchmark.total_return)}</span>.
+        {costErosion > 0.001 && (
+          <>
+            {" "}Biaya transaksi menggerus{" "}
+                    <span className="font-semibold text-down">{pctMag(costErosion)}</span> dari hasil kotor.
+          </>
+        )}
+      </p>
     </div>
   );
 }
@@ -130,19 +253,25 @@ function MetricRow({
   net,
   benchmark,
   tone,
+  hint,
 }: {
   label: string;
   gross: string;
   net: string;
   benchmark: string;
   tone?: Tone;
+  hint?: string;
 }) {
-  const cls = tone === "up" ? "text-up" : tone === "down" ? "text-down" : "";
   return (
     <tr>
-      <td className="text-muted">{label}</td>
+      <td className="text-muted">
+        <span className="inline-flex items-center gap-1">
+          {label}
+          {hint && <InfoDot text={hint} />}
+        </span>
+      </td>
       <td className="text-muted text-right tabular-nums">{gross}</td>
-      <td className={`text-right font-semibold tabular-nums ${cls}`}>{net}</td>
+      <td className={`text-right font-semibold tabular-nums ${toneClass(tone)}`}>{net}</td>
       <td className="text-muted text-right tabular-nums">{benchmark}</td>
     </tr>
   );
@@ -165,44 +294,49 @@ function MetricsTable({
             <th className="text-left">Metrik</th>
             <th className="text-right">Sebelum biaya</th>
             <th className="text-right">Setelah biaya</th>
-            <th className="text-right">Buy &amp; Hold</th>
+            <th className="text-right">Beli &amp; tahan</th>
           </tr>
         </thead>
         <tbody>
           <MetricRow
-            label="Total return"
+            label="Total keuntungan"
+            hint="Berapa persen modal bertambah atau berkurang selama periode uji."
             gross={pct(gross.total_return)}
             net={pct(net.total_return)}
             benchmark={pct(benchmark.total_return)}
             tone={toneOf(net.total_return)}
           />
           <MetricRow
-            label="Return tahunan (CAGR)"
+            label="Rata-rata per tahun"
+            hint="Setara keuntungan tahunan bila hasilnya diratakan (CAGR)."
             gross={pct(gross.annualized_return)}
             net={pct(net.annualized_return)}
             benchmark={pct(benchmark.annualized_return)}
           />
           <MetricRow
-            label="Max drawdown"
+            label="Jatuh terdalam"
+            hint="Penurunan terbesar dari puncak ke dasar selama uji (max drawdown)."
             gross={pct(-gross.max_drawdown)}
             net={pct(-net.max_drawdown)}
             benchmark={pct(-benchmark.max_drawdown)}
             tone="down"
           />
           <MetricRow
-            label="Volatilitas tahunan"
+            label="Naik-turun tahunan"
+            hint="Seberapa liar nilai portofolio bergerak (volatilitas tahunan)."
             gross={pct(gross.volatility)}
             net={pct(net.volatility)}
             benchmark={pct(benchmark.volatility)}
           />
           <MetricRow
-            label="Sharpe ratio (rf = 0)"
+            label="Imbal hasil per risiko"
+            hint="Keuntungan dibanding naik-turunnya (Sharpe). Makin tinggi makin efisien."
             gross={decimals(gross.sharpe)}
             net={decimals(net.sharpe)}
             benchmark={decimals(benchmark.sharpe)}
           />
           <MetricRow
-            label="Nilai akhir"
+            label="Modal akhir"
             gross={`Rp ${fmtCompact(gross.final_equity)}`}
             net={`Rp ${fmtCompact(net.final_equity)}`}
             benchmark={`Rp ${fmtCompact(benchmark.final_equity)}`}
@@ -227,6 +361,8 @@ export default function BacktestPage() {
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState<TabId>("ringkasan");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const strategies = config?.strategies;
 
@@ -246,16 +382,6 @@ export default function BacktestPage() {
     );
   }, [costPct]);
 
-  // Pick a default strategy (and its default params) once the catalog loads.
-  useEffect(() => {
-    if (!strategyId && strategies?.length) {
-      setStrategyId(strategies[0].id);
-      setParams(defaultsFor(strategies[0]));
-    }
-  }, [strategies, strategyId]);
-
-  // Seed the cadence and cost knobs from the backend defaults, and the universe
-  // from the watchlist — each only the first time the data arrives.
   useEffect(() => {
     if (!config) return;
     if (!costPct) setCostPct(costPctFromDefaults(config.cost_defaults));
@@ -300,6 +426,7 @@ export default function BacktestPage() {
         rebalance,
       });
       setResult(res);
+      setTab("ringkasan");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setResult(null);
@@ -317,15 +444,22 @@ export default function BacktestPage() {
       result.rebalance)
     : "";
 
+  const codelist = codes
+    .split(",")
+    .map((c) => c.trim().toUpperCase())
+    .filter(Boolean);
+  const ready = Boolean(strategyId) && codelist.length > 0 && !loading;
+
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Backtest <span className="gradient-text">Simulator</span>
-        </h1>
+      <div className="min-w-0">
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  <FlaskConical size={26} className="text-accent" aria-hidden />
+                  Uji Strategi <span className="gradient-text">(Backtest)</span>
+                </h1>
         <p className="text-muted mt-0.5 text-sm">
-          Uji strategi di data historis point-in-time, lengkap dengan komisi,
-          pajak, slippage &amp; batas likuiditas
+          Coba sebuah strategi di data masa lalu — seolah-olah kamu sudah
+          menjalankannya sejak dulu — lalu lihat hasilnya setelah biaya nyata.
         </p>
       </div>
 
@@ -333,45 +467,60 @@ export default function BacktestPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* ---------------------------------------------------------- form */}
-        <div className="lg:col-span-1">
-          <Card title="Konfigurasi" subtitle="Strategi, universe, periode, dan biaya" info="Backtest = uji sebuah strategi memakai data masa lalu, seolah-olah kamu menjalankannya dulu. Atur strateginya di sini. Ini simulasi untuk belajar — hasil masa lalu tidak menjamin masa depan.">
+        <div className="min-w-0 lg:col-span-1">
+          <Card
+            title="1. Pilih Strategi"
+            subtitle="Aturan beli-jual yang mau diuji"
+            info="Backtest = uji strategi memakai data masa lalu. Ini simulasi untuk belajar; hasil masa lalu tidak menjamin masa depan."
+          >
             {configError ? (
               <ErrorState message={`Gagal memuat konfigurasi: ${configError.message}`} />
             ) : configLoading || !config || !costPct ? (
               <Skeleton className="h-72" />
             ) : (
               <div className="space-y-5">
-                <div>
-                  <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
-                    Strategi
-                  </p>
-                  <div className="space-y-2">
-                    {config.strategies.map((s) => (
+                <div className="space-y-2">
+                  {config.strategies.map((s) => {
+                    const active = strategyId === s.id;
+                    return (
                       <button
                         key={s.id}
                         type="button"
                         onClick={() => choose(s)}
-                        className={`card card-hover w-full p-3 text-left ${
-                          strategyId === s.id ? "ring-1 ring-[var(--accent)]" : ""
+                        aria-pressed={active}
+                        className={`card card-hover flex w-full items-start gap-3 p-3 text-left ${
+                          active ? "ring-1 ring-[var(--accent)]" : ""
                         }`}
                       >
-                        <p className="text-sm font-semibold">{s.name}</p>
-                        <p className="text-muted mt-1 text-xs leading-relaxed">
-                          {s.description}
-                        </p>
+                        <span
+                          aria-hidden
+                          className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
+                            active
+                              ? "border-[var(--accent)] bg-[var(--accent)]"
+                              : "border-[var(--border-strong)]"
+                          }`}
+                        >
+                          {active && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="text-sm font-semibold">{s.name}</span>
+                          <span className="text-muted mt-1 block text-xs leading-relaxed">
+                            {s.description}
+                          </span>
+                        </span>
                       </button>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
 
                 {current && current.params.length > 0 && (
                   <div>
                     <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
-                      Parameter
+                      Pengaturan strategi
                     </p>
                     <div className="grid grid-cols-2 gap-3">
                       {current.params.map((p) => (
-                        <label key={p.key} className="block">
+                        <label key={p.key} className="block min-w-0">
                           <span className="text-muted text-xs">{p.label}</span>
                           <input
                             type="number"
@@ -388,28 +537,47 @@ export default function BacktestPage() {
                   </div>
                 )}
 
-                <label className="block">
-                  <span className="text-muted text-xs">
-                    Emiten (pisah koma, maks {config.max_codes})
-                  </span>
+                <div>
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-muted text-xs font-semibold tracking-wider uppercase">
+                      Emiten ({codelist.length}/{config.max_codes})
+                    </p>
+                    {watchlist?.length ? (
+                      <button
+                        type="button"
+                        className="text-muted text-xs underline decoration-dotted hover:text-[var(--fg)]"
+                        onClick={() =>
+                          setCodes(
+                            watchlist.slice(0, 10).map((r) => r.code).join(", "),
+                          )
+                        }
+                      >
+                        Pakai watchlist
+                      </button>
+                    ) : null}
+                  </div>
                   <textarea
-                    className="input mt-1 w-full resize-y"
-                    rows={3}
+                    className="input w-full resize-y"
+                    rows={2}
                     value={codes}
                     placeholder="BBCA, BBRI, TLKM"
                     onChange={(e) => setCodes(e.target.value)}
                   />
-                </label>
+                  <p className="text-muted mt-1 text-xs">
+                    Pisahkan dengan koma. Maksimal {config.max_codes} emiten.
+                  </p>
+                </div>
 
                 <div>
                   <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
-                    Periode
+                    Rentang waktu
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {PERIODS.map((p) => (
                       <button
                         key={p.id}
                         type="button"
+                        aria-pressed={period === p.id}
                         onClick={() => setPeriod(p.id)}
                         className={`chip ${period === p.id ? "chip-active" : ""}`}
                       >
@@ -419,193 +587,354 @@ export default function BacktestPage() {
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
-                    Frekuensi rebalance
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {config.rebalance_options.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        title={option.description}
-                        onClick={() => setRebalance(option.id)}
-                        className={`chip ${rebalance === option.id ? "chip-active" : ""}`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-muted mt-2 text-xs leading-relaxed">
-                    Di antara hari rebalance, posisi dibiarkan mengikuti pasar —
-                    bukan dipaksa balik ke bobot target. Makin jarang, makin
-                    kecil turnover dan biayanya.
-                  </p>
-                </div>
-
-                <label className="block">
-                  <span className="text-muted text-xs">Modal awal (Rp)</span>
-                  <input
-                    type="number"
-                    className="input mt-1 w-full"
-                    value={cash}
-                    min={1_000_000}
-                    step={1_000_000}
-                    onChange={(e) => setCash(Number(e.target.value) || 0)}
-                  />
-                </label>
-
-                <div>
-                  <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
-                    Biaya &amp; likuiditas
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {COST_PRESETS.map((preset) => (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        title={preset.desc}
-                        onClick={() => setCostPct(preset.value)}
-                        className={`chip ${activeCostPreset === preset.id ? "chip-active" : ""}`}
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    {COST_FIELDS.map((f) => (
-                      <label key={f.key} className="block">
-                        <span className="text-muted text-xs">{f.label}</span>
-                        <input
-                          type="number"
-                          className="input mt-1 w-full"
-                          value={costPct[f.key]}
-                          min={0}
-                          step={f.step}
-                          onChange={(e) => handleCost(f.key, e.target.value)}
-                        />
-                      </label>
-                    ))}
-                  </div>
-                  <p className="text-muted mt-2 text-xs leading-relaxed">
-                    Cap likuiditas membatasi porsi tiap order terhadap nilai
-                    transaksi harian emiten; 0 berarti tanpa batas.
-                  </p>
-                </div>
-
                 <button
                   type="button"
-                  className="btn btn-primary w-full"
-                  onClick={onRun}
-                  disabled={loading || !strategyId || !codes.trim()}
+                  className="text-muted flex items-center gap-1 text-xs underline decoration-dotted hover:text-[var(--fg)]"
+                  aria-expanded={showAdvanced}
+                  onClick={() => setShowAdvanced((v) => !v)}
                 >
-                  {loading ? "Menghitung…" : "Jalankan Backtest"}
+                  <Settings2 className="h-3 w-3" />
+                  {showAdvanced ? "Sembunyikan pengaturan lanjutan" : "Pengaturan lanjutan"}
                 </button>
+
+                {showAdvanced && (
+                  <div className="space-y-5 border-l-2 border-[var(--border)] pl-3">
+                    <div>
+                      <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
+                        Seberapa sering portofolio disusun ulang
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {config.rebalance_options.map((option) => (
+                          <button
+                            key={option.id}
+                            type="button"
+                            title={option.description}
+                            aria-pressed={rebalance === option.id}
+                            onClick={() => setRebalance(option.id)}
+                            className={`chip ${rebalance === option.id ? "chip-active" : ""}`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-muted mt-2 text-xs leading-relaxed">
+                        Di antara jadwal susun-ulang, posisi dibiarkan mengikuti
+                        pasar. Makin jarang, makin kecil biaya transaksinya.
+                      </p>
+                    </div>
+
+                    <label className="block min-w-0">
+                      <span className="text-muted text-xs">Modal awal (Rp)</span>
+                      <input
+                        type="number"
+                        className="input mt-1 w-full"
+                        value={cash}
+                        min={1_000_000}
+                        step={1_000_000}
+                        onChange={(e) => setCash(Number(e.target.value) || 0)}
+                      />
+                    </label>
+
+                    <div>
+                      <p className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
+                        Biaya &amp; likuiditas
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {COST_PRESETS.map((preset) => (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            title={preset.desc}
+                            aria-pressed={activeCostPreset === preset.id}
+                            onClick={() => setCostPct(preset.value)}
+                            className={`chip ${activeCostPreset === preset.id ? "chip-active" : ""}`}
+                          >
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        {COST_FIELDS.map((f) => (
+                          <label key={f.key} className="block min-w-0">
+                            <span className="text-muted flex items-center gap-1 text-xs">
+                              {f.label}
+                              <InfoDot text={f.hint} />
+                            </span>
+                            <input
+                              type="number"
+                              className="input mt-1 w-full"
+                              value={costPct[f.key]}
+                              min={0}
+                              step={f.step}
+                              onChange={(e) => handleCost(f.key, e.target.value)}
+                            />
+                          </label>
+                        ))}
+                      </div>
+                      <p className="text-muted mt-2 text-xs leading-relaxed">
+                        Model biaya: {costModelLabel(config.cost_defaults)}.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="sticky bottom-0 -mx-4 border-t border-[var(--border)] bg-[var(--bg-elev)] px-4 pt-3 pb-1 sm:-mx-5 sm:px-5">
+                  <button
+                    type="button"
+                    className="btn btn-primary flex w-full items-center justify-center gap-2"
+                    onClick={onRun}
+                    disabled={!ready}
+                  >
+                    <Play className="h-4 w-4" />
+                    {loading ? "Menghitung..." : "Jalankan Backtest"}
+                  </button>
+                  <p className="text-muted mt-2 text-center text-xs">
+                    {!strategyId
+                      ? "Pilih satu strategi dulu di atas."
+                      : codelist.length === 0
+                        ? "Isi minimal satu kode emiten."
+                        : `${codelist.length} emiten · ${PERIODS.find((p) => p.id === period)?.label}`}
+                  </p>
+                </div>
               </div>
             )}
           </Card>
         </div>
 
         {/* ------------------------------------------------------- results */}
-        <div className="space-y-4 lg:col-span-2">
+        <div className="min-w-0 space-y-4 lg:col-span-2">
           {error && <ErrorState message={error} />}
 
           {!result && !error && (
-            <Card title="Hasil">
-              <EmptyState message="Atur strategi di kiri, lalu klik “Jalankan Backtest”." />
+            <Card title="2. Hasil" info="Hasil muncul di sini setelah kamu menekan “Jalankan Backtest”.">
+              {loading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-20" />
+                  <Skeleton className="h-72" />
+                </div>
+              ) : (
+                <EmptyState message="Belum ada hasil. Pilih satu strategi di panel kiri, lalu tekan “Jalankan Backtest”." />
+              )}
             </Card>
           )}
 
           {result && (
             <>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Stat
-                  label="Total return (neto)"
-                  value={pct(result.metrics.total_return)}
-                  tone={toneOf(result.metrics.total_return)}
-                />
-                <Stat label="Alpha vs B&H" value={pct(alpha)} tone={toneOf(alpha)} />
-                <Stat
-                  label="Max drawdown"
-                  value={pct(-result.metrics.max_drawdown)}
-                  tone="down"
-                />
-                <Stat label="Sharpe (neto)" value={decimals(result.metrics.sharpe)} />
-              </div>
+              <VerdictCard result={result} alpha={alpha} costErosion={costErosion} />
 
-              <Card
-                title="Equity Curve"
-                subtitle={`${result.codes.length} emiten · ${result.days} hari bursa · ${result.start} → ${result.end}`}
-                info="Grafik pertumbuhan modal dari waktu ke waktu jika strategi dijalankan. Garis naik = untung, turun = rugi. Perhatikan juga seberapa dalam jatuhnya, bukan cuma hasil akhirnya."
-                right={<LastUpdated dep={result} />}
+              <nav
+                aria-label="Bagian hasil backtest"
+                className="flex flex-wrap gap-2"
+                role="tablist"
               >
-                <EquityCurveChart
-                  points={result.equity_curve}
-                  initialCash={result.initial_cash}
-                />
-              </Card>
+                {TABS.map(({ id, label, hint, icon: Icon }) => {
+                  const active = tab === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setTab(id)}
+                      title={hint}
+                      className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                        active
+                          ? "border-[var(--accent)] bg-[var(--accent)]/10 font-semibold text-[var(--fg)]"
+                          : "text-muted border-[var(--border)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
 
-              <Card
-                title="Perbandingan Metrik"
-                subtitle={`Modal awal Rp ${fmtCompact(result.initial_cash)} · strategi ${result.strategy_name}`}
-                info="Membandingkan hasil strategi (setelah dan sebelum biaya) dengan benchmark (beli-tahan biasa). Berguna untuk cek: apakah strategi ini benar-benar lebih baik daripada sekadar diam memegang saham?"
-              >
-                <MetricsTable
-                  gross={result.gross_metrics}
-                  net={result.metrics}
-                  benchmark={result.benchmark}
-                />
-              </Card>
+              {tab === "ringkasan" && (
+                <div className="space-y-4" role="tabpanel">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Stat
+                      label="Keuntungan bersih"
+                      hint="Total perubahan modal setelah semua biaya dihitung."
+                      value={pct(result.metrics.total_return)}
+                      tone={toneOf(result.metrics.total_return)}
+                    />
+                    <Stat
+                      label="Selisih vs beli-tahan"
+                      hint="Seberapa jauh strategi mengalahkan (atau kalah dari) cara pasif beli lalu diamkan."
+                      value={pct(alpha)}
+                      tone={toneOf(alpha)}
+                    />
+                    <Stat
+                      label="Jatuh terdalam"
+                      hint="Penurunan terbesar dari titik tertinggi ke titik terendah selama uji."
+                      value={pct(-result.metrics.max_drawdown)}
+                      tone="down"
+                    />
+                    <Stat
+                      label="Imbal hasil per risiko"
+                      hint="Keuntungan dibanding naik-turunnya nilai. Makin tinggi makin efisien."
+                      value={decimals(result.metrics.sharpe)}
+                    />
+                  </div>
 
-              <Card
-                title="Dampak Biaya"
-                subtitle={`Rebalance ${cadenceLabel} ×${result.rebalance_days} · turnover Rp ${fmtCompact(result.cost_impact.turnover)} · ${result.days} hari bursa`}
-                info="Rincian biaya (komisi, pajak, slippage) yang menggerus keuntungan. Banyak strategi terlihat cuan di atas kertas tapi rugi setelah biaya nyata dihitung. Bagian ini menjaga kamu tetap realistis."
-              >
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <Stat
-                    label="Total biaya"
-                    value={`Rp ${fmtCompact(result.cost_impact.total_cost)}`}
-                    tone="down"
-                  />
-                  <Stat
-                    label="Komisi + pajak"
-                    value={`Rp ${fmtCompact(result.cost_impact.total_fees)}`}
-                    tone="down"
-                  />
-                  <Stat
-                    label="Slippage"
-                    value={`Rp ${fmtCompact(result.cost_impact.total_slippage)}`}
-                    tone="down"
-                  />
-                  <Stat
-                    label="Cost drag"
-                    value={pct(result.cost_impact.cost_pct_of_equity)}
-                    tone="down"
-                  />
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="card p-4">
+                      <p className="text-muted text-xs">Modal akhir strategi</p>
+                      <p className="mt-1 text-xl font-bold tabular-nums">
+                        Rp {fmtCompact(result.metrics.final_equity)}
+                      </p>
+                      <p className="text-muted mt-2 text-xs">
+                        Dari modal awal Rp {fmtCompact(result.initial_cash)} →
+                        {" "}
+                        <span className={toneClass(toneOf(result.metrics.final_equity - result.initial_cash))}>
+                          {result.metrics.final_equity >= result.initial_cash ? "untung" : "rugi"} Rp{" "}
+                          {fmtCompact(Math.abs(result.metrics.final_equity - result.initial_cash))}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="card p-4">
+                      <p className="text-muted text-xs">Yang diuji</p>
+                      <p className="mt-1 text-sm font-semibold">{result.strategy_name}</p>
+                      <p className="text-muted mt-2 text-xs leading-relaxed">
+                        {result.codes.length} emiten · {result.days} hari bursa ·{" "}
+                        {result.start} → {result.end} · susun ulang {cadenceLabel}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Card
+                    title="Cara membaca hasil ini"
+                    subtitle="Agar tidak salah tafsir"
+                  >
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex gap-2">
+                        <Info className="text-muted mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="font-semibold text-[var(--fg)]">Tanpa mengintip masa depan.</span>{" "}
+                          <span className="text-muted">
+                            Tiap hari simulasi hanya memakai harga dan data yang
+                            memang sudah ada saat itu.
+                          </span>
+                        </span>
+                      </li>
+                      <li className="flex gap-2">
+                        <Info className="text-muted mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="font-semibold text-[var(--fg)]">Frekuensi susun-ulang itu pengungkit utama.</span>{" "}
+                          <span className="text-muted">
+                            Makin sering, makin besar biayanya. Coba bandingkan
+                            tab Biaya antar frekuensi.
+                          </span>
+                        </span>
+                      </li>
+                      <li className="flex gap-2">
+                        <Info className="text-muted mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="font-semibold text-[var(--fg)]">Beli-tahan adalah tolok ukur.</span>{" "}
+                          <span className="text-muted">
+                            Kalau strategi kalah dari sekadar membeli lalu diam,
+                            strategi itu belum menambah nilai.
+                          </span>
+                        </span>
+                      </li>
+                      <li className="flex gap-2">
+                        <Info className="text-muted mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="min-w-0">
+                          <span className="font-semibold text-[var(--fg)]">Ini simulasi, bukan janji.</span>{" "}
+                          <span className="text-muted">
+                            Hasil bagus di masa lalu tidak berarti bagus di masa depan.
+                          </span>
+                        </span>
+                      </li>
+                    </ul>
+                  </Card>
                 </div>
-                <p className="text-muted mt-3 text-xs leading-relaxed">
-                  Erosi return dari biaya:{" "}
-                  <span className="text-down font-semibold">{pct(costErosion)}</span>{" "}
-                  ({pct(result.gross_metrics.total_return)} sebelum biaya →{" "}
-                  {pct(result.metrics.total_return)} setelah biaya).
-                </p>
-                <p className="text-muted mt-2 text-xs leading-relaxed">
-                  Model: {costModelLabel(result.costs)}
-                </p>
-              </Card>
+              )}
 
-              <Card
-                title="Ledger Rebalance"
-                subtitle={`Rebalance ${cadenceLabel} · klik salah satu sesi untuk lihat trade & posisinya`}
-                info="Catatan setiap kali strategi menyusun ulang portofolio (rebalance): saham apa yang dibeli/dijual dan berapa. Klik sebuah sesi untuk lihat detail transaksinya."
-              >
-                <RebalanceLedger
-                  events={result.rebalances}
-                  truncated={result.rebalances_truncated}
-                  total={result.total_rebalances}
-                />
-              </Card>
+              {tab === "kurva" && (
+                <Card
+                  title="Kurva Modal"
+                  subtitle={`${result.codes.length} emiten · ${result.days} hari bursa · ${result.start} → ${result.end}`}
+                  info="Grafik pertumbuhan modal dari waktu ke waktu. Garis naik = untung, turun = rugi. Perhatikan juga seberapa dalam jatuhnya, bukan cuma hasil akhirnya."
+                  right={<LastUpdated dep={result} />}
+                >
+                  <EquityCurveChart
+                    points={result.equity_curve}
+                    initialCash={result.initial_cash}
+                  />
+                </Card>
+              )}
+
+              {tab === "perbandingan" && (
+                <Card
+                  title="Perbandingan Hasil"
+                  subtitle={`Modal awal Rp ${fmtCompact(result.initial_cash)} · strategi ${result.strategy_name}`}
+                  info="Membandingkan hasil strategi (setelah dan sebelum biaya) dengan cara pasif beli-tahan. Berguna untuk cek: apakah strategi ini benar-benar lebih baik daripada diam memegang saham?"
+                >
+                  <MetricsTable
+                    gross={result.gross_metrics}
+                    net={result.metrics}
+                    benchmark={result.benchmark}
+                  />
+                </Card>
+              )}
+
+              {tab === "biaya" && (
+                <Card
+                  title="Dampak Biaya"
+                  subtitle={`Susun ulang ${cadenceLabel} ×${result.rebalance_days} · nilai transaksi Rp ${fmtCompact(result.cost_impact.turnover)} · ${result.days} hari bursa`}
+                  info="Rincian biaya (komisi, pajak, slippage) yang menggerus keuntungan. Banyak strategi terlihat cuan di atas kertas tapi rugi setelah biaya nyata dihitung."
+                >
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Stat
+                      label="Total biaya"
+                      hint="Jumlah semua komisi, pajak, dan slippage selama periode uji."
+                      value={`Rp ${fmtCompact(result.cost_impact.total_cost)}`}
+                      tone="down"
+                    />
+                    <Stat
+                      label="Komisi + pajak"
+                      value={`Rp ${fmtCompact(result.cost_impact.total_fees)}`}
+                      tone="down"
+                    />
+                    <Stat
+                      label="Slippage"
+                      value={`Rp ${fmtCompact(result.cost_impact.total_slippage)}`}
+                      tone="down"
+                    />
+                    <Stat
+                      label="Porsi biaya dari modal"
+                      hint="Berapa persen modal yang habis hanya untuk biaya transaksi."
+                      value={pctMag(result.cost_impact.cost_pct_of_equity)}
+                      tone="down"
+                    />
+                  </div>
+                  <p className="text-muted mt-3 text-xs leading-relaxed">
+                    Biaya menggerus keuntungan{" "}
+                    <span className="text-down font-semibold">{pctMag(costErosion)}</span>{" "}
+                    ({pct(result.gross_metrics.total_return)} sebelum biaya →{" "}
+                    {pct(result.metrics.total_return)} setelah biaya).
+                  </p>
+                  <p className="text-muted mt-2 text-xs leading-relaxed">
+                    Model biaya: {costModelLabel(result.costs)}
+                  </p>
+                </Card>
+              )}
+
+              {tab === "ledger" && (
+                <Card
+                  title="Jejak Transaksi"
+                  subtitle={`Susun ulang ${cadenceLabel} · klik satu sesi untuk lihat pembelian & penjualannya`}
+                  info="Catatan setiap kali strategi menyusun ulang portofolio: saham apa yang dibeli/dijual dan berapa. Klik sebuah sesi untuk lihat detail transaksinya."
+                >
+                  <RebalanceLedger
+                    events={result.rebalances}
+                    truncated={result.rebalances_truncated}
+                    total={result.total_rebalances}
+                  />
+                </Card>
+              )}
 
               <p className="text-muted text-xs leading-relaxed">{result.disclaimer}</p>
             </>
@@ -613,58 +942,47 @@ export default function BacktestPage() {
         </div>
       </div>
 
-      <Card title="Cara membaca hasil" subtitle="Agar tidak salah tafsir">
-        <ul className="space-y-2 text-sm">
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Point-in-time.</span>{" "}
-            <span className="text-muted">
-              Emiten hanya “melihat” harga sampai hari simulasi, jadi tidak ada
-              look-ahead bias. Harga juga disesuaikan dengan aksi korporasi
-              (split/bonus) yang sudah diketahui saat itu.
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Frekuensi rebalance itu pengungkit utama.</span>{" "}
-            <span className="text-muted">
-              Rebalance harian memaksa seluruh buku kembali ke bobot target tiap
-              sesi, jadi turnover-nya besar. Mingguan atau bulanan membiarkan
-              posisi mengalir dan hampir selalu memangkas biaya drastis —
-              bandingkan kartu “Dampak Biaya” antar frekuensi.
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Biaya bikin atau menghancurkan.</span>{" "}
-            <span className="text-muted">
-              Setiap rebalance dibebani komisi dua arah, pajak jual, dan slippage.
-              Lihat kolom “Sebelum biaya” vs “Setelah biaya” untuk tahu berapa
-              yang dimakan biaya.
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Cap likuiditas.</span>{" "}
-            <span className="text-muted">
-              Order dibatasi porsi tertentu dari nilai transaksi harian emiten,
-              jadi saham tipis hanya bisa diisi sebagian per hari (realistis,
-              tapi butuh beberapa hari untuk masuk/keluar penuh).
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Ledger = bukti churn.</span>{" "}
-            <span className="text-muted">
-              Tiap sesi rebalance merekam persis emiten mana yang dibeli/dijual,
-              volume, harga eksekusi, fee, dan posisi akhirnya. Dari sini
-              kelihatan kenapa turnover bisa besar walau sinyal jarang berubah.
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-[var(--fg)]">Buy &amp; Hold = tolok ukur.</span>{" "}
-            <span className="text-muted">
-              Benchmark beli rata semua emiten di awal periode (hanya dibebani
-              biaya masuk) lalu didiamkan. Kalau strategi kalah dari kolom ini,
-              strategi belum menambah nilai.
-            </span>
-          </li>
-        </ul>
+      <Card
+        title="Istilah singkat"
+        subtitle="Arti kata yang sering muncul di halaman ini"
+        right={<BookOpen className="text-muted h-4 w-4" />}
+      >
+        <dl className="grid gap-3 text-sm sm:grid-cols-2">
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Backtest</dt>
+            <dd className="text-muted">Menguji strategi memakai data masa lalu.</dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Beli &amp; tahan</dt>
+            <dd className="text-muted">
+              Beli semua emiten di awal lalu diamkan sampai akhir — pembanding paling jujur.
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Susun ulang (rebalance)</dt>
+            <dd className="text-muted">
+              Momen strategi menyesuaikan kembali komposisi portofolio sesuai aturannya.
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Biaya transaksi</dt>
+            <dd className="text-muted">
+              Komisi, pajak jual, dan slippage yang dibayar setiap kali transaksi.
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Cap likuiditas</dt>
+            <dd className="text-muted">
+              Batas porsi order terhadap nilai transaksi harian; saham tipis hanya bisa diisi sebagian per hari.
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="font-semibold text-[var(--fg)]">Jatuh terdalam (drawdown)</dt>
+            <dd className="text-muted">
+              Penurunan terbesar dari titik tertinggi ke terendah selama periode uji.
+            </dd>
+          </div>
+        </dl>
       </Card>
     </main>
   );

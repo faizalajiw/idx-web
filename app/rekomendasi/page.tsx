@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Crown, Award, List, Lightbulb, ShieldAlert, ChevronDown } from "lucide-react";
+import { Target, Crown, Award, List, Lightbulb, ShieldAlert, ChevronDown } from "lucide-react";
 import { useRecommendations, useRecommendationTrack } from "@/lib/hooks";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -307,16 +307,23 @@ export default function RekomendasiPage() {
   const [minGrade, setMinGrade] = useState<Grade>("C");
   const [limit, setLimit] = useState(20);
   const { data, error, isLoading } = useRecommendations(limit, minGrade);
+  const { data: all } = useRecommendations(100, "C");
   const { data: track } = useRecommendationTrack();
 
   const topCount = data?.rows.filter((r) => r.grade === "A").length ?? 0;
+  const tabCount = (grade: Grade) => {
+    const rows = all?.rows ?? [];
+    const allowed = grade === "A" ? ["A"] : grade === "B" ? ["A", "B"] : ["A", "B", "C"];
+    return all ? rows.filter((r) => allowed.includes(r.grade)).length : null;
+  };
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:py-8">
+    <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:py-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Rekomendasi <span className="gradient-text">Beli</span>
-        </h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  <Target size={26} className="text-accent" aria-hidden />
+                  Rekomendasi <span className="gradient-text">Beli</span>
+                </h1>
         <p className="text-muted max-w-2xl text-sm leading-relaxed">
           Saham yang menurut sistem paling layak dibeli hari ini, lengkap dengan harga beli, batas
           rugi, dan target. Pilih kandidat, baca alasannya, lalu putuskan sendiri.
@@ -357,6 +364,11 @@ export default function RekomendasiPage() {
                     >
                       <Icon size={15} aria-hidden />
                       {label}
+                      {tabCount(grade) !== null && (
+                        <span className="text-muted rounded-full bg-white/[0.06] px-1.5 text-[11px]">
+                          {tabCount(grade)}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

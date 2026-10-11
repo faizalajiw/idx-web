@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LayoutDashboard } from "lucide-react";
 import { MarketOverview } from "@/components/MarketOverview";
 import { LatestNewsCard } from "@/components/NewsCards";
 import { TopLeadersPanel } from "@/components/TopLeadersPanel";
@@ -214,7 +215,8 @@ export default function DashboardPage() {
   return (
     <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+<h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <LayoutDashboard size={26} className="text-accent" aria-hidden />
           Dashboard <span className="gradient-text">Pasar</span>
         </h1>
         <p className="text-muted mt-0.5 text-sm">

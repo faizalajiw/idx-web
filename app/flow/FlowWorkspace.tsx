@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { ArrowLeftRight, Search } from "lucide-react";
 import { useWatchlist } from "@/lib/hooks";
 import { ForeignFlowCard } from "@/components/ForeignFlowCard";
 import { FlowTimelineCard } from "@/components/FlowTimelineCard";
@@ -42,7 +42,7 @@ function StockPicker({ value }: { value: string | null }) {
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value.toUpperCase())}
-            placeholder="Cari kode emiten, mis. BBRI"
+            placeholder="Ketik kode saham, mis. BBRI"
             className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-elev)] pl-10 pr-3 text-sm font-medium tracking-wide outline-none transition-shadow focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30"
             aria-label="Kode emiten"
           />
@@ -83,15 +83,24 @@ function StockPicker({ value }: { value: string | null }) {
  */
 export function FlowWorkspace({ code }: { code: string | null }) {
   return (
-    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
+    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:py-8">
+      <header className="space-y-1">
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <ArrowLeftRight size={26} className="text-accent" aria-hidden />
+          Aliran <span className="gradient-text">Dana Emiten</span>
+        </h1>
+        <p className="text-muted text-sm">
+          Pilih satu saham untuk melihat apakah investor asing dan broker besar sedang mengumpulkan atau melepas saham tersebut.
+        </p>
+      </header>
       <StockPicker value={code} />
       {code ? (
-        <>
+        <div className="grid grid-cols-1 gap-4">
           <ForeignFlowCard code={code} />
           <FlowTimelineCard code={code} />
-        </>
+        </div>
       ) : (
-        <EmptyState message="Masukkan kode emiten di atas untuk melihat arus asing dan timeline aliran dana." />
+        <EmptyState message="Belum ada emiten dipilih. Ketik kode di atas atau klik salah satu saran cepat." />
       )}
     </main>
   );

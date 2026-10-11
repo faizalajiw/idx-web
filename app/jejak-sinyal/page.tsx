@@ -5,9 +5,9 @@ import { useSignalTrack } from "@/lib/hooks";
 import { Card } from "@/components/Card";
 import { TickerLogo } from "@/components/TickerLogo";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
-import type { SignalTrack, SignalTrackStat } from "@/lib/types";
 import { LastUpdated } from "@/components/LastUpdated";
-import { ArrowDownRight, ArrowUpRight, History, Target } from "lucide-react";
+import type { SignalTrack, SignalTrackStat } from "@/lib/types";
+import { ArrowDownRight, ArrowUpRight, History, Scale, Target, TrendingUp } from "lucide-react";
 
 const pct = (v: number | null) =>
   v === null ? "-" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(2)}%`;
@@ -17,7 +17,29 @@ const num = (v: number | null, digits = 2) => (v === null ? "-" : v.toFixed(digi
 const tone = (v: number | null) =>
   v === null ? "text-muted" : v > 0 ? "text-up" : v < 0 ? "text-down" : "text-muted";
 
-function HorizonPills({
+// Horizon dihitung dalam hari bursa (trading day), bukan jam.
+const HORIZON_LABEL: Record<number, { title: string; hint: string }> = {
+  5: { title: "1 minggu", hint: "5 hari bursa" },
+  10: { title: "2 minggu", hint: "10 hari bursa" },
+  21: { title: "1 bulan", hint: "21 hari bursa" },
+};
+const horizonLabel = (h: number) =>
+  HORIZON_LABEL[h] ?? { title: `${h} hari`, hint: `${h} hari bursa` };
+
+/** Penilaian sederhana: apakah sinyal mengalahkan pasar, dan apakah buktinya cukup kuat. */
+function verdict(row: SignalTrackStat | undefined) {
+  if (!row || row.mean_abnormal === null) {
+    return { text: "Data belum cukup", cls: "badge" };
+  }
+  const beats = row.mean_abnormal > 0;
+  const solid = row.t_stat !== null && Math.abs(row.t_stat) >= 2;
+  const rawPositive = row.mean_fwd !== null && row.mean_fwd > 0;
+  if (beats && solid && rawPositive) return { text: "Mengalahkan pasar", cls: "badge-buy" };
+  if (beats) return { text: "Unggul tipis, belum pasti", cls: "badge" };
+  return { text: "Belum mengalahkan pasar", cls: "badge-sell" };
+}
+
+function HorizonTabs({
   horizons,
   active,
   onChange,
@@ -27,91 +49,135 @@ function HorizonPills({
   onChange: (h: number) => void;
 }) {
   return (
-    <div className="flex gap-1">
-      {horizons.map((h) => (
-        <button
-          key={h}
-          type="button"
-          onClick={() => onChange(h)}
-          className={`btn ${h === active ? "btn-primary" : "btn-ghost"} px-2.5 py-1 text-xs`}
-          aria-pressed={h === active}
-        >
-          {h}h
-        </button>
-      ))}
+    <div role="tablist" aria-label="Pilih jangka waktu" className="grid grid-cols-3 gap-2">
+      {horizons.map((h) => {
+        const on = h === active;
+        const l = horizonLabel(h);
+        return (
+          <button
+            key={h}
+            type="button"
+            role="tab"
+            aria-selected={on}
+            onClick={() => onChange(h)}
+            className={`rounded-xl border px-3 py-2.5 text-left transition ${
+              on
+                ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                : "border-[var(--border)] hover:bg-[var(--bg-elev)]"
+            }`}
+          >
+            <p className={`text-sm font-semibold ${on ? "text-[var(--accent)]" : ""}`}>{l.title}</p>
+            <p className="text-muted text-[11px]">{l.hint}</p>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function StatTable({ rows, horizon }: { rows: SignalTrackStat[]; horizon: number }) {
-  const visible = rows.filter((r) => r.horizon === horizon && r.n > 0);
-  if (visible.length === 0) return <EmptyState message="Belum cukup data pada horizon ini." />;
+function SignalResultCard({
+  signal,
+  row,
+}: {
+  signal: "BUY" | "SELL";
+  row: SignalTrackStat | undefined;
+}) {
+  const label = signal === "BUY" ? "Beli" : "Jual";
+  const v = verdict(row);
+  const Icon = signal === "BUY" ? ArrowUpRight : ArrowDownRight;
   return (
-    <div className="overflow-x-auto">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th className="text-left">Sinyal</th>
-            <th className="text-right">n</th>
-            <th className="text-right">Hit rate</th>
-            <th className="text-right" title="Rata-rata return setelah sinyal (entry close T+1)">
-              Mean
-            </th>
-            <th className="text-right">Median</th>
-            <th className="text-right" title="Dikurangi return pasar equal-weight, window sama">
-              Abnormal
-            </th>
-            <th className="text-right" title="Newey-West lag 5">t-stat</th>
-            <th className="text-right" title="Puncak kenaikan terbaik dalam horizon (rata-rata)">
-              MFE
-            </th>
-            <th className="text-right" title="Penurunan terburuk dalam horizon (rata-rata)">
-              MAE
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {visible.map((r) => (
-            <tr key={`${r.signal}-${r.regime ?? "all"}-${r.horizon}`}>
-              <td>
-                <span className={`badge ${r.signal === "BUY" ? "badge-buy" : "badge-sell"}`}>
-                  {r.signal}
-                </span>
-                {r.regime && <span className="text-muted ml-2 text-xs">{r.regime}</span>}
-              </td>
-              <td className="text-right tabular-nums">{r.n}</td>
-              <td className="text-right tabular-nums">{hitPct(r.hit_rate)}</td>
-              <td className={`text-right tabular-nums ${tone(r.mean_fwd)}`}>{pct(r.mean_fwd)}</td>
-              <td className={`text-right tabular-nums ${tone(r.median_fwd)}`}>
-                {pct(r.median_fwd)}
-              </td>
-              <td className={`text-right tabular-nums ${tone(r.mean_abnormal)}`}>
-                {pct(r.mean_abnormal)}
-              </td>
-              <td className="text-muted text-right tabular-nums">{num(r.t_stat)}</td>
-              <td className="text-muted text-right tabular-nums">{pct(r.avg_mfe)}</td>
-              <td className="text-muted text-right tabular-nums">{pct(r.avg_mae)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="card p-4">
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className={`badge ${signal === "BUY" ? "badge-buy" : "badge-sell"} inline-flex items-center gap-1`}
+        >
+          <Icon size={12} aria-hidden /> Sinyal {label}
+        </span>
+        <span className={`badge ${v.cls}`}>{v.text}</span>
+      </div>
+
+      {!row || row.n === 0 ? (
+        <p className="text-muted mt-4 text-sm">Belum ada sinyal {label.toLowerCase()} yang sudah selesai dihitung.</p>
+      ) : (
+        <>
+          <p className="mt-4 text-3xl font-bold tabular-nums">{hitPct(row.hit_rate)}</p>
+          <p className="text-muted mt-1 text-xs">
+            Dari {row.n} sinyal, {hitPct(row.hit_rate)} searah dengan prediksi.
+          </p>
+
+          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <div>
+              <dt className="text-muted text-[11px] uppercase tracking-wide">Rata-rata return</dt>
+              <dd className={`font-semibold tabular-nums ${tone(row.mean_fwd)}`}>{pct(row.mean_fwd)}</dd>
+            </div>
+            <div>
+              <dt className="text-muted text-[11px] uppercase tracking-wide">Vs pasar</dt>
+              <dd className={`font-semibold tabular-nums ${tone(row.mean_abnormal)}`}>
+                {pct(row.mean_abnormal)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted text-[11px] uppercase tracking-wide">Return tengah</dt>
+              <dd className={`tabular-nums ${tone(row.median_fwd)}`}>{pct(row.median_fwd)}</dd>
+            </div>
+            <div>
+              <dt className="text-muted text-[11px] uppercase tracking-wide">Kekuatan bukti</dt>
+              <dd className="tabular-nums">
+                {row.t_stat === null ? "-" : Math.abs(row.t_stat) >= 2 ? "Kuat" : "Lemah"}{" "}
+                <span className="text-muted text-xs">(t {num(row.t_stat)})</span>
+              </dd>
+            </div>
+          </dl>
+        </>
+      )}
+    </div>
+  );
+}
+
+function RegimeCard({ row }: { row: SignalTrackStat }) {
+  const v = verdict(row);
+  const toneText = v.cls === "badge-buy" ? "text-up" : v.cls === "badge-sell" ? "text-down" : "text-muted";
+  return (
+    <div className="rounded-xl border border-[var(--border)] p-3.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={`badge ${row.signal === "BUY" ? "badge-buy" : "badge-sell"}`}>
+            {row.signal === "BUY" ? "Beli" : "Jual"}
+          </span>
+          <span className="truncate text-sm font-medium">{row.regime ?? "Semua kondisi"}</span>
+        </div>
+        <span className="text-muted shrink-0 text-xs">n = {row.n}</span>
+      </div>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-2xl font-bold tabular-nums">{hitPct(row.hit_rate)}</p>
+          <p className="text-muted text-[11px]">tingkat keberhasilan</p>
+        </div>
+        <div className="text-right">
+          <p className={`text-sm font-semibold tabular-nums ${tone(row.mean_abnormal)}`}>
+            {pct(row.mean_abnormal)}
+          </p>
+          <p className="text-muted text-[11px]">vs pasar</p>
+        </div>
+      </div>
+      <p className={`mt-2 text-xs ${toneText}`}>{v.text}</p>
     </div>
   );
 }
 
 function SummaryStrip({ data }: { data: SignalTrack }) {
   const items = [
-    { label: "Total sinyal", value: String(data.signals) },
-    { label: "BUY / SELL", value: `${data.buy} / ${data.sell}` },
-    { label: "Periode", value: `${data.first_date ?? "-"} → ${data.last_date ?? "-"}` },
-    { label: "Dihitung", value: data.generated_at?.replace("T", " ") ?? "-" },
+    { label: "Sinyal tercatat", value: String(data.signals) },
+    { label: "Beli / Jual", value: `${data.buy} / ${data.sell}` },
+    { label: "Periode data", value: `${data.first_date ?? "-"} s/d ${data.last_date ?? "-"}` },
+    { label: "Terakhir dihitung", value: data.generated_at?.replace("T", " ").slice(0, 16) ?? "-" },
   ];
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {items.map((it) => (
         <div key={it.label} className="card p-3">
           <p className="text-muted text-[11px] uppercase tracking-wide">{it.label}</p>
-          <p className="mt-1 text-sm font-semibold tabular-nums">{it.value}</p>
+          <p className="mt-1 break-words text-sm font-semibold tabular-nums">{it.value}</p>
         </div>
       ))}
     </div>
@@ -133,54 +199,82 @@ export default function JejakSinyalPage() {
   const horizons = data?.horizons ?? [5, 10, 21];
   const activeHorizon = horizons.includes(horizon) ? horizon : (horizons[horizons.length - 1] ?? 21);
 
+  const overall = data?.overall.filter((r) => r.horizon === activeHorizon && r.regime === null) ?? [];
+  const buyRow = overall.find((r) => r.signal === "BUY");
+  const sellRow = overall.find((r) => r.signal === "SELL");
+  const regimeRows = (data?.by_regime ?? []).filter((r) => r.horizon === activeHorizon && r.n > 0);
+
   return (
-    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
+    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:py-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Jejak <span className="gradient-text">Sinyal</span>
-        </h1>
-        <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
-          Track record historis sinyal BUY/SELL — hit-rate, return setelah sinyal, dan
-          selisihnya terhadap pasar, dipecah per kondisi IHSG.
-          <LastUpdated sessionDate={data?.last_date} updatedAt={data?.generated_at} />
+        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                  <History size={26} className="text-accent" aria-hidden />
+                  Jejak <span className="gradient-text">Sinyal</span>
+                </h1>
+        <p className="text-muted mt-1 text-sm">
+          Seberapa sering sinyal beli dan jual di aplikasi ini benar-benar berhasil, dilihat dari data masa lalu.
         </p>
+        <div className="mt-1">
+          <LastUpdated sessionDate={data?.last_date} updatedAt={data?.generated_at} />
+        </div>
       </div>
 
       {isLoading || !data ? (
-        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-64 w-full" />
       ) : (
         <>
-          <SummaryStrip data={data} />
+          <Card
+            title={
+              <span className="inline-flex items-center gap-2">
+                <Scale size={15} aria-hidden /> Pilih jangka waktu
+              </span>
+            }
+            subtitle="Setelah sinyal muncul, seberapa lama kamu menunggu hasilnya?"
+            info="Jangka waktu dihitung dalam hari bursa. Pilih 1 minggu untuk hasil jangka pendek, 1 bulan untuk jangka lebih panjang."
+          >
+            <HorizonTabs horizons={horizons} active={activeHorizon} onChange={setHorizon} />
+          </Card>
+
+          <section className="space-y-3">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <Target size={16} aria-hidden /> Hasil sinyal dalam {horizonLabel(activeHorizon).title}
+            </h2>
+            <div className="grid gap-3 md:grid-cols-2">
+              <SignalResultCard signal="BUY" row={buyRow} />
+              <SignalResultCard signal="SELL" row={sellRow} />
+            </div>
+            <p className="text-muted text-xs">
+              <strong className="text-[var(--fg)]">Vs pasar</strong> = selisih hasil sinyal dibanding rata-rata pasar pada
+              periode yang sama. Positif berarti sinyal lebih baik dari pasar.{" "}
+              <strong className="text-[var(--fg)]">Kekuatan bukti</strong> menunjukkan apakah hasil ini cukup konsisten,
+              bukan sekadar kebetulan.
+            </p>
+          </section>
 
           <Card
             title={
-              <>
-                <Target size={15} aria-hidden /> Kinerja per Sinyal
-              </>
+              <span className="inline-flex items-center gap-2">
+                <TrendingUp size={15} aria-hidden /> Kapan sinyal paling bisa dipercaya?
+              </span>
             }
-            subtitle="Entry di close T+1, dibandingkan pasar equal-weight pada window yang sama"
-            info="Melacak seberapa akurat sinyal beli/jual di aplikasi ini bila benar-benar diikuti — apakah rata-rata untung dan mengalahkan pasar? Ini rapor kejujuran sinyalnya."
-            right={<HorizonPills horizons={horizons} active={activeHorizon} onChange={setHorizon} />}
+            subtitle="Hasil dipecah berdasarkan kondisi pasar IHSG"
+            info="Banyak sinyal bekerja baik saat pasar trending, tapi kurang akurat saat pasar menyamping. Bagian ini membantu kamu tahu kapan sebaiknya lebih percaya pada sinyal."
           >
-            <StatTable rows={data.overall} horizon={activeHorizon} />
+            {regimeRows.length === 0 ? (
+              <EmptyState message="Belum cukup data per kondisi pasar untuk jangka waktu ini." />
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {regimeRows.map((r) => (
+                  <RegimeCard key={`${r.signal}-${r.regime ?? "all"}-${r.horizon}`} row={r} />
+                ))}
+              </div>
+            )}
           </Card>
 
           <Card
-            title={
-              <>
-                <History size={15} aria-hidden /> Kinerja per Kondisi IHSG
-              </>
-            }
-            subtitle="Apakah sinyal bekerja lebih baik saat pasar trending, ranging, atau transisi?"
-            info="Membedah kinerja sinyal berdasarkan kondisi pasar. Banyak sinyal bagus saat pasar tren tapi buruk saat pasar menyamping — di sini kamu bisa lihat kapan sebaiknya lebih percaya sinyalnya."
-          >
-            <StatTable rows={data.by_regime} horizon={activeHorizon} />
-          </Card>
-
-          <Card
-            title="Sinyal Terbaru"
-            subtitle="Return yang sudah terealisasi sejak sinyal (kosong = horizon belum selesai)"
-            info="Daftar sinyal yang baru muncul beserta hasilnya sejauh ini. Kolom kosong berarti waktunya belum cukup untuk menilai hasil akhir."
+            title="Sinyal terbaru"
+            subtitle="Hasil yang sudah terjadi sejak sinyal muncul. Tanda '-' berarti jangka waktu belum selesai."
+            info="Daftar sinyal terbaru beserta hasilnya sejauh ini. Tanda '-' berarti jangka waktu belum selesai, jadi hasilnya belum bisa dinilai."
           >
             {data.recent.length === 0 ? (
               <EmptyState message="Belum ada sinyal tercatat." />
@@ -190,43 +284,35 @@ export default function JejakSinyalPage() {
                   <thead>
                     <tr>
                       <th className="text-left">Tanggal</th>
-                      <th className="text-left">Emiten</th>
+                      <th className="text-left">Saham</th>
                       <th className="text-left">Sinyal</th>
-                      <th className="text-right">Close</th>
-                      <th className="text-right">5h</th>
-                      <th className="text-right">10h</th>
-                      <th className="text-right">21h</th>
+                      <th className="hidden text-right sm:table-cell">Harga</th>
+                      <th className="text-right">1 minggu</th>
+                      <th className="hidden text-right md:table-cell">2 minggu</th>
+                      <th className="text-right">1 bulan</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.recent.map((r) => (
-                      <tr key={`${r.code}-${r.date}`}>
+                      <tr key={`${r.code}-${r.date}-${r.signal}`}>
                         <td className="text-muted tabular-nums">{r.date}</td>
-                        <td className="font-medium"><span className="inline-flex items-center gap-2"><TickerLogo code={r.code} size={18} />{r.code}</span></td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              r.signal === "BUY" ? "badge-buy" : "badge-sell"
-                            } inline-flex items-center gap-1`}
-                          >
-                            {r.signal === "BUY" ? (
-                              <ArrowUpRight size={12} aria-hidden />
-                            ) : (
-                              <ArrowDownRight size={12} aria-hidden />
-                            )}
-                            {r.signal}
+                        <td className="font-medium">
+                          <span className="inline-flex items-center gap-2">
+                            <TickerLogo code={r.code} size={18} />
+                            {r.code}
                           </span>
                         </td>
-                        <td className="text-right tabular-nums">{num(r.close, 0)}</td>
-                        <td className={`text-right tabular-nums ${tone(r.fwd_5)}`}>
-                          {pct(r.fwd_5)}
+                        <td>
+                          <span className={`badge ${r.signal === "BUY" ? "badge-buy" : "badge-sell"}`}>
+                            {r.signal === "BUY" ? "Beli" : "Jual"}
+                          </span>
                         </td>
-                        <td className={`text-right tabular-nums ${tone(r.fwd_10)}`}>
+                        <td className="hidden text-right tabular-nums sm:table-cell">{num(r.close, 0)}</td>
+                        <td className={`text-right tabular-nums ${tone(r.fwd_5)}`}>{pct(r.fwd_5)}</td>
+                        <td className={`hidden text-right tabular-nums md:table-cell ${tone(r.fwd_10)}`}>
                           {pct(r.fwd_10)}
                         </td>
-                        <td className={`text-right tabular-nums ${tone(r.fwd_21)}`}>
-                          {pct(r.fwd_21)}
-                        </td>
+                        <td className={`text-right tabular-nums ${tone(r.fwd_21)}`}>{pct(r.fwd_21)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -234,15 +320,15 @@ export default function JejakSinyalPage() {
               </div>
             )}
           </Card>
+
+          <SummaryStrip data={data} />
         </>
       )}
 
       <p className="text-muted text-[11px] leading-snug">
-        Metodologi: sinyal dihitung point-in-time dari layer harga bebas
-        look-ahead (rule SMA20/50 + RSI yang sama dengan dashboard), entry di
-        close T+1, SELL palsu ex-dividend tidak dicatat. Return historis adalah
-        ukuran deskriptif — bukan jaminan hasil masa depan, dan belum
-        memperhitungkan biaya transaksi.
+        Metodologi: sinyal dihitung hanya dengan data yang tersedia pada hari itu (bebas look-ahead), entry di harga
+        penutupan hari berikutnya (T+1), dan SELL palsu saat ex-dividend tidak dicatat. Hasil masa lalu bukan jaminan hasil
+        di masa depan, dan belum memperhitungkan biaya transaksi.
       </p>
     </main>
   );
