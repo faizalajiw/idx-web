@@ -11,3 +11,5 @@ next-env.d.ts
 *.tsbuildinfo
 
 docs/node_modules/
+
+logs/
