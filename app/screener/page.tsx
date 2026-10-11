@@ -50,28 +50,48 @@ const PRESETS: {
     },
   },
   {
-    label: "Breakout Volume",
+    label: "Lonjakan Volume",
     icon: BarChart3,
     filters: { min_vol_ratio: 2, min_momentum: 0, min_days: 30 },
-    desc: "Volume hari ini ≥2× rata-rata 20 hari — aktivitas tidak wajar",
+    desc: "Volume hari ini ≥2× rata-rata 20 hari, harga tidak turun",
+    guide: {
+      untuk: "Mencari saham yang volumenya tiba-tiba melonjak hari ini. Ini tanda ada pelaku besar yang masuk, jadi layak dicek lebih lanjut, bukan langsung dibeli.",
+      kriteria: ["Vol Ratio ≥ 2×", "Momentum 20 hari ≥ 0% (harga tidak turun)"],
+      cara: "Urutkan dari Vol Ratio tertinggi. 2× berarti volume hari ini dua kali rata-rata 20 hari. Momentum positif berarti lonjakan volume disertai kenaikan harga, dan Jarak 52w dekat 0% memperkuat sinyal breakout. Konfirmasi arah dengan Foreign Net dan Buku (OB).",
+    },
   },
   {
     label: "Oversold Sehat",
     icon: Droplet,
     filters: { rsi_max: 35, min_value: 5e9, min_days: 30 },
-    desc: "RSI <35 tapi masih likuid — kandidat rebound",
+    desc: "RSI ≤35 (sudah banyak dijual) tapi masih likuid — kandidat rebound",
+    guide: {
+      untuk: "Mencari saham yang sudah turun banyak sampai terlihat 'murah' secara teknikal, dan masih ramai diperdagangkan. Ini kandidat untuk dipantau rebound, bukan jaminan naik.",
+      kriteria: ["RSI(14) ≤ 35 (oversold)", "Nilai transaksi > Rp 5 M/hari"],
+      cara: "RSI di bawah 35 berarti tekanan jual sudah berlebihan, sehingga peluang pantulan (rebound) terbuka. Nilai transaksi besar memastikan saham mudah dibeli dan dijual. Urutkan dari RSI terendah, lalu cek ATR% (makin tinggi makin berisiko) dan Foreign Net: positif berarti asing mulai masuk saat harga turun.",
+    },
   },
   {
     label: "Trend Up Tenang",
     icon: Wind,
     filters: { signal: "BUY", rsi_min: 50, rsi_max: 65, min_days: 30 },
     desc: "Sinyal BUY, uptrend, RSI sehat (tidak overbought)",
+    guide: {
+      untuk: "Mencari saham yang sedang tren naik dengan tenang: sinyal teknikal BUY aktif dan RSI di zona sehat, bukan zona jenuh beli. Cocok untuk ikut tren tanpa mengejar harga yang sudah terlalu tinggi.",
+      kriteria: ["Signal = BUY", "RSI(14) 50-65 (uptrend, belum overbought)"],
+      cara: "Sinyal BUY berarti tren rata-rata masih naik. RSI 50-65 menandakan harga naik tertib, belum jenuh beli, jadi masih ada ruang naik. Urutkan dari momentum tertinggi, lalu cek Hari sejak sinyal: 0-5 berarti sinyal masih baru; besar berarti sinyal sudah tua. Jarak 52w dekat 0% menandakan harga dekat puncak, hati-hati beli di ujung tren.",
+    },
   },
   {
     label: "Akumulasi Broker",
     icon: Activity,
     filters: { min_broker_score: 60, min_value: 5e9, min_days: 30 },
     desc: "Skor aktivitas broker ≥60 (hanya faktor aliran yang lolos uji IC), likuid >Rp 5 M/hari",
+    guide: {
+      untuk: "Mencari saham yang aktivitas broker-nya menunjukkan pola akumulasi, yaitu ada pihak yang terus mengumpulkan saham. Ini sinyal aliran pelaku, bukan jaminan harga naik.",
+      kriteria: ["Skor aktivitas broker ≥ 60", "Nilai transaksi > Rp 5 M/hari"],
+      cara: "Skor broker makin tinggi berarti pola beli cenderung dominan. Urutkan dari skor tertinggi, lalu pastikan Value cukup besar agar sinyal tidak berasal dari transaksi kecil. Kombinasikan dengan Foreign Net dan Momentum: akumulasi yang disertai harga naik lebih kuat dibanding akumulasi saat harga masih turun. Skor ini butuh data broker harian (jalankan idx ic bila kosong).",
+    },
   },
 ];
 
@@ -179,6 +199,7 @@ const COLUMNS: ColumnDef[] = [
   {
     key: "vol_ratio",
     label: "Vol Ratio",
+    title: "Volume hari ini ÷ rata-rata 20 hari. ≥2× = lonjakan volume",
     render: (r) => (r.vol_ratio !== null ? `${r.vol_ratio.toFixed(2)}×` : "-"),
     cellClass: () => "text-right tabular-nums",
   },

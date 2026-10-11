@@ -13,7 +13,7 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 ### Preset & Panel Filter
 | Field | Isi |
 |---|---|
-| Nama card | Filter + preset (Momentum + Foreign In, Breakout Volume, Oversold Sehat, Trend Up Tenang, Akumulasi Broker) |
+| Nama card | Filter + preset (Momentum + Foreign In, Lonjakan Volume, Oversold Sehat, Trend Up Tenang, Akumulasi Broker) |
 | Komponen | `PRESETS`/panel filter di [screener/page.tsx:33](../../idx-web/app/screener/page.tsx) |
 | Fungsi | Menyusun parameter filter; preset mengisi beberapa filter sekaligus |
 | Sumber data | Klien-only (state); dikirim sebagai query ke `GET /api/screener` |
