@@ -279,6 +279,8 @@ Jangan dibuat ulang tanpa keputusan baru. Backend terkait tetap dipakai oleh fit
 - [aktivitas-broker.md](./aktivitas-broker.md)
 - [sektor.md](./sektor.md)
 - [halaman-detail.md](./halaman-detail.md)
+- [framework-agen.md](./framework-agen.md) — peran agen (Trading, Frontend, Trainer)
+- [sumber-data.md](./sumber-data.md) — daftar sumber berita market
 
 ## Build PDF
 

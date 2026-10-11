@@ -7,3 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Dokumentasi Project
+
+- Peran agen dan framework analisis multi-agen: [docs/framework-agen.md](./docs/framework-agen.md)
+- Sumber data berita: [docs/sumber-data.md](./docs/sumber-data.md)
+- Peta menu dan status implementasi: [docs/README.md](./docs/README.md)
