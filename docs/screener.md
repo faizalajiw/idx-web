@@ -19,8 +19,9 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Sumber data | Klien-only (state); dikirim sebagai query ke `GET /api/screener` |
 | Rumus/Logika | Preset = kombinasi nilai filter (`min_momentum`, `foreign_in_only`, `min_vol_ratio`, `rsi_max`, `signal`, `min_broker_score`, `min_value`, `min_days`) |
 | Periode/Window | `min_days` = syarat panjang data (default 30 sesi) |
-| Interaksi | Klik preset / ubah filter → refetch |
-| Empty/Loading/Error | — |
+| Interaksi | Klik preset / ubah filter → refetch. Tooltip (`title`) tiap preset berisi deskripsi singkat |
+| Guide card | Muncul di bawah tab preset untuk preset aktif. Berisi 3 bagian: **Untuk apa?** (tujuan preset), **Kriteria** (chip syarat), **Cara baca** (cara menafsirkan hasil) |
+| Empty/Loading/Error | Skeleton saat load pertama (`ScreenerShellSkeleton`, fallback Suspense) |
 
 ### Tabel Hasil Screener
 | Field | Isi |
@@ -31,7 +32,7 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Sumber data | `GET /api/screener` ([app.py:527](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_screener` ([analytics.py:1561](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit`, `research.orderbook` (1744–1755) |
 | Rumus/Logika | Momentum 20d = % perubahan 20 sesi; RSI(14); Vol ratio = volume÷rata-rata 20 sesi; ATR% = ATR(14)/close; Jarak 52w = posisi vs puncak 52 pekan; OB imbalance/absorption dari `research.orderbook`; Skor broker dari `research.factor_ic_history` (bobot lulus IC) |
 | Periode/Window | 20 sesi (momentum/volume), 14 (RSI/ATR), 52 pekan (jarak), lookback broker 60 hari |
-| Interaksi | Klik header → sort; toggle kolom; klik emiten → detail |
+| Interaksi | Klik header → sort; toggle kolom; klik emiten → detail. Hover kolom (`title`) menampilkan keterangan; Foreign Net: net beli (+) / jual (-) asing dalam Rp |
 | Empty/Loading/Error | Empty state bila tidak ada yang lolos; pesan khusus bila skor broker belum ada (butuh run `idx ic`) |
 
 ### Faktor (Legenda Skor)
@@ -45,6 +46,14 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Periode/Window | — |
 | Interaksi | — |
 | Empty/Loading/Error | — |
+
+### Sinkronisasi Filter ↔ URL
+Filter disimpan di query string (`/screener?min_momentum=5&foreign_in_only=true&...`) agar bisa di-share dan dipakai back/forward.
+- **Sumber kebenaran**: URL. State `filters` di-hydrate dari URL (`filtersFromParams`).
+- **Perbandingan**: `sameFilters` membandingkan hasil `screenerQuery(...)` (serialisasi kanonik), bukan perbandingan key-per-key. Ini menyamakan jalur URL→state dan state→URL.
+- **Navigasi**: `router.replace` (bukan `push`), dan hanya bila query string benar-benar berbeda. Riwayat browser tidak penuh oleh entri duplikat.
+- **Hasil uji** (Playwright): penulisan history turun dari ~22 dalam 3 detik menjadi 2; CLS turun dari ~1.6 menjadi ~0.13.
+- **Aturan**: jangan menambah `lastSynced` ref atau perbandingan shallow baru. Jika menambah filter baru, tambahkan juga ke `filtersFromParams`, `screenerQuery`, dan `sameFilters` agar tetap konsisten.
 
 ## 4. Data Flow (end-to-end)
 ```

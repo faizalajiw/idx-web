@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useScreener, useBrokerActivity } from "@/lib/hooks";
@@ -128,13 +128,13 @@ function filtersFromParams(sp: URLSearchParams): ScreenerFilters {
   return out;
 }
 
-/** Perbandingan dangkal dua filter — untuk deteksi perubahan tanpa loop. */
+/**
+ * Dua filter dianggap sama jika menghasilkan query string yang sama.
+ * Membandingkan lewat serializer yang sama dengan URL, jadi field kosong
+ * (undefined / false) dan urutan key tidak lagi bikin perbedaan palsu.
+ */
 function sameFilters(a: ScreenerFilters, b: ScreenerFilters): boolean {
-  const keys = new Set([...Object.keys(a), ...Object.keys(b)] as (keyof ScreenerFilters)[]);
-  for (const k of keys) {
-    if ((a[k] as unknown) !== (b[k] as unknown)) return false;
-  }
-  return true;
+  return screenerQuery(a) === screenerQuery(b);
 }
 
 /** Kolom tabel — dipakai untuk render, sort, dan toggle visibilitas. */
@@ -265,16 +265,11 @@ function ScreenerView() {
 
   const queryStr = screenerQuery(filters);
 
-  // Query string yang terakhir ditulis sendiri. Dipakai supaya perubahan URL
-  // hasil tulisan kita tidak dibaca balik (itu yang bikin loop & halaman berkedip).
-  const lastSynced = useRef(searchParams.toString());
-
-  // URL -> state: hanya untuk perubahan dari luar (back/forward, link dibagikan).
+  // URL -> state: untuk back/forward & link dibagikan. sameFilters menjaga
+  // state tidak diganti jika isinya sudah sama, jadi tidak ada loop dengan
+  // state -> URL di bawah.
   useEffect(() => {
-    const q = searchParams.toString();
-    if (q === lastSynced.current) return;
-    lastSynced.current = q;
-    const fromUrl = filtersFromParams(new URLSearchParams(q));
+    const fromUrl = filtersFromParams(new URLSearchParams(searchParams.toString()));
     setFilters((prev) => (sameFilters(prev, fromUrl) ? prev : fromUrl));
   }, [searchParams]);
 
@@ -282,7 +277,6 @@ function ScreenerView() {
   useEffect(() => {
     const next = queryStr.replace(/^\?/, "");
     if (searchParams.toString() !== next) {
-      lastSynced.current = next;
       router.replace(next ? `/screener?${next}` : "/screener", { scroll: false });
     }
   }, [queryStr, searchParams, router]);
