@@ -25,12 +25,29 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const PRESETS: { label: string; icon: LucideIcon; filters: ScreenerFilters; desc: string }[] = [
+type PresetGuide = { untuk: string; kriteria: string[]; cara: string };
+
+const PRESETS: {
+  label: string;
+  icon: LucideIcon;
+  filters: ScreenerFilters;
+  desc: string;
+  guide?: PresetGuide;
+}[] = [
   {
     label: "Momentum + Foreign In",
     icon: Rocket,
     filters: { min_momentum: 5, foreign_in_only: true, min_value: 10e9, min_days: 30 },
     desc: "Naik >5% dalam 20 hari, diakumulasi asing, likuid >Rp 10 M/hari",
+    guide: {
+      untuk: "Mencari saham yang sedang naik dan didukung beli asing hari ini, sehingga lebih mudah dijual kembali.",
+      kriteria: [
+        "Momentum 20 hari > 5%",
+        "Asing net beli hari terakhir",
+        "Nilai transaksi > Rp 10 M",
+      ],
+      cara: "Urutkan dari momentum tertinggi. Kolom Foreign Net positif dan Value besar menandakan dukungan nyata; Jarak 52w dekat 0% berarti harga dekat puncak.",
+    },
   },
   {
     label: "Breakout Volume",
@@ -215,6 +232,7 @@ const COLUMNS: ColumnDef[] = [
   {
     key: "foreign_net",
     label: "Foreign Net",
+    title: "Net beli (+) / jual (-) asing hari terakhir, dalam Rp",
     render: (r) => fmtCompact(r.foreign_net),
     cellClass: (r) => `text-right tabular-nums ${(r.foreign_net ?? 0) >= 0 ? "text-up" : "text-down"}`,
   },
@@ -343,6 +361,39 @@ function ScreenerView() {
           );
         })}
       </div>
+
+      {PRESETS[active]?.guide && (
+        <div className="card-glass space-y-3 p-4 sm:p-5">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+              Untuk apa?
+            </p>
+            <p className="mt-1 text-sm">{PRESETS[active].guide!.untuk}</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+              Kriteria
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {PRESETS[active].guide!.kriteria.map((k) => (
+                <span
+                  key={k}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 text-xs"
+                >
+                  <Check size={12} className="text-[var(--accent)]" aria-hidden />
+                  {k}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
+              Cara baca
+            </p>
+            <p className="text-muted mt-1 text-sm">{PRESETS[active].guide!.cara}</p>
+          </div>
+        </div>
+      )}
 
       {brokerNotValidated && (
         <div className="rounded-md border border-[rgba(255,193,7,0.3)] bg-[rgba(255,193,7,0.07)] p-3 text-sm">
