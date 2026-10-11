@@ -19,6 +19,7 @@ import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
 import { InfoHint } from "./InfoHint";
+import { TickerLogo } from "./TickerLogo";
 
 const UP = "var(--chart-up)"; // net buy (akumulasi asing)
 const DOWN = "var(--chart-down)"; // net sell (distribusi asing)
@@ -128,12 +129,12 @@ function PeerList({
       <ul className="space-y-1">
         {peers.map((p) => (
           <li key={p.code} className="flex items-center gap-2 text-[11px]">
-            <span
-              className={`w-12 shrink-0 font-semibold ${p.is_self ? "text-up" : ""}`}
-              title={p.is_self ? "Emiten ini" : undefined}
-            >
-              {p.code}
-              {p.is_self ? " ←" : ""}
+            <span className="flex w-16 shrink-0 items-center gap-1">
+              <TickerLogo code={p.code} size={16} />
+              <span className={`font-semibold ${p.is_self ? "text-up" : ""}`} title={p.is_self ? "Emiten ini" : undefined}>
+                {p.code}
+                {p.is_self ? " ←" : ""}
+              </span>
             </span>
             <span className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/5">
               <span

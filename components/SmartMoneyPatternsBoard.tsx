@@ -5,6 +5,7 @@ import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { useSmartMoneyPatternsBoard } from "@/lib/hooks";
 import { fmtCompact, fmtDateStr, fmtNum } from "@/lib/format";
 import { Card } from "./Card";
+import { TickerLogo } from "./TickerLogo";
 import { InfoHint } from "./InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import type { SmartMoneyPatternsBoardGroup } from "@/lib/types";
@@ -119,6 +120,7 @@ function PatternGroup({ group }: { group: SmartMoneyPatternsBoardGroup }) {
             }`}
             className="hover:bg-white/[0.06] flex items-center gap-1.5 rounded-md border border-[var(--border)] px-2 py-1 text-[11px] transition-colors"
           >
+            <TickerLogo code={e.code} size={16} />
             <span className="font-semibold">{e.code}</span>
             <span className={`tabular-nums ${buy ? "text-up" : "text-down"}`}>
               {fmtCompact(e.net_sum_idr)}

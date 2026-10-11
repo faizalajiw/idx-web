@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RebalanceEvent } from "@/lib/types";
 import { fmtCompact, fmtNum } from "@/lib/format";
 import { EmptyState } from "./States";
+import { TickerLogo } from "./TickerLogo";
 
 function SideBadge({ side }: { side: string }) {
   const buy = side === "buy";
@@ -109,7 +110,7 @@ export function RebalanceLedger({
                   <tbody>
                     {active.trades.map((t, i) => (
                       <tr key={`${t.code}-${t.side}-${i}`}>
-                        <td className="font-semibold">{t.code}</td>
+                        <td className="font-semibold"><span className="inline-flex items-center gap-2"><TickerLogo code={t.code} size={18} />{t.code}</span></td>
                         <td className="text-center">
                           <SideBadge side={t.side} />
                         </td>
@@ -152,7 +153,7 @@ export function RebalanceLedger({
                       return (
                         <tr key={h.code}>
                           <td>
-                            <span className="font-semibold">{h.code}</span>
+                            <span className="inline-flex items-center gap-2"><TickerLogo code={h.code} size={18} /><span className="font-semibold">{h.code}</span></span>
                           </td>
                           <td className="text-right tabular-nums">{fmtNum(h.shares, 2)}</td>
                           <td className="text-right tabular-nums">{fmtNum(h.price, 2)}</td>

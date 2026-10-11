@@ -7,6 +7,7 @@ import { FlowTimelineCard } from "@/components/FlowTimelineCard";
 import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
+import { TickerLogo } from "@/components/TickerLogo";
 import { fmtCompact, fmtPct, fmtNum, trendClass } from "@/lib/format";
 import type {
   BrokerActivityDriver,
@@ -103,7 +104,10 @@ function RankingTable() {
               <td className="text-muted tabular-nums">{i + 1}</td>
               <td>
                 <div className="flex flex-col">
-                  <span className="font-semibold">{r.code}</span>
+                  <span className="inline-flex items-center gap-2 font-semibold">
+                    <TickerLogo code={r.code} size={18} />
+                    {r.code}
+                  </span>
                   {r.name && (
                     <span className="text-muted max-w-[190px] truncate text-[10px]">
                       {r.name}

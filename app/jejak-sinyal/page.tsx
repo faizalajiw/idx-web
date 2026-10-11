@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSignalTrack } from "@/lib/hooks";
 import { Card } from "@/components/Card";
+import { TickerLogo } from "@/components/TickerLogo";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import type { SignalTrack, SignalTrackStat } from "@/lib/types";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -201,7 +202,7 @@ export default function JejakSinyalPage() {
                     {data.recent.map((r) => (
                       <tr key={`${r.code}-${r.date}`}>
                         <td className="text-muted tabular-nums">{r.date}</td>
-                        <td className="font-medium">{r.code}</td>
+                        <td className="font-medium"><span className="inline-flex items-center gap-2"><TickerLogo code={r.code} size={18} />{r.code}</span></td>
                         <td>
                           <span
                             className={`badge ${

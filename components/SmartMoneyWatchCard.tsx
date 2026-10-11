@@ -6,6 +6,7 @@ import { Bell, Minus, TrendingDown, TrendingUp } from "lucide-react";
 import { useSmartMoneyWatchlist } from "@/lib/hooks";
 import { fmtNum } from "@/lib/format";
 import { Card } from "./Card";
+import { TickerLogo } from "./TickerLogo";
 import { InfoHint } from "./InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import type { SmartMoneyWatchRow } from "@/lib/types";
@@ -153,6 +154,7 @@ function WatchRow({ row }: { row: SmartMoneyWatchRow }) {
       className="flex items-center gap-2.5 rounded-lg border border-[var(--border)] bg-white/[0.02] px-3 py-2 transition-colors hover:bg-white/[0.05]"
     >
       <Icon size={15} className={`shrink-0 ${cls}`} aria-hidden />
+      <TickerLogo code={row.code} size={22} />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold">{row.code}</span>
         {row.name && (

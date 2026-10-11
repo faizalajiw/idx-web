@@ -2,6 +2,7 @@
 
 import { useSentiment } from "@/lib/hooks";
 import { Card } from "@/components/Card";
+import { TickerLogo } from "@/components/TickerLogo";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import type { SentimentItem, SentimentMarket } from "@/lib/types";
 import { LastUpdated } from "@/components/LastUpdated";
@@ -45,7 +46,7 @@ function SentimentList({ items, title }: { items: SentimentItem[]; title: string
         <li key={i.code} className="border-b border-[var(--border)] pb-2.5 last:border-0 last:pb-0">
           <div className="flex items-baseline justify-between gap-2">
             <div className="min-w-0">
-              <span className="font-semibold">{i.code}</span>
+              <span className="inline-flex items-center gap-2"><TickerLogo code={i.code} size={20} /><span className="font-semibold">{i.code}</span></span>
               <span className="text-muted ml-2 truncate text-xs">{i.name ?? "-"}</span>
             </div>
             <div className="flex shrink-0 items-center gap-2">
