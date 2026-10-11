@@ -26,9 +26,9 @@ function StockPicker({ value }: { value: string | null }) {
   }, [watchlist, draft, value]);
 
   return (
-    <div className="space-y-2">
+    <div className="card space-y-3 p-4">
       <form
-        className="flex items-center gap-2"
+        className="flex flex-col gap-2 sm:flex-row sm:items-center"
         action={`/flow/${draft.trim().toUpperCase()}`}
         method="get"
         onSubmit={(e) => {
@@ -37,26 +37,26 @@ function StockPicker({ value }: { value: string | null }) {
           if (code) window.location.href = `/flow/${code}`;
         }}
       >
-        <div className="relative flex-1">
-          <Search className="text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="group relative flex-1">
+          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value.toUpperCase())}
-            placeholder="Kode emiten, mis. BBRI"
-            className="w-full rounded-md border border-[var(--border)] bg-[var(--bg-elev)] py-2 pl-9 pr-3 text-sm outline-none focus:border-[var(--accent)]"
+            placeholder="Cari kode emiten, mis. BBRI"
+            className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-elev)] pl-10 pr-3 text-sm font-medium tracking-wide outline-none transition-shadow focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30"
             aria-label="Kode emiten"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="h-11 rounded-xl bg-[var(--accent)] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           Lihat
         </button>
       </form>
       {suggestions.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-muted text-[11px]">Cepat:</span>
+          <span className="text-muted text-[11px] font-medium">Cepat:</span>
           {suggestions.map((c) => (
             <Link
               key={c}
@@ -83,7 +83,7 @@ function StockPicker({ value }: { value: string | null }) {
  */
 export function FlowWorkspace({ code }: { code: string | null }) {
   return (
-    <div className="space-y-4">
+    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <StockPicker value={code} />
       {code ? (
         <>
@@ -93,6 +93,6 @@ export function FlowWorkspace({ code }: { code: string | null }) {
       ) : (
         <EmptyState message="Masukkan kode emiten di atas untuk melihat arus asing dan timeline aliran dana." />
       )}
-    </div>
+    </main>
   );
 }

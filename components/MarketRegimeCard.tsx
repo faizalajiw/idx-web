@@ -102,7 +102,7 @@ export function MarketRegimeCard() {
         subtitle="Status tren & volatilitas IHSG"
         right={<LastUpdated sessionDate={data?.as_of} updatedAt={data?.generated_at} />}
       >
-        <p className="text-muted text-sm">Data regime belum tersedia.</p>
+        <p className="text-muted text-sm">Data kondisi IHSG belum tersedia.</p>
       </Card>
     );
   }
@@ -118,8 +118,8 @@ export function MarketRegimeCard() {
   return (
     <Card
       title="Suasana Pasar"
-      subtitle="Ringkasan tren & volatilitas IHSG (regime)"
-      info="'Suasana pasar' (regime) = kondisi umum IHSG dari data historis: sedang naik, turun, atau menyamping. Timeline di bawah menunjukkan suasana tiap hari bursa 60 hari terakhir — warnanya mengikuti regime harian. Volatilitas = seberapa besar & cepat pergerakan harga."
+      subtitle="Ringkasan tren & volatilitas IHSG (kondisi IHSG)"
+      info="'Suasana pasar' (kondisi IHSG) = kondisi umum IHSG dari data historis: sedang naik, turun, atau menyamping. Timeline di bawah menunjukkan suasana tiap hari bursa 60 hari terakhir — warnanya mengikuti kondisi harian. Volatilitas = seberapa besar & cepat pergerakan harga."
       right={<LastUpdated sessionDate={data.as_of} updatedAt={data.generated_at} />}
     >
       <div className="flex flex-col gap-4">
@@ -181,7 +181,7 @@ export function MarketRegimeCard() {
           {hist.isLoading || !hist.data ? (
             <div className="h-8 animate-pulse rounded bg-white/[0.04]" />
           ) : (
-            <div className="flex gap-[2px] overflow-hidden" role="img" aria-label="Timeline regime IHSG">
+            <div className="flex gap-[2px] overflow-hidden" role="img" aria-label="Timeline kondisi IHSG">
               {hist.data.recent.slice(-60).map((d) => {
                 const color = REGIME_COLOR[d.regime ?? ""] ?? "var(--border)";
                 const hot = (d.realized_vol ?? 0) >= 30;

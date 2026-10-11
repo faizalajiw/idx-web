@@ -25,35 +25,35 @@ function StockPicker({ value }: { value: string | null }) {
   }, [watchlist, draft, value]);
 
   return (
-    <div className="space-y-2">
+    <div className="card space-y-3 p-4">
       <form
-        className="flex items-center gap-2"
+        className="flex flex-col gap-2 sm:flex-row sm:items-center"
         onSubmit={(e) => {
           e.preventDefault();
           const code = draft.trim().toUpperCase();
           if (code) window.location.href = `/keputusan/${code}`;
         }}
       >
-        <div className="relative flex-1">
-          <Search className="text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <div className="group relative flex-1">
+          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value.toUpperCase())}
-            placeholder="Kode emiten, mis. BBRI"
-            className="w-full rounded-md border border-[var(--border)] bg-[var(--bg-elev)] py-2 pl-9 pr-3 text-sm outline-none focus:border-[var(--accent)]"
+            placeholder="Cari kode emiten, mis. BBRI"
+            className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-elev)] pl-10 pr-3 text-sm font-medium tracking-wide outline-none transition-shadow focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30"
             aria-label="Kode emiten"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="h-11 rounded-xl bg-[var(--accent)] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           Analisis
         </button>
       </form>
       {suggestions.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-muted text-[11px]">Cepat:</span>
+          <span className="text-muted text-[11px] font-medium">Cepat:</span>
           {suggestions.map((c) => (
             <Link
               key={c}
@@ -129,7 +129,7 @@ function ContextStrip({ d }: { d: NonNullable<import("@/lib/types").StockDecisio
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div className="rounded-lg border border-[var(--border)] p-2.5">
-        <p className="text-muted text-[11px]">Regime IHSG</p>
+        <p className="text-muted text-[11px]">Kondisi IHSG</p>
         <p
           className="mt-0.5 text-sm font-semibold"
           style={{ color: regimeDown ? "var(--down)" : regime.startsWith("TRENDING") ? "var(--up)" : undefined }}
@@ -245,7 +245,7 @@ export function DecisionWorkspace({ code }: { code: string | null }) {
   const hc = data?.hold_check;
 
   return (
-    <div className="space-y-4">
+    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8">
       <StockPicker value={code} />
 
       {code ? (
@@ -259,7 +259,7 @@ export function DecisionWorkspace({ code }: { code: string | null }) {
             <Card
               title={`Ruang Keputusan — ${code}`}
               subtitle="Verdict gabungan teknikal + valuasi + lapisan IC/broker"
-              info="Satu verdict dari skor keputusan backend (satu sumber kebenaran skor). Konteks di bawah (regime, sentimen, base rate) tidak mengubah verdict — mereka membantu lo menilai seberapa besar percaya diri terhadap verdict itu. Alat bantu riset, bukan rekomendasi beli/jual."
+              info="Satu verdict dari skor keputusan backend (satu sumber kebenaran skor). Konteks di bawah (kondisi IHSG, sentimen, base rate) tidak mengubah verdict — mereka membantu lo menilai seberapa besar percaya diri terhadap verdict itu. Alat bantu riset, bukan rekomendasi beli/jual."
             >
               {!hc ? (
                 <EmptyState message="Emiten tidak ditemukan / histori tidak cukup untuk verdict." />
@@ -371,6 +371,6 @@ export function DecisionWorkspace({ code }: { code: string | null }) {
       ) : (
         <EmptyState message="Masukkan kode emiten untuk melihat verdict gabungan, konteks aliran, dan level pembatalannya." />
       )}
-    </div>
+    </main>
   );
 }

@@ -62,7 +62,7 @@ export function RegimeBanner() {
       title="ADX(14) + DI dari IHSG; volatilitas = realized vol 20 hari ter-annualisasi (~240 hari bursa)"
     >
       <span className="text-muted text-xs font-semibold tracking-widest uppercase">
-        Regime IHSG
+        Kondisi IHSG
       </span>
       <span className={style.badge}>
         <RegimeIcon size={13} className="mr-1" aria-hidden /> {style.label}

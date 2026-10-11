@@ -1,5 +1,32 @@
 "use client";
 
+import {
+  Landmark,
+  Wallet,
+  ShieldCheck,
+  Flame,
+  Mountain,
+  Gem,
+  Building2,
+  Signal,
+  TowerControl,
+  HardHat,
+  Truck,
+  ShoppingBasket,
+  ShoppingBag,
+  Sprout,
+  HeartPulse,
+  Clapperboard,
+  Car,
+  FlaskConical,
+  Zap,
+  Cpu,
+  Store,
+  Briefcase,
+  Network,
+  Layers,
+  type LucideIcon,
+} from "lucide-react";
 import { useSectorRotation } from "@/lib/hooks";
 import type { SectorRotationRow } from "@/lib/types";
 import { Card } from "./Card";
@@ -13,6 +40,37 @@ const PHASE_STYLE: Record<string, { badge: string; label: string }> = {
   TERPURUK: { badge: "badge badge-sell", label: "Terpuruk" },
   STABIL: { badge: "badge badge-hold opacity-60", label: "Stabil" },
 };
+
+/** Ikon + warna per sektor (vocabulary dari BUCKETS di sector_map.py). */
+const SECTOR_ICON: Record<string, { icon: LucideIcon; color: string }> = {
+  Perbankan: { icon: Landmark, color: "#38bdf8" },
+  "Keuangan Non-Bank": { icon: Wallet, color: "#22d3ee" },
+  Asuransi: { icon: ShieldCheck, color: "#2dd4bf" },
+  Energi: { icon: Flame, color: "#fb923c" },
+  Batubara: { icon: Mountain, color: "#a3a3a3" },
+  "Logam & Mineral": { icon: Gem, color: "#c084fc" },
+  Properti: { icon: Building2, color: "#f472b6" },
+  "Telkom & Internet": { icon: Signal, color: "#60a5fa" },
+  Infrastruktur: { icon: TowerControl, color: "#818cf8" },
+  Konstruksi: { icon: HardHat, color: "#facc15" },
+  "Transportasi & Logistik": { icon: Truck, color: "#34d399" },
+  "Konsumer Primer": { icon: ShoppingBasket, color: "#4ade80" },
+  "Konsumer Sekunder": { icon: ShoppingBag, color: "#a3e635" },
+  Agriculture: { icon: Sprout, color: "#65a30d" },
+  Kesehatan: { icon: HeartPulse, color: "#f87171" },
+  "Media & Hiburan": { icon: Clapperboard, color: "#e879f9" },
+  Otomotif: { icon: Car, color: "#fbbf24" },
+  "Industri Dasar & Kimia": { icon: FlaskConical, color: "#fcd34d" },
+  Utilitas: { icon: Zap, color: "#fde047" },
+  Teknologi: { icon: Cpu, color: "#22d3ee" },
+  Retail: { icon: Store, color: "#fb7185" },
+  "Jasa & Industri": { icon: Briefcase, color: "#94a3b8" },
+  Konglomerat: { icon: Network, color: "#c4b5fd" },
+};
+
+function sectorVisual(sector: string): { icon: LucideIcon; color: string } {
+  return SECTOR_ICON[sector] ?? { icon: Layers, color: "var(--fg-muted)" };
+}
 
 const p0 = (v: number) => `${(v * 100).toFixed(0)}%`;
 
@@ -29,8 +87,8 @@ function deltaClass(v: number | null): string {
 /** Sparkline median skor sektor — SVG polos, tanpa Recharts per baris. */
 function Sparkline({ values }: { values: number[] }) {
   if (values.length < 2) return null;
-  const w = 76;
-  const h = 22;
+  const w = 120;
+  const h = 28;
   // Sertakan 50 supaya garis netralnya selalu terlihat di skala.
   const min = Math.min(...values, 50);
   const max = Math.max(...values, 50);
@@ -41,7 +99,7 @@ function Sparkline({ values }: { values: number[] }) {
   const last = values[values.length - 1];
 
   return (
-    <svg width={w} height={h} aria-hidden className="overflow-visible">
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden className="overflow-visible">
       <line
         x1={0}
         x2={w}
@@ -54,13 +112,72 @@ function Sparkline({ values }: { values: number[] }) {
         points={points}
         fill="none"
         stroke={last >= 50 ? "var(--chart-up)" : "var(--chart-down)"}
-        strokeWidth={1.5}
+        strokeWidth={1.75}
+        strokeLinejoin="round"
+        strokeLinecap="round"
       />
     </svg>
   );
 }
 
-function RotationTable() {
+/** Satu sektor sebagai card — menggantikan satu baris tabel. */
+function SectorCard({ s }: { s: SectorRotationRow }) {
+  const style = (s.phase && PHASE_STYLE[s.phase]) || null;
+  const { icon: Icon, color } = sectorVisual(s.sector);
+
+  return (
+    <div className="card flex flex-col gap-3 p-4 transition-colors hover:border-[var(--accent)]/40">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+            style={{ background: `color-mix(in srgb, ${color} 16%, transparent)`, color }}
+          >
+            <Icon size={18} aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-semibold leading-tight">{s.sector}</p>
+            <p className="text-muted text-xs">{s.n_names} emiten</p>
+          </div>
+        </div>
+        {style ? (
+          <span className={`${style.badge} shrink-0`}>{style.label}</span>
+        ) : (
+          <span className="text-muted shrink-0 text-xs">—</span>
+        )}
+      </div>
+
+      <div className="flex items-end justify-between gap-2">
+        <div>
+          <p className="text-muted text-[11px]">Median skor</p>
+          <p className="text-xl font-bold tabular-nums leading-none">{s.median_score.toFixed(1)}</p>
+        </div>
+        <div className="flex gap-4 text-right">
+          <div>
+            <p className="text-muted text-[11px]">Δ 5 sesi</p>
+            <p className={`font-semibold tabular-nums ${deltaClass(s.delta_5d)}`}>{deltaCell(s.delta_5d)}</p>
+          </div>
+          <div>
+            <p className="text-muted text-[11px]">Δ 21 sesi</p>
+            <p className={`font-semibold tabular-nums ${deltaClass(s.delta_21d)}`}>{deltaCell(s.delta_21d)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
+        <div className="shrink-0">
+          <p className="text-muted text-[11px]">Breadth</p>
+          <p className="font-semibold tabular-nums">{p0(s.breadth)}</p>
+        </div>
+        <div className="min-w-0 flex-1">
+          <Sparkline values={s.history} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RotationGrid() {
   const { data, error, isLoading } = useSectorRotation(60, 3);
 
   if (error) return <ErrorState message={`Gagal memuat rotasi sektor: ${error.message}`} />;
@@ -89,51 +206,10 @@ function RotationTable() {
 
   return (
     <div className="space-y-3">
-      <div className="overflow-x-auto">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th className="text-left">Sektor</th>
-              <th className="text-left">Fase</th>
-              <th className="text-right">Median skor</th>
-              <th className="text-right">Δ 5 sesi</th>
-              <th className="text-right">Δ 21 sesi</th>
-              <th className="text-right">Breadth</th>
-              <th className="text-left">Tren</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.sectors.map((s: SectorRotationRow) => {
-              const style = (s.phase && PHASE_STYLE[s.phase]) || null;
-              return (
-                <tr key={s.sector}>
-                  <td>
-                    <span className="font-semibold">{s.sector}</span>
-                    <span className="text-muted ml-2 text-xs">{s.n_names} emiten</span>
-                  </td>
-                  <td>
-                    {style ? (
-                      <span className={style.badge}>{style.label}</span>
-                    ) : (
-                      <span className="text-muted text-xs">—</span>
-                    )}
-                  </td>
-                  <td className="text-right font-semibold tabular-nums">{s.median_score.toFixed(1)}</td>
-                  <td className={`text-right tabular-nums ${deltaClass(s.delta_5d)}`}>
-                    {deltaCell(s.delta_5d)}
-                  </td>
-                  <td className={`text-right tabular-nums ${deltaClass(s.delta_21d)}`}>
-                    {deltaCell(s.delta_21d)}
-                  </td>
-                  <td className="text-right tabular-nums">{p0(s.breadth)}</td>
-                  <td>
-                    <Sparkline values={s.history} />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {data.sectors.map((s: SectorRotationRow) => (
+          <SectorCard key={s.sector} s={s} />
+        ))}
       </div>
 
       <p className="text-muted text-[11px] leading-snug">
@@ -167,7 +243,7 @@ export function SectorRotationTable() {
       info="Sektor mana yang aliran dananya sedang berbalik naik (akumulasi) atau turun (distribusi). Dihitung dari jejak aliran broker (proksi arus asing + buku intraday), dibobot oleh uji IC."
       right={<LastUpdated sessionDate={data?.as_of} updatedAt={data?.ic_run_date} dep={data} />}
     >
-      <RotationTable />
+      <RotationGrid />
     </Card>
   );
 }

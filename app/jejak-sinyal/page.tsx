@@ -140,7 +140,7 @@ export default function JejakSinyalPage() {
         </h1>
         <p className="text-muted mt-0.5 flex items-center gap-2 text-sm">
           Track record historis sinyal BUY/SELL — hit-rate, return setelah sinyal, dan
-          selisihnya terhadap pasar, dipecah per regime IHSG.
+          selisihnya terhadap pasar, dipecah per kondisi IHSG.
           <LastUpdated sessionDate={data?.last_date} updatedAt={data?.generated_at} />
         </p>
       </div>
@@ -167,7 +167,7 @@ export default function JejakSinyalPage() {
           <Card
             title={
               <>
-                <History size={15} aria-hidden /> Kinerja per Regime IHSG
+                <History size={15} aria-hidden /> Kinerja per Kondisi IHSG
               </>
             }
             subtitle="Apakah sinyal bekerja lebih baik saat pasar trending, ranging, atau transisi?"

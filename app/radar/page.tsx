@@ -16,7 +16,7 @@ import type { SmartMoneyRadarRow } from "@/lib/types";
 
 /** Opsi jendela agregasi (hari bursa). */
 const WINDOWS = [
-  { days: 2, label: "2 sesi" },
+  { days: 1, label: "1 sesi" },
   { days: 5, label: "5 sesi" },
   { days: 10, label: "10 sesi" },
   { days: 21, label: "1 bulan" },

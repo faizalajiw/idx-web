@@ -198,7 +198,7 @@ function RegimeSummary() {
   if (!s || s.days === 0)
     return (
       <p className="text-muted text-sm">
-        Histori regime belum tersedia — job harian 16:20 WIB akan mengisinya
+        Histori kondisi IHSG belum tersedia — job harian 16:20 WIB akan mengisinya
         (atau buka halaman ini lagi untuk memicu backfill).
       </p>
     );
@@ -206,7 +206,7 @@ function RegimeSummary() {
     <div className="space-y-2 text-sm">
       <p className="text-muted">
         {s.days} hari bursa ({s.first} → {s.last}) · rata-rata ADX{" "}
-        {s.avg_adx} · {s.transitions} transisi regime.
+        {s.avg_adx} · {s.transitions} transisi kondisi.
       </p>
       <div className="flex flex-wrap gap-2">
         {Object.entries(s.share).map(([rg, pct]) => (
@@ -238,7 +238,7 @@ export default function FaktorPage() {
         <Card title="Bobot Composite Aktif" subtitle="Dari run IC terbaru — otomatis dipakai skor keputusan" info="Seberapa besar 'suara' tiap faktor (momentum, valuasi, dll) dalam skor gabungan. Bobot lebih besar = faktor itu dianggap lebih andal belakangan ini. Dihitung otomatis dari data.">
           <WeightsCard />
         </Card>
-        <Card title="Regime IHSG Historis" subtitle="Distribusi regime + transisi (backfill otomatis)" info="Rekap seberapa sering pasar berada di tiap kondisi (tren naik/turun/sideways) dan seberapa sering berpindah. Membantu paham karakter pasar dari waktu ke waktu.">
+        <Card title="Kondisi IHSG Historis" subtitle="Distribusi kondisi + transisi (backfill otomatis)" info="Rekap seberapa sering pasar berada di tiap kondisi (tren naik/turun/sideways) dan seberapa sering berpindah. Membantu paham karakter pasar dari waktu ke waktu.">
           <RegimeSummary />
         </Card>
       </div>
