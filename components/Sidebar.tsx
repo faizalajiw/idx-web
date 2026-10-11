@@ -165,7 +165,7 @@ export function Topbar() {
       <span className="topbar-brand lg:hidden">
         <Brand />
       </span>
-      <div className="flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2">
         <GlobalLastUpdated />
         <ThemeToggle />
         <MarketBadge />
