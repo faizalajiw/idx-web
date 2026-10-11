@@ -193,8 +193,9 @@ export function useSentiment(limit = 15) {
 }
 
 
-export function useScreener(filters: ScreenerFilters) {
-  const key = `/api/screener${screenerQuery(filters)}`;
+/** `null` = belum ada strategi dipilih; tidak ada request yang dikirim. */
+export function useScreener(filters: ScreenerFilters | null) {
+  const key = filters ? `/api/screener${screenerQuery(filters)}` : null;
   return useSWR<ScreenerRow[]>(key, fetcher, { keepPreviousData: true });
 }
 

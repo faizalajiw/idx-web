@@ -13,15 +13,22 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 ### Preset & Panel Filter
 | Field | Isi |
 |---|---|
-| Nama card | Filter + preset (Momentum + Foreign In, Lonjakan Volume, Oversold Sehat, Trend Up Tenang, Akumulasi Broker) |
-| Komponen | `PRESETS`/panel filter di [screener/page.tsx:33](../../idx-web/app/screener/page.tsx) |
-| Fungsi | Menyusun parameter filter; preset mengisi beberapa filter sekaligus |
+| Nama card | Tab strategi (Momentum + Foreign In, Lonjakan Volume, Oversold Sehat, Trend Up Tenang, Akumulasi Broker) |
+| Komponen | `PRESETS` dan tab bar di [screener/page.tsx](../../idx-web/app/screener/page.tsx) |
+| Fungsi | Memilih satu strategi; setiap tab mengisi beberapa filter sekaligus |
 | Sumber data | Klien-only (state); dikirim sebagai query ke `GET /api/screener` |
 | Rumus/Logika | Preset = kombinasi nilai filter (`min_momentum`, `foreign_in_only`, `min_vol_ratio`, `rsi_max`, `signal`, `min_broker_score`, `min_value`, `min_days`) |
 | Periode/Window | `min_days` = syarat panjang data (default 30 sesi) |
-| Interaksi | Klik preset / ubah filter → refetch. Tooltip (`title`) tiap preset berisi deskripsi singkat |
-| Guide card | Muncul di bawah tab preset untuk preset aktif. Berisi 3 bagian: **Untuk apa?** (tujuan preset), **Kriteria** (chip syarat), **Cara baca** (cara menafsirkan hasil) |
-| Empty/Loading/Error | Skeleton saat load pertama (`ScreenerShellSkeleton`, fallback Suspense) |
+| Interaksi | Tab `role="tablist"` dengan roving tabindex. Navigasi keyboard: ←/→ pindah tab, Home/End ke ujung. Klik tab → URL ter-update dan hasil dimuat. Deskripsi singkat di tooltip (`title`) |
+| Guide card | `role="tabpanel"`, hanya tampil setelah strategi dipilih. Berisi **Untuk apa?**, **Kriteria** (chip syarat), **Cara baca** |
+| Empty/Loading/Error | **Default (belum pilih)**: panel panduan dengan 5 kartu strategi, tanpa fetch ke API. Setelah pilih: skeleton saat load pertama (`ScreenerShellSkeleton`, fallback Suspense) |
+
+### Status Default (Belum Pilih Strategi)
+- Saat membuka `/screener` tanpa query, tidak ada tab yang aktif (`active = -1`) dan tidak ada request `GET /api/screener`.
+- Panel panduan menampilkan 5 kartu strategi yang bisa diklik untuk memulai.
+- Panel FACTORS, peringatan skor broker, dan tabel hasil hanya tampil setelah strategi dipilih.
+- Hook `useScreener` menerima `null`; SWR key bernilai null sehingga fetch dilewati.
+- Deep link dengan query preset (mis. `/screener?min_momentum=0&min_vol_ratio=2&min_days=30`) langsung memilih tab yang cocok dan memuat hasil.
 
 ### Tabel Hasil Screener
 | Field | Isi |

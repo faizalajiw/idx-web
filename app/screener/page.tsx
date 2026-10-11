@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useScreener, useBrokerActivity } from "@/lib/hooks";
@@ -22,6 +22,7 @@ import {
   SlidersHorizontal,
   Check,
   Activity,
+  Compass,
   type LucideIcon,
 } from "lucide-react";
 
@@ -266,12 +267,14 @@ function ScreenerView() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [filters, setFilters] = useState<ScreenerFilters>(() => {
-    const fromUrl = filtersFromParams(new URLSearchParams(searchParams));
-    return Object.keys(fromUrl).length > 0 ? fromUrl : PRESETS[0].filters;
-  });
-  const [active, setActive] = useState(0);
-  const { data, error, isLoading } = useScreener(filters);
+  // Belum ada strategi dipilih = filter kosong: tidak ada fetch, tampil guidance.
+  const [filters, setFilters] = useState<ScreenerFilters>(() =>
+    filtersFromParams(new URLSearchParams(searchParams)),
+  );
+  const hasSelection = Object.keys(filters).length > 0;
+  const [active, setActive] = useState(-1);
+  const { data, error, isLoading } = useScreener(hasSelection ? filters : null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Status validasi skor broker: tanpa ini, filter broker yang belum tervalidasi
   // hanya menghasilkan "tidak ada saham lolos" tanpa alasan yang jelas.
@@ -310,6 +313,21 @@ function ScreenerView() {
   function apply(i: number) {
     setActive(i);
     setFilters(PRESETS[i].filters);
+  }
+
+  /** Navigasi keyboard pola WAI-ARIA tabs: panah kiri/kanan, Home, End. */
+  function onTabKeyDown(e: React.KeyboardEvent, i: number) {
+    const n = PRESETS.length;
+    const next =
+      e.key === "ArrowRight" ? (i + 1) % n
+      : e.key === "ArrowLeft" ? (i - 1 + n) % n
+      : e.key === "Home" ? 0
+      : e.key === "End" ? n - 1
+      : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    tabRefs.current[next]?.focus();
+    apply(next);
   }
 
   function toggleSort(key: SortKey) {
@@ -362,31 +380,85 @@ function ScreenerView() {
 
       <RegimeBanner />
 
-      {/* Tab strategi cepat */}
-      <div className="flex flex-wrap gap-2">
+      {/* Tab strategi: pola WAI-ARIA tabs, roving tabindex, panah kiri/kanan */}
+      <div
+        role="tablist"
+        aria-label="Strategi screening"
+        className="no-scrollbar flex gap-1 overflow-x-auto border-b border-[var(--border)]"
+      >
         {PRESETS.map((p, i) => {
           const PresetIcon = p.icon;
           const isActive = active === i;
+          // Tanpa pilihan, tab pertama tetap bisa difokus lewat keyboard.
+          const focusable = isActive || (active === -1 && i === 0);
           return (
             <button
               key={p.label}
+              ref={(el) => {
+                tabRefs.current[i] = el;
+              }}
+              role="tab"
+              id={`screener-tab-${i}`}
+              aria-selected={isActive}
+              aria-controls="screener-panel"
+              tabIndex={focusable ? 0 : -1}
               onClick={() => apply(i)}
+              onKeyDown={(e) => onTabKeyDown(e, i)}
               title={p.desc}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`group -mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
                 isActive
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-white"
-                  : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
+                  ? "border-[var(--accent)] text-[var(--fg)]"
+                  : "border-transparent text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
               }`}
             >
-              <PresetIcon size={15} aria-hidden />
+              <PresetIcon
+                size={15}
+                aria-hidden
+                className={isActive ? "text-[var(--accent)]" : "opacity-70 group-hover:opacity-100"}
+              />
               {p.label}
             </button>
           );
         })}
       </div>
 
-      {PRESETS[active]?.guide && (
-        <div className="card-glass space-y-3 p-4 sm:p-5">
+      {!hasSelection && (
+        <div className="card-glass space-y-5 p-5 sm:p-6">
+          <div className="max-w-2xl">
+            <h2 className="text-lg font-semibold">Pilih satu strategi untuk mulai</h2>
+            <p className="text-muted mt-1 text-sm">
+              Setiap strategi menggabungkan beberapa faktor sekaligus. Pilih salah satu tab di atas
+              atau kartu di bawah, lalu hasil saham yang lolos akan muncul di sini.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {PRESETS.map((p, i) => {
+              const PresetIcon = p.icon;
+              return (
+                <button
+                  key={p.label}
+                  onClick={() => apply(i)}
+                  className="group rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-4 text-left transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <PresetIcon size={16} className="text-[var(--accent)]" aria-hidden />
+                    {p.label}
+                  </span>
+                  <span className="text-muted mt-1.5 block text-xs leading-relaxed">{p.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {hasSelection && PRESETS[active]?.guide && (
+        <div
+          role="tabpanel"
+          id="screener-panel"
+          aria-labelledby={`screener-tab-${active}`}
+          className="card-glass space-y-3 p-4 sm:p-5"
+        >
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--fg-muted)]">
               Untuk apa?
@@ -418,7 +490,7 @@ function ScreenerView() {
         </div>
       )}
 
-      {brokerNotValidated && (
+      {hasSelection && brokerNotValidated && (
         <div className="rounded-md border border-[rgba(255,193,7,0.3)] bg-[rgba(255,193,7,0.07)] p-3 text-sm">
           <p className="font-medium">Filter skor broker tidak berlaku — skor belum tervalidasi.</p>
           <p className="text-muted mt-1">
@@ -430,6 +502,7 @@ function ScreenerView() {
         </div>
       )}
 
+      {hasSelection && (<>
       <details className="text-muted text-sm">
         <summary className="cursor-pointer select-none font-medium text-[var(--fg)]">
           Faktor apa saja yang dihitung?
@@ -446,7 +519,7 @@ function ScreenerView() {
       <Card
         title={`Hasil Screening${data ? ` · ${data.length} saham` : ""}`}
         subtitle={`Urut: ${COLUMNS.find((c) => c.key === sortKey)?.label} ${sortDir === "desc" ? "↓" : "↑"}`}
-        info="Screener = alat saring saham berdasarkan kriteria tertentu (momentum, RSI, dsb). Pakai tab filter cepat di atas atau atur faktornya sendiri. Klik judul kolom untuk urutkan, dan tombol 'Kolom' untuk pilih data yang ditampilkan."
+        info="Saham yang lolos semua kriteria strategi yang dipilih. Klik judul kolom untuk urutkan, dan tombol 'Kolom' untuk memilih data yang ditampilkan."
         right={
           <div className="flex items-center gap-2">
             <LastUpdated dep={data} />
@@ -552,6 +625,7 @@ function ScreenerView() {
           </div>
         )}
       </Card>
+      </>)}
     </main>
   );
 }
