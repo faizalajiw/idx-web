@@ -38,7 +38,7 @@ const GROUPS: NavGroup[] = [
   },
   {
     title: "Screening",
-    items: [{ href: "/screener", label: "Screener", icon: Filter }],
+    items: [{ href: "/screener", label: "Screener AI", icon: Filter }],
   },
   {
     title: "Analisis",

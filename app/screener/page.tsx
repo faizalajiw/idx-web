@@ -23,6 +23,7 @@ import {
   Check,
   Activity,
   Compass,
+  Info,
   type LucideIcon,
 } from "lucide-react";
 
@@ -110,6 +111,74 @@ const FACTORS = [
   ["Foreign net", "Net buy/sell asing hari terakhir (Rp, notional = lembar × close)."],
   ["Likuiditas", "Nilai transaksi harian — filter minimal untuk hindari saham 'oleh-oleh'."],
 ];
+
+function FactorsModal({ onClose }: { onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    const prevFocus = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCloseRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prevOverflow;
+      prevFocus?.focus();
+    };
+  }, []);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="factors-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-[fadeIn_150ms_ease-out]"
+        onMouseDown={onClose}
+        aria-hidden
+      />
+      <div className="relative flex max-h-[85vh] w-[min(640px,100%)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-[popIn_180ms_ease-out]">
+        <header className="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+          <div>
+            <h3 id="factors-title" className="text-base font-semibold tracking-tight">
+              Faktor yang dihitung
+            </h3>
+            <p className="mt-0.5 text-xs text-[var(--fg-muted)]">
+              {FACTORS.length} faktor · dipakai untuk menyaring dan mengurutkan saham
+            </p>
+          </div>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--fg-muted)] transition hover:bg-[var(--bg-elev)] hover:text-[var(--fg)]"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </header>
+        <ul className="overflow-y-auto divide-y divide-[var(--border)] p-2">
+          {FACTORS.map(([k, v]) => (
+            <li key={k} className="rounded-xl px-3 py-3">
+              <p className="text-sm font-medium text-[var(--fg)]">{k}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-[var(--fg-muted)]">{v}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 function signalBadge(sig: string): string {
   if (sig === "BUY") return "badge badge-buy";
@@ -285,6 +354,7 @@ function ScreenerView() {
   const [sortKey, setSortKey] = useState<SortKey>("momentum_20d");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [visible, setVisible] = useState<Set<SortKey>>(new Set(DEFAULT_VISIBLE));
+  const [factorsOpen, setFactorsOpen] = useState(false);
   const [showCols, setShowCols] = useState(false);
 
   const queryStr = screenerQuery(filters);
@@ -503,18 +573,18 @@ function ScreenerView() {
       )}
 
       {hasSelection && (<>
-      <details className="text-muted text-sm">
-        <summary className="cursor-pointer select-none font-medium text-[var(--fg)]">
+      <div>
+        <button
+          type="button"
+          onClick={() => setFactorsOpen(true)}
+          aria-haspopup="dialog"
+          className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-sm font-medium text-[var(--fg)] transition hover:border-[var(--border-strong)] hover:bg-[var(--bg-elev)]"
+        >
+          <Info size={14} aria-hidden />
           Faktor apa saja yang dihitung?
-        </summary>
-        <ul className="mt-2 space-y-1.5">
-          {FACTORS.map(([k, v]) => (
-            <li key={k}>
-              <span className="font-medium text-[var(--fg)]">{k}</span> — {v}
-            </li>
-          ))}
-        </ul>
-      </details>
+        </button>
+      </div>
+      {factorsOpen && <FactorsModal onClose={() => setFactorsOpen(false)} />}
 
       <Card
         title={`Hasil Screening${data ? ` · ${data.length} saham` : ""}`}

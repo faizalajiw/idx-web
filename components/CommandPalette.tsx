@@ -22,7 +22,7 @@ type Item =
 const NAV_ACTIONS: Action[] = [
   { id: "home", label: "Dashboard", href: "/", keywords: "beranda home dashboard" },
   { id: "pantau", label: "Pantau", href: "/pantau", keywords: "pantau alert notifikasi" },
-  { id: "screener", label: "Screener", href: "/screener", keywords: "screener filter scan cari" },
+  { id: "screener", label: "Screener AI", href: "/screener", keywords: "screener filter scan cari" },
   { id: "rekomendasi", label: "Rekomendasi Beli", href: "/rekomendasi", keywords: "rekomendasi beli sinyal" },
   { id: "keputusan", label: "Ruang Keputusan", href: "/keputusan", keywords: "keputusan decision" },
   
