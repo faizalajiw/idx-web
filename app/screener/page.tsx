@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useScreener, useBrokerActivity } from "@/lib/hooks";
@@ -265,9 +265,16 @@ function ScreenerView() {
 
   const queryStr = screenerQuery(filters);
 
-  // URL -> state: dukung tombol back/forward browser & link yang dibagikan.
+  // Query string yang terakhir ditulis sendiri. Dipakai supaya perubahan URL
+  // hasil tulisan kita tidak dibaca balik (itu yang bikin loop & halaman berkedip).
+  const lastSynced = useRef(searchParams.toString());
+
+  // URL -> state: hanya untuk perubahan dari luar (back/forward, link dibagikan).
   useEffect(() => {
-    const fromUrl = filtersFromParams(new URLSearchParams(searchParams));
+    const q = searchParams.toString();
+    if (q === lastSynced.current) return;
+    lastSynced.current = q;
+    const fromUrl = filtersFromParams(new URLSearchParams(q));
     setFilters((prev) => (sameFilters(prev, fromUrl) ? prev : fromUrl));
   }, [searchParams]);
 
@@ -275,6 +282,7 @@ function ScreenerView() {
   useEffect(() => {
     const next = queryStr.replace(/^\?/, "");
     if (searchParams.toString() !== next) {
+      lastSynced.current = next;
       router.replace(next ? `/screener?${next}` : "/screener", { scroll: false });
     }
   }, [queryStr, searchParams, router]);
@@ -533,13 +541,31 @@ function ScreenerView() {
   );
 }
 
+/** Kerangka dengan ukuran sama seperti halaman asli, supaya tidak ada lompatan layout. */
+function ScreenerShellSkeleton() {
+  return (
+    <main className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:py-8" aria-busy="true">
+      <div className="space-y-2">
+        <Skeleton className="h-9 w-64" />
+        <Skeleton className="h-4 w-96 max-w-full" />
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 4 }, (_, i) => (
+          <Skeleton key={i} className="h-8 w-32" />
+        ))}
+      </div>
+      <Skeleton className="h-72" />
+    </main>
+  );
+}
+
 /**
  * useSearchParams butuh Suspense boundary saat prerender; default export
  * hanya membungkus view supaya build statis tetap lolos.
  */
 export default function ScreenerPage() {
   return (
-    <Suspense fallback={<Skeleton className="mx-auto mt-10 h-72 max-w-4xl" />}>
+    <Suspense fallback={<ScreenerShellSkeleton />}>
       <ScreenerView />
     </Suspense>
   );
