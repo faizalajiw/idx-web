@@ -17,6 +17,8 @@ Urutan dari atas ke bawah:
 2. **Baris 1, dua kolom**
    - Kiri: kartu **Suhu Pasar**. Berisi gauge skor 0–100 dan tiga bar komponen dari tengah (Lebar pasar, Gerak IHSG, Arus asing).
    - Kanan: empat kotak statistik (Dianalisis, Akumulasi, Distribusi, Netral), lalu kartu **Breadth & Aliran** berisi bar naik/stagnan/turun dan tiga angka (IHSG, Porsi asing, Asing/nilai).
+     - Setiap kotak punya ikon Lucide dan warna sendiri lewat `--stat-c`: Dianalisis (`BarChart3`, biru aksen), Akumulasi (`TrendingUp`, hijau), Distribusi (`TrendingDown`, merah), Netral (`Minus`, abu-abu).
+     - Kotak memakai kelas `.stat-box` di [globals.css](../app/globals.css). Latar memakai tint 9% dari warna kotak, dan garis atas serta border saat hover memakai warna yang sama.
 3. **Baris 2, dua kolom (xl ke atas)**: kartu **Akumulasi** dan kartu **Distribusi**. Tidak ada tab; keduanya terlihat sekaligus. Klik emiten untuk membuka alasan sinyal.
 4. **Baris 3, dua kolom**: kartu **Bobot Skor Emiten** dan kartu **Catatan** (disclaimer dari backend, atau peringatan bila orderbook tidak tersedia).
 
