@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Bell, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { Activity, Bell, Layers, Minus, TrendingDown, TrendingUp, type LucideIcon } from "lucide-react";
 import { useSmartMoneyWatchlist } from "@/lib/hooks";
 import { fmtNum } from "@/lib/format";
 import { Card } from "./Card";
@@ -11,11 +11,11 @@ import { InfoHint } from "./InfoHint";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import type { SmartMoneyWatchRow } from "@/lib/types";
 
-const FILTERS: { key: string; label: string }[] = [
-  { key: "aktif", label: "Ada aliran" },
-  { key: "akumulasi", label: "Ditimbun" },
-  { key: "distribusi", label: "Dibuang" },
-  { key: "semua", label: "Semua" },
+const FILTERS: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "aktif", label: "Ada aliran", icon: Activity },
+  { key: "akumulasi", label: "Ditimbun", icon: TrendingUp },
+  { key: "distribusi", label: "Dibuang", icon: TrendingDown },
+  { key: "semua", label: "Semua", icon: Layers },
 ];
 
 function sideStyle(side: string | null, insufficient: boolean) {
@@ -44,14 +44,14 @@ export function SmartMoneyWatchCard() {
   const [filter, setFilter] = useState("aktif");
 
   const rows = data?.rows ?? [];
-  const counts = useMemo(() => {
+  const counts: Record<string, number> = useMemo(() => {
     let acc = 0, dist = 0, neu = 0;
     for (const r of rows) {
       if (r.insufficient || r.side === "netral" || !r.side) neu += 1;
       else if (r.side === "akumulasi") acc += 1;
       else dist += 1;
     }
-    return { acc, dist, neu };
+    return { aktif: acc + dist, akumulasi: acc, distribusi: dist, semua: rows.length };
   }, [rows]);
 
   const shown = useMemo(() => {
@@ -100,36 +100,44 @@ export function SmartMoneyWatchCard() {
         <EmptyState message="Watchlist masih kosong — tambahkan emiten di atas." />
       ) : (
         <div className="space-y-3">
-          {/* ringkasan kondisi pasar watchlist */}
-          <div className="flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full bg-up/12 px-2.5 py-1 font-semibold text-up tabular-nums">
-              {counts.acc} ditimbun
-            </span>
-            <span className="rounded-full bg-down/12 px-2.5 py-1 font-semibold text-down tabular-nums">
-              {counts.dist} dibuang
-            </span>
-            <span className="text-muted rounded-full bg-white/5 px-2.5 py-1 font-semibold tabular-nums">
-              {counts.neu} seimbang
-            </span>
-          </div>
-
-          {/* filter */}
-          <div className="flex flex-wrap gap-1" role="group" aria-label="Filter">
-            {FILTERS.map((f) => (
-              <button
-                key={f.key}
-                type="button"
-                onClick={() => setFilter(f.key)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  filter === f.key
-                    ? "bg-[var(--accent)] text-white"
-                    : "text-muted hover:bg-white/[0.06]"
-                }`}
-                aria-pressed={filter === f.key}
-              >
-                {f.label}
-              </button>
-            ))}
+          {/* tab filter: jumlah per kategori langsung terlihat */}
+          <div
+            role="tablist"
+            aria-label="Filter watchlist"
+            className="flex flex-wrap gap-1 border-b border-[var(--border)]"
+          >
+            {FILTERS.map((f) => {
+              const active = filter === f.key;
+              const FilterIcon = f.icon;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setFilter(f.key)}
+                  className={`group -mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
+                    active
+                      ? "border-[var(--accent)] text-[var(--fg)]"
+                      : "border-transparent text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
+                  }`}
+                >
+                  <FilterIcon
+                    size={15}
+                    aria-hidden
+                    className={active ? "text-[var(--accent)]" : "opacity-70 group-hover:opacity-100"}
+                  />
+                  {f.label}
+                  <span
+                    className={`rounded-full px-1.5 text-[10px] font-semibold tabular-nums ${
+                      active ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-white/5 text-muted"
+                    }`}
+                  >
+                    {counts[f.key]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="max-h-80 space-y-1 overflow-y-auto pr-1">

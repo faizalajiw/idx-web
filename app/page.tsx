@@ -184,20 +184,20 @@ function HeroIndex() {
           ))}
         </div>
 
-        <p className="text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]">
+        <p className="text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] break-words">
           {trade && hasTrade ? (
             <>
-              <span>Sesi bursa {fmtDateStr(trade.date)}</span>
+              <span className="min-w-0">Sesi bursa {fmtDateStr(trade.date)}</span>
               {trade.non_regular_share_value != null && (
-                <span>· non-reguler {(trade.non_regular_share_value * 100).toFixed(1)}% value</span>
+                <span className="min-w-0">· non-reguler {(trade.non_regular_share_value * 100).toFixed(1)}% value</span>
               )}
               {trade.non_regular_share_volume != null && (
-                <span>· {(trade.non_regular_share_volume * 100).toFixed(1)}% volume</span>
+                <span className="min-w-0">· {(trade.non_regular_share_volume * 100).toFixed(1)}% volume</span>
               )}
-              <span>· angka final setelah pasar tutup</span>
+              <span className="min-w-0">· angka final setelah pasar tutup</span>
             </>
           ) : (
-            <span>
+            <span className="min-w-0">
               Pasar reguler/non-reguler: data sesi terbaru belum tersedia · angka final setelah pasar tutup
             </span>
           )}

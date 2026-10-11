@@ -454,7 +454,7 @@ function ScreenerView() {
       <div
         role="tablist"
         aria-label="Strategi screening"
-        className="no-scrollbar flex gap-1 overflow-x-auto border-b border-[var(--border)]"
+        className="flex flex-wrap gap-1 border-b border-[var(--border)]"
       >
         {PRESETS.map((p, i) => {
           const PresetIcon = p.icon;
