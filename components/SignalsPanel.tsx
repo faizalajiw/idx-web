@@ -7,6 +7,7 @@ import type { Signal } from "@/lib/types";
 import { Card } from "./Card";
 import { EmptyState, ErrorState, Skeleton } from "./States";
 import { LastUpdated } from "./LastUpdated";
+import { TickerLogo } from "./TickerLogo";
 
 type SignalFilter = "BUY" | "SELL" | "HOLD";
 
@@ -81,6 +82,7 @@ function SignalRow({ s, onSelect, selected }: { s: Signal; onSelect?: (c: string
     >
       <div className="flex items-center gap-2">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${s.trend_up ? "bg-[var(--up)]" : "bg-[var(--down)]"}`} />
+        <TickerLogo code={s.code} size={22} />
         <span className="text-sm font-semibold">{s.code}</span>
         <span className={`${badgeClass(s.signal)} shrink-0`}>{s.signal}</span>
         {s.div_adjusted && (

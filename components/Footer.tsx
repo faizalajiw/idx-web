@@ -1,8 +1,8 @@
 /** Footer global — ditempatkan di akhir .app-main (lihat app/layout.tsx). */
 export function Footer() {
   return (
-    <footer className="mt-6 border-t border-[var(--border)]">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-sm sm:flex-row sm:px-6">
+    <footer className="app-footer">
+      <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-2 px-4 py-2.5 text-sm sm:px-6">
         <p className="text-muted">
           <span className="font-semibold text-[var(--fg)]">Market Labs</span> · 2026
         </p>

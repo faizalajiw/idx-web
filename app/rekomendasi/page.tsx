@@ -8,6 +8,7 @@ import { Card } from "@/components/Card";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { TickerLogo } from "@/components/TickerLogo";
 import { fmtNum, fmtPct, fmtCompact, trendClass } from "@/lib/format";
 import type {
   RecommendationRow,
@@ -108,40 +109,43 @@ function LevelRow({ row }: { row: RecommendationRow }) {
 function CandidateCard({ row }: { row: RecommendationRow }) {
   const metrics = row.metrics;
   return (
-    <li className="card card-hover p-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className={GRADE_BADGE[row.grade] ?? "badge badge-hold"}>
-              Grade {row.grade}
-            </span>
-            <Link
-              href={`/keputusan/${row.code}`}
-              className="text-base font-semibold hover:underline"
-            >
-              {row.code}
-            </Link>
-            <span className="text-muted truncate text-xs">{row.name ?? "-"}</span>
+    <li className="card card-hover flex h-full flex-col p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <TickerLogo code={row.code} size={40} />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <Link
+                href={`/keputusan/${row.code}`}
+                className="text-base font-bold hover:underline"
+              >
+                {row.code}
+              </Link>
+              <span className={GRADE_BADGE[row.grade] ?? "badge badge-hold"}>
+                Grade {row.grade}
+              </span>
+            </div>
+            <p className="text-muted truncate text-xs">{row.name ?? "-"}</p>
           </div>
-          <p className="text-muted mt-1 text-[11px] tabular-nums">
-            {row.setup ?? "-"} · horizon {row.horizon_days ?? "-"} hari bursa
-            {row.confidence ? ` · keyakinan ${row.confidence}` : ""}
-            {metrics?.rsi !== null && metrics?.rsi !== undefined
-              ? ` · RSI ${metrics.rsi.toFixed(0)}`
-              : ""}
-            {metrics?.mom_20d !== null && metrics?.mom_20d !== undefined
-              ? ` · mom20 ${fmtPct(metrics.mom_20d)}`
-              : ""}
-            {metrics?.value !== null && metrics?.value !== undefined
-              ? ` · nilai ${fmtCompact(metrics.value)}`
-              : ""}
-          </p>
         </div>
-        <div className="text-right">
+        <div className="shrink-0 text-right">
           <p className="text-2xl font-bold leading-none tabular-nums">{row.score.toFixed(0)}</p>
           <p className="text-muted text-[10px] uppercase tracking-wide">skor</p>
         </div>
       </div>
+      <p className="text-muted mt-2 text-[11px] tabular-nums">
+        {row.setup ?? "-"} · horizon {row.horizon_days ?? "-"} hari bursa
+        {row.confidence ? ` · keyakinan ${row.confidence}` : ""}
+        {metrics?.rsi !== null && metrics?.rsi !== undefined
+          ? ` · RSI ${metrics.rsi.toFixed(0)}`
+          : ""}
+        {metrics?.mom_20d !== null && metrics?.mom_20d !== undefined
+          ? ` · mom20 ${fmtPct(metrics.mom_20d)}`
+          : ""}
+        {metrics?.value !== null && metrics?.value !== undefined
+          ? ` · nilai ${fmtCompact(metrics.value)}`
+          : ""}
+      </p>
 
       <div className="mt-3">
         <LevelRow row={row} />
@@ -214,7 +218,7 @@ function TrackRecord({ track }: { track: RecommendationTrack }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-muted text-[11px]">Horizon:</span>
+        <span className="text-muted text-[11px]">Lihat hasil setelah:</span>
         {track.horizons.map((h) => (
           <button
             key={h}
@@ -233,69 +237,50 @@ function TrackRecord({ track }: { track: RecommendationTrack }) {
           {track.candidates} kandidat · {track.first_date} → {track.last_date}
         </span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th className="text-left">Grade</th>
-              <th className="text-right">Sampel</th>
-              <th className="text-right">Hit rate</th>
-              <th className="text-right">Mean fwd</th>
-              <th className="text-right">Abnormal</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.grade}>
-                <td>
-                  <span className={GRADE_BADGE[r.grade] ?? "badge badge-hold"}>
-                    {r.grade}
-                  </span>
-                </td>
-                <td className="text-right tabular-nums">{r.n}</td>
-                <td className="text-right tabular-nums">
-                  {r.hit_rate === null ? "-" : `${(r.hit_rate * 100).toFixed(0)}%`}
-                </td>
-                <td className={`text-right tabular-nums ${trendClass(r.mean_fwd)}`}>
-                  {r.mean_fwd === null ? "-" : `${(r.mean_fwd * 100).toFixed(2)}%`}
-                </td>
-                <td className={`text-right tabular-nums ${trendClass(r.mean_abnormal)}`}>
-                  {r.mean_abnormal === null
-                    ? "-"
-                    : `${(r.mean_abnormal * 100).toFixed(2)}%`}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {rows.map((r) => {
+          const hit = r.hit_rate === null ? null : Math.round(r.hit_rate * 100);
+          const beat = r.mean_abnormal === null ? null : r.mean_abnormal >= 0;
+          return (
+            <div key={r.grade} className="card p-4">
+              <div className="flex items-center justify-between">
+                <span className={GRADE_BADGE[r.grade] ?? "badge badge-hold"}>Grade {r.grade}</span>
+                <span className="text-muted text-[11px] tabular-nums">{r.n} sampel</span>
+              </div>
+              <p className="mt-3 text-[11px] text-muted">Dari 100 kandidat, berapa yang naik?</p>
+              <p className="text-3xl font-bold tabular-nums">
+                {hit === null ? "-" : `${hit}`}
+                <span className="text-base font-semibold text-muted"> / 100</span>
+              </p>
+              {hit !== null && (
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5" aria-hidden>
+                  <div className="h-full rounded-full bg-up" style={{ width: `${hit}%` }} />
+                </div>
+              )}
+              <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <p className="text-muted">Rata-rata naik/turun</p>
+                  <p className={`font-semibold tabular-nums ${trendClass(r.mean_fwd)}`}>
+                    {r.mean_fwd === null ? "-" : `${(r.mean_fwd * 100).toFixed(2)}%`}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted">Dibanding pasar</p>
+                  <p className={`font-semibold tabular-nums ${trendClass(r.mean_abnormal)}`}>
+                    {r.mean_abnormal === null
+                      ? "-"
+                      : `${beat ? "Lebih baik" : "Lebih buruk"} ${(r.mean_abnormal * 100).toFixed(2)}%`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-      {track.recent.length > 0 && (
-        <div>
-          <p className="text-muted mb-1.5 text-[11px] font-semibold uppercase tracking-wide">
-            Kandidat terbaru (return sudah terealisasi)
-          </p>
-          <ul className="text-[11px]">
-            {track.recent.slice(0, 6).map((r) => (
-              <li
-                key={`${r.code}-${r.date}`}
-                className="flex items-center justify-between border-b border-[var(--border)] py-1 last:border-0 tabular-nums"
-              >
-                <span>
-                  <span className={GRADE_BADGE[r.grade] ?? "badge badge-hold"}>{r.grade}</span>{" "}
-                  <span className="font-medium">{r.code}</span>{" "}
-                  <span className="text-muted">{r.date}</span>
-                </span>
-                <span className="flex gap-3">
-                  <span className={trendClass(r.fwd_5)}>h5 {fmtPct((r.fwd_5 ?? 0) * 100)}</span>
-                  <span className={trendClass(r.fwd_10)}>
-                    h10 {fmtPct((r.fwd_10 ?? 0) * 100)}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <p className="text-muted text-[11px] leading-snug">
+        Cara baca: &quot;Dibanding pasar&quot; membandingkan kandidat dengan rata-rata seluruh saham
+        pada periode yang sama. Grade A = peringkat teratas hari itu, bukan jaminan naik.
+      </p>
     </div>
   );
 }
@@ -384,7 +369,7 @@ export default function RekomendasiPage() {
                 }
               />
             ) : (
-              <ul className="space-y-3">
+              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {data.rows.map((row) => (
                   <CandidateCard key={row.code} row={row} />
                 ))}
@@ -398,7 +383,7 @@ export default function RekomendasiPage() {
                 <Crosshair size={15} aria-hidden /> Track Record Kandidat
               </>
             }
-            subtitle="Seberapa sering kandidat ini benar-benar berbuah — diukur, bukan diklaim"
+            subtitle="Bukti: apakah kandidat di masa lalu benar-benar naik"
             info="Setiap kandidat dicatat lalu dinilai di close T+1 (disiplin backtest), return diukur per horizon lalu dibandingkan return pasar equal-weight (abnormal). Grade = peringkat relatif di dalam pool hari itu (A 2% · B 10% · C 25% teratas), bukan probabilitas; kalau tabel ini tidak menunjukkan grade tinggi selalu lebih baik, itu memang temuan apa adanya — bukan alasan menyembunyikannya. Sampel kecil dibaca sekilas saja."
           >
             {track ? <TrackRecord track={track} /> : <Skeleton className="h-40 w-full" />}

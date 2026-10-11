@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MarketOverview } from "@/components/MarketOverview";
 import { MarketNarrationCard } from "@/components/MarketNarration";
 import { TopLeadersPanel } from "@/components/TopLeadersPanel";
@@ -10,41 +10,95 @@ import { TechnicalChart } from "@/components/TechnicalChart";
 import { MarketRegimeCard } from "@/components/MarketRegimeCard";
 import { useMarketOverview, useMarketTradeSummary } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact, fmtDateStr } from "@/lib/format";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  BarChart2,
+  Wallet,
+  Building2,
+  Activity,
+  Landmark,
+  Handshake,
+  type LucideIcon,
+} from "lucide-react";
 import { LastUpdated } from "@/components/LastUpdated";
 import { InfoHint } from "@/components/InfoHint";
-import type { MarketTradeSummary } from "@/lib/types";
 
-/** Kotak segmen pasar (reguler / non-reguler) — jadi item grid di hero IHSG. */
-function SegmentBox({
+/** Satu kotak statistik di hero IHSG: ikon berwarna, label kecil, nilai utama, sub-nilai opsional. */
+function StatTile({
   label,
-  seg,
+  value,
+  sub,
   warn = false,
+  title,
+  icon: Icon,
+  color,
 }: {
   label: string;
-  seg?: MarketTradeSummary["regular"];
+  value: string;
+  sub?: string;
   warn?: boolean;
+  title?: string;
+  icon: LucideIcon;
+  color: string;
 }) {
   return (
-    <div
-      className="stat-box px-4 py-3 text-center sm:text-left"
-      title="1 lot = 100 lembar"
-    >
-      <p
-        className={`text-[10px] font-medium tracking-widest uppercase ${warn ? "text-warn" : "text-muted"}`}
+    <div className="stat-box flex items-center gap-3 px-3.5 py-3" title={title}>
+      <span
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+        style={{ background: `color-mix(in srgb, ${color} 16%, transparent)`, color }}
       >
-        {label}
-      </p>
-      <p className="mt-1 text-base font-semibold tabular-nums sm:text-lg">
-        {seg?.value != null ? `Rp ${fmtCompact(seg.value)}` : "-"}
-      </p>
-      <p className="text-muted mt-0.5 text-[11px] tabular-nums">
-        {seg?.volume_lot != null ? `${fmtCompact(seg.volume_lot)} lot` : "-"}
-      </p>
+        <Icon size={18} aria-hidden />
+      </span>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <p className={`truncate text-[11px] font-medium ${warn ? "text-warn" : "text-muted"}`}>
+          {label}
+        </p>
+        <p className="text-base font-semibold tabular-nums sm:text-lg">{value}</p>
+        {sub && <p className="text-muted text-[11px] tabular-nums">{sub}</p>}
+      </div>
     </div>
   );
 }
 
+
+/** Angka IHSG: count-up halus saat nilai berubah, hormati reduced-motion. */
+function IndexValue({ value }: { value: number | null }) {
+  const [display, setDisplay] = useState<number | null>(value);
+  const fromRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (value == null) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const from = fromRef.current ?? value;
+    fromRef.current = value;
+    if (reduce || from === value) {
+      setDisplay(value);
+      return;
+    }
+    const start = performance.now();
+    const duration = 700;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(from + (value - from) * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  return (
+    <p
+      key={value ?? "none"}
+      className="index-value text-4xl font-bold leading-none tracking-tight tabular-nums sm:text-5xl"
+    >
+      {fmtNum(display, 2)}
+    </p>
+  );
+}
 
 function HeroIndex() {
   const { data } = useMarketOverview();
@@ -64,72 +118,70 @@ function HeroIndex() {
 
   const stocks = trade?.stock_count || data?.totals.stock_count || 0;
 
-  const stats = [
+  const volLot = trade?.total.volume_lot ?? null;
+  const totalValue =
+    trade && hasTrade ? trade.total.value : (data?.totals.total_value ?? null);
+
+  const tiles = [
     {
       label: "Volume",
-      value: fmtCompact(trade?.total.volume_lot ?? null),
-      prefix: "",
-      suffix: trade?.total.volume_lot != null ? " lot" : "",
+      value: volLot != null ? `${fmtCompact(volLot)} lot` : "-",
+      icon: Activity,
+      color: "#38bdf8",
     },
     {
-      label: "Value",
-      value: fmtCompact(trade && hasTrade ? trade.total.value : (data?.totals.total_value ?? null)),
-      prefix: "Rp ",
-      suffix: "",
+      label: "Nilai Transaksi",
+      value: totalValue != null ? `Rp ${fmtCompact(totalValue)}` : "-",
+      icon: Wallet,
+      color: "#4ade80",
     },
-    { label: "Emiten Aktif", value: fmtNum(stocks), prefix: "", suffix: "" },
+    { label: "Emiten Aktif", value: fmtNum(stocks), icon: Building2, color: "#c4b5fd" },
+  ];
+
+  const segments = [
+    { label: "Pasar Reguler", seg: trade?.regular, warn: false, icon: Landmark, color: "#fbbf24" },
+    { label: "Pasar Non-Reguler", seg: trade?.non_regular, warn: true, icon: Handshake, color: "#fb923c" },
   ];
 
   return (
-    <div className="card card-hover fade-up flex h-full flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <div className="flex items-center gap-2">
-          <p className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
+    <div className="card card-hover fade-up flex h-full flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+      <div className="flex min-w-0 flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-muted text-[11px] font-semibold tracking-[0.16em] uppercase">
             IHSG · Composite
           </p>
           <span className={`badge tabular-nums ${badgeTone}`}>
             <DirIcon size={12} className="mr-1" aria-hidden />
             {fmtNum(chg, 2)} ({fmtPct(pct)})
           </span>
-          <LastUpdated
-            sessionDate={data?.index?.captured_at}
-            updatedAt={data?.index?.captured_at}
-          />
         </div>
-        <p className="mt-1 text-4xl font-bold tracking-tight tabular-nums sm:text-5xl">
-          {fmtNum(idx?.current ?? idx?.close, 2)}
-        </p>
+        <IndexValue value={idx?.current ?? idx?.close ?? null} />
+        <LastUpdated
+          sessionDate={data?.index?.captured_at}
+          updatedAt={data?.index?.captured_at}
+        />
       </div>
 
-      <div className="flex min-w-0 flex-col gap-2.5">
-        {/* Satu grid: Volume, Value, Emiten Aktif + rincian reguler/non-reguler */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="stat-box px-4 py-3 text-center sm:text-left"
-            >
-              <p className="text-muted text-[10px] font-medium tracking-widest uppercase">
-                {s.label}
-              </p>
-              <p className="mt-1 text-base font-semibold tabular-nums sm:text-lg">
-                {s.prefix}
-                {s.value}
-                {s.suffix}
-              </p>
-            </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+          {tiles.map((t) => (
+            <StatTile key={t.label} label={t.label} value={t.value} icon={t.icon} color={t.color} />
           ))}
+        </div>
 
-          <SegmentBox
-            label="Pasar Reguler"
-            seg={trade?.regular}
-            warn={false}
-          />
-          <SegmentBox
-            label="Pasar Non-Reguler"
-            seg={trade?.non_regular}
-            warn
-          />
+        <div className="grid grid-cols-2 gap-2.5">
+          {segments.map((s) => (
+            <StatTile
+              key={s.label}
+              label={s.label}
+              warn={s.warn}
+              icon={s.icon}
+              color={s.color}
+              title="1 lot = 100 lembar"
+              value={s.seg?.value != null ? `Rp ${fmtCompact(s.seg.value)}` : "-"}
+              sub={s.seg?.volume_lot != null ? `${fmtCompact(s.seg.volume_lot)} lot` : undefined}
+            />
+          ))}
         </div>
 
         <p className="text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]">

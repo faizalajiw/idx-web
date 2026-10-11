@@ -319,6 +319,15 @@ body {
 }
 .fade-up { animation: fadeUp 0.4s ease both; }
 
+@keyframes indexGlow {
+  from { opacity: 0.55; text-shadow: 0 0 0 transparent; }
+  to { opacity: 1; text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent); }
+}
+.index-value { animation: indexGlow 0.9s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .index-value { animation: none; }
+}
+
 @keyframes pulseDot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
@@ -367,6 +376,7 @@ body {
 
 .app-main {
   padding-left: var(--rail-w);
+  padding-bottom: 3.25rem; /* ruang untuk .app-footer yang fixed */
   transition: padding-left 0.2s ease;
 }
 
@@ -375,11 +385,25 @@ body {
   transition: width 0.2s ease;
 }
 
+/* Footer fixed di bawah viewport; left mengikuti lebar sidebar */
+.app-footer {
+  position: fixed;
+  left: var(--rail-w);
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  transition: left 0.2s ease;
+}
+
 @media (min-width: 1024px) {
   .app-main { padding-left: 15rem; }
   html.sidebar-collapsed .app-main { padding-left: var(--rail-w); }
   .app-sidebar { width: 15rem; }
   html.sidebar-collapsed .app-sidebar { width: var(--rail-w); }
+  .app-footer { left: 15rem; }
+  html.sidebar-collapsed .app-footer { left: var(--rail-w); }
 }
 
 /* Header: brand + tombol toggle (toggle hanya relevan di desktop) */
