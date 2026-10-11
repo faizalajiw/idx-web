@@ -6,7 +6,6 @@ import { Search } from "lucide-react";
 import { useWatchlist } from "@/lib/hooks";
 import { ForeignFlowCard } from "@/components/ForeignFlowCard";
 import { FlowTimelineCard } from "@/components/FlowTimelineCard";
-import { BrokerFlowCard } from "@/components/BrokerFlowCard";
 import { EmptyState } from "@/components/States";
 
 /** Pemilih emiten: input kode + saran cepat dari watchlist. */
@@ -78,9 +77,9 @@ function StockPicker({ value }: { value: string | null }) {
 }
 
 /**
- * Isi halaman Aliran Dana Emiten: arah asing harian, timeline skor akumulasi,
- * dan komposisi kategori broker — semua untuk satu emiten. `code` null =
- * tampil pemilih dengan empty state (deep-link /flow).
+ * Isi halaman Aliran Dana Emiten: arah asing harian dan timeline skor
+ * akumulasi — keduanya untuk satu emiten. `code` null = tampil pemilih
+ * dengan empty state (deep-link /flow).
  */
 export function FlowWorkspace({ code }: { code: string | null }) {
   return (
@@ -90,10 +89,9 @@ export function FlowWorkspace({ code }: { code: string | null }) {
         <>
           <ForeignFlowCard code={code} />
           <FlowTimelineCard code={code} />
-          <BrokerFlowCard compact />
         </>
       ) : (
-        <EmptyState message="Masukkan kode emiten di atas untuk melihat arus asing, timeline aliran dana, dan komposisi broker-nya." />
+        <EmptyState message="Masukkan kode emiten di atas untuk melihat arus asing dan timeline aliran dana." />
       )}
     </div>
   );

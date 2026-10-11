@@ -66,7 +66,7 @@ flowchart LR
 |---|---|---|
 | `/stock/[code]` | Dinamis | Semua card analitik satu emiten (SmartMoneyBanner, chart, signals, ownership, foreign flow, event study, history) |
 | `/keputusan/[code]` | Dinamis | Workspace keputusan per emiten (verdict, jejak asing, level pembatalan, base rate) |
-| `/flow/[code]` | Dinamis | Workspace aliran dana per emiten (ForeignFlowCard, FlowTimelineCard, BrokerFlowCard) |
+| `/flow/[code]` | Dinamis | Workspace aliran dana per emiten (ForeignFlowCard, FlowTimelineCard) |
 | `/radar/[code]` | Dinamis | SmartMoneyBanner + track record + back-link |
 | (semua) `error` | Status | [`app/error.tsx`](../../idx-web/app/error.tsx): tampilan galat dengan tombol coba lagi dan `ThemeToggle` |
 | (semua) `loading` | Status | [`app/loading.tsx`](../../idx-web/app/loading.tsx): skeleton saat route dimuat |

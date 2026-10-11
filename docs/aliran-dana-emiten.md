@@ -1,14 +1,14 @@
 # Aliran Dana Emiten (`/flow` + `/flow/[code]`)
 
 ## 1. Ringkasan Fungsi
-Satu halaman untuk membaca aliran dana satu emiten: arah asing harian, timeline skor akumulasi, dan komposisi broker. Pengguna: analis yang sudah memilih emiten dan ingin melihat jejak aliran. Tanpa kode, halaman menampilkan pemilih dan empty state.
+Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeline skor akumulasi. Pengguna: analis yang sudah memilih emiten dan ingin melihat jejak aliran. Tanpa kode, halaman menampilkan pemilih dan empty state.
 
 ## 2. Route & Berkas
 - URL indeks: `/flow` → [`app/flow/page.tsx`](../../idx-web/app/flow/page.tsx) (tanpa emiten)
 - URL detail: `/flow/[code]` → `app/flow/[code]/page.tsx` [BELUM TERVERIFIKASI nama berkas]
 - Workspace: [`app/flow/FlowWorkspace.tsx`](../../idx-web/app/flow/FlowWorkspace.tsx)
-- Komponen: `ForeignFlowCard`, `FlowTimelineCard`, `BrokerFlowCard` ([components/](../../idx-web/components/))
-- Hook: `useWatchlist()` (untuk saran cepat, [hooks.ts](../../idx-web/lib/hooks.ts)); `useStockForeignFlow(code, 30, 10)` ([hooks.ts:129](../../idx-web/lib/hooks.ts)); `useStockBrokerActivity(code, lookback)` ([hooks.ts:227](../../idx-web/lib/hooks.ts), 300 detik); `useBrokerFlow(20, 5)` ([hooks.ts:117](../../idx-web/lib/hooks.ts))
+- Komponen: `ForeignFlowCard`, `FlowTimelineCard` ([components/](../../idx-web/components/))
+- Hook: `useWatchlist()` (untuk saran cepat, [hooks.ts](../../idx-web/lib/hooks.ts)); `useStockForeignFlow(code, 30, 10)` ([hooks.ts:129](../../idx-web/lib/hooks.ts)); `useStockBrokerActivity(code, lookback)` ([hooks.ts:227](../../idx-web/lib/hooks.ts), 300 detik)
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -48,23 +48,13 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian, timeline 
 | Interaksi | Tooltip per titik: tanggal, skor, median |
 | Empty/Loading/Error | Pesan: butuh ≥ 2 sesi berskor dan faktor tervalidasi IC |
 
-### Komposisi Broker (BrokerFlowCard)
-| Field | Isi |
-|---|---|
-| Nama card | Komposisi Broker |
-| Komponen | [BrokerFlowCard.tsx](../../idx-web/components/BrokerFlowCard.tsx) (`compact`) |
-| Fungsi | Porsi nilai transaksi per kategori broker: asing, lokal, BUMN |
-| Sumber data | `GET /api/broker-flow?days=20&top_n=5` ([app.py:221](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_broker_flow` ([analytics.py:2055](../../idx-scraper/src/idx_scraper/api/analytics.py)); tabel `research.broker_daily` |
-| Rumus/Logika | Nilai per kategori dibagi total; kategori dari map kurasi `idx_scraper.broker_flow` |
-| Periode/Window | 20 sesi, top 5 |
-| Interaksi | Toggle peta broker (`showMap`) |
-| Empty/Loading/Error | Pesan: isi lewat `idx serve` (job 16:30) atau `python -m scripts.backfill_broker_eod` |
+Komposisi broker (asing/lokal/BUMN) tidak lagi ditampilkan di halaman ini karena bersifat pasar, bukan per emiten. Lihat [Aktivitas Broker](aktivitas-broker.md).
 
 ## 4. Data Flow (end-to-end)
 ```
-Ingest EOD (foreign_flow, broker_daily) → Postgres
-  → analytics.get_stock_foreign_flow / get_stock_broker_activity / get_broker_flow
-  → GET /api/stocks/{code}/... → SWR → ForeignFlowCard, FlowTimelineCard, BrokerFlowCard
+Ingest EOD (foreign_flow, broker_activity) → Postgres
+  → analytics.get_stock_foreign_flow / get_stock_broker_activity
+  → GET /api/stocks/{code}/... → SWR → ForeignFlowCard, FlowTimelineCard
 ```
 
 ## 5. Cara Pengambilan / Update Data
@@ -81,5 +71,5 @@ Ingest EOD (foreign_flow, broker_daily) → Postgres
 
 ## 7. Catatan Batasan & Edge Case
 - Timeline butuh minimal 2 sesi berskor dan faktor tervalidasi; bila tidak, kartu kosong.
-- Komposisi broker bersifat pasar, bukan per emiten.
+- Komposisi broker tidak ditampilkan di halaman ini (dihapus karena membingungkan; bersifat pasar, bukan per emiten).
 - Data EOD: tidak real-time.
