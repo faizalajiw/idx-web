@@ -68,6 +68,7 @@ flowchart LR
 | `/keputusan/[code]` | Dinamis | Workspace keputusan per emiten (verdict, jejak asing, level pembatalan, base rate) |
 | `/flow/[code]` | Dinamis | Workspace aliran dana per emiten (ForeignFlowCard, FlowTimelineCard) |
 | `/radar/[code]` | Dinamis | SmartMoneyBanner + track record + back-link |
+| `/dossier/[code]` | Dinamis | Dossier analisis per emiten: 7 bagian dengan tanggal sesi + export PDF ([dossier.md](./dossier.md)) |
 | (semua) `error` | Status | [`app/error.tsx`](../../idx-web/app/error.tsx): tampilan galat dengan tombol coba lagi dan `ThemeToggle` |
 | (semua) `loading` | Status | [`app/loading.tsx`](../../idx-web/app/loading.tsx): skeleton saat route dimuat |
 | (semua) `not-found` | Status | [`app/not-found.tsx`](../../idx-web/app/not-found.tsx): halaman 404 dengan tautan kembali |
@@ -204,6 +205,8 @@ sequenceDiagram
 | Sentimen | `/api/sentiment` | `analytics.get_sentiment` | `research.latest_pit`, `orderbook` | on-demand |
 | Aktivitas Broker | `/api/broker-activity` | `analytics.get_broker_activity` | `research.broker_daily` | EOD refresh |
 | Aktivitas Broker | `/api/stocks/{code}/brokers` | `services.get_broker_concentration` | `research.broker_daily` | EOD refresh |
+| Dossier | `/api/stocks/{code}/dossier` | `dossier.build_dossier` | `research.latest_pit` + sumber analitik di atas | on-demand (sumber sudah ber-cache) |
+| Dossier | `/api/stocks/{code}/dossier.pdf` | `dossier_pdf.render_dossier_pdf` | sama dengan dossier | on-demand |
 | Sektor | `/api/sectors` | `analytics.get_sector_analysis` | `research.latest_pit` | on-demand |
 | Sektor | `/api/sectors/rotation` | `analytics.get_sector_rotation` | `research.latest_pit` | on-demand |
 | (semua) | `/api/cache/clear` | `analytics.clear_research_cache` | — | dipanggil job refresh |

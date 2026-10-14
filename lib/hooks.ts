@@ -11,6 +11,7 @@ import {
   deleteAlert,
 } from "./api";
 import type {
+  StockDossier,
   AlertRuleCreate,
   AlertStatus,
   BacktestConfig,
@@ -124,6 +125,15 @@ export function useStockForeignFlow(code: string, days = 30, peerDays = 10) {
     fetcher,
     { refreshInterval: 300_000 },
   );
+}
+
+/**
+ * Dossier satu emiten: satu fetch, setiap bagian membawa tanggal sesinya.
+ * Dibaca sekali per halaman; refresh 5 menit cukup (data EOD harian).
+ */
+export function useStockDossier(code: string | null) {
+  const key = code ? `/api/stocks/${encodeURIComponent(code)}/dossier` : null;
+  return useSWR<StockDossier>(key, fetcher, { refreshInterval: 300_000 });
 }
 
 /**

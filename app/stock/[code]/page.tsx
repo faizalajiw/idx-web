@@ -63,6 +63,9 @@ export default function StockDetailPage() {
         </div>
 
         <nav className="flex shrink-0 items-center gap-2" aria-label="Navigasi emiten">
+          <Link href={`/dossier/${code}`} className={NAV_BTN} title="Buka dossier analisis">
+            Dossier
+          </Link>
           {prev ? (
             <Link href={`/stock/${prev}`} className={NAV_BTN} title={`Ke ${prev}`}>
               <span aria-hidden>←</span>&nbsp;{prev}

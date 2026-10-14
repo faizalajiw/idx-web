@@ -472,6 +472,34 @@ export interface RegimeHistory {
   generated_at?: string | null;
 }
 
+// ------------------------------------------------------------ dossier emiten
+
+/** Satu bagian dossier. Tanggal & stale dihitung backend; data bagian bebas bentuk. */
+export interface DossierSection<T = Record<string, unknown>> {
+  data: T | null;
+  session_date: string | null;
+  stale: boolean;
+  error: string | null;
+}
+
+/** Sumber: /api/stocks/{code}/dossier. Tidak ada skor baru di sini. */
+export interface StockDossier {
+  code: string;
+  latest_session: string | null;
+  generated_at: string;
+  verdict: Record<string, unknown> | null;
+  sections: {
+    profil: DossierSection;
+    valuasi: DossierSection;
+    faktor: DossierSection;
+    arus_asing: DossierSection;
+    aktivitas_broker: DossierSection;
+    sentimen: DossierSection;
+    catatan_risiko: DossierSection;
+  };
+  stale_sections: string[];
+}
+
 // --------------------------------------------------------- sentimen (flow & buku)
 /** Satu emiten di daftar sorotan sentimen (akumulasi / distribusi). */
 export interface SentimentItem {

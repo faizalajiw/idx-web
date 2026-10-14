@@ -12,7 +12,17 @@ Ringkasan semua perubahan pada sesi ini: halaman, dokumentasi, data, dan operasi
 - **Tidak berubah**: hook `useSentiment`, tipe `SentimentResponse`, endpoint backend.
 - **Verifikasi**: `tsc --noEmit` lolos. Belum ada verifikasi visual di browser (mode gelap/terang, mobile).
 
-## 2. Dokumentasi
+## 2. Dossier Emiten (`/dossier/[code]`)
+
+- **Baru**: halaman dossier per emiten dengan 7 bagian (Profil, Valuasi, Faktor & Verdict, Arus Asing, Aktivitas Broker, Sentimen, Catatan Risiko). Setiap bagian menampilkan tanggal sesinya dan penanda stale.
+- **Backend**: `api/dossier.py` (gabungan, tanpa skor baru), `api/dossier_pdf.py` (PDF ReportLab). Endpoint `GET /api/stocks/{code}/dossier` dan `/dossier.pdf`.
+- **Dependensi baru**: `reportlab>=4.2` di grup `api` (`pyproject.toml`).
+- **Tautan masuk**: tombol Dossier di `/stock/[code]` dan di baris Screener.
+- **Perbaikan selama verifikasi**: tanggal sentimen memakai tanggal buku order (8 Okt), bukan sesi 9 Okt. Objek bersarang (regime, market gauge, invalidasi) sebelumnya terbuang dan sekarang ditampilkan.
+- **Verifikasi**: 32 tes pytest lolos, ruff lolos, `tsc --noEmit` lolos. Endpoint dan PDF diuji di `:8000` (PDF 200, `application/pdf`). Halaman diuji di browser: judul, 7 bagian, tanpa error console.
+- Dokumen: [dossier.md](dossier.md).
+
+## 2b. Dokumentasi
 
 - `docs/sentimen.md`: ditulis ulang sesuai layout baru. Bobot dan ambang dicek ulang terhadap `research/sentiment.py`. Typo sudah diperbaiki.
 - `docs/perubahan-2026-10-12.md`: berkas ini.

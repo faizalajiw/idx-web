@@ -672,15 +672,24 @@ function ScreenerView() {
                 {sorted.map((r) => (
                   <tr key={r.code}>
                     <td>
-                      <Link href={`/stock/${r.code}`} className="flex items-center gap-2.5 hover:underline">
-                        <TickerLogo code={r.code} size={26} />
-                        <span className="font-semibold">{r.code}</span>
-                        {r.name && (
-                          <span className="text-muted hidden text-xs md:inline">
-                            {r.name.length > 24 ? `${r.name.slice(0, 24)}…` : r.name}
-                          </span>
-                        )}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/stock/${r.code}`} className="flex items-center gap-2.5 hover:underline">
+                          <TickerLogo code={r.code} size={26} />
+                          <span className="font-semibold">{r.code}</span>
+                          {r.name && (
+                            <span className="text-muted hidden text-xs md:inline">
+                              {r.name.length > 24 ? `${r.name.slice(0, 24)}…` : r.name}
+                            </span>
+                          )}
+                        </Link>
+                        <Link
+                          href={`/dossier/${r.code}`}
+                          className="text-muted shrink-0 rounded border border-[var(--border)] px-1.5 py-0.5 text-[10px] hover:border-[var(--border-strong)] hover:text-[var(--fg)]"
+                          title={`Dossier analisis ${r.code}`}
+                        >
+                          Dossier
+                        </Link>
+                      </div>
                     </td>
                     {shownColumns.map((c) => (
                       <td key={c.key} className={c.cellClass?.(r) ?? "text-right tabular-nums"} title={c.title}>
