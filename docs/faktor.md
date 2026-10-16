@@ -107,4 +107,4 @@ Harga EOD (Postgres) → research.ic (build panel, IC harian)
 - Faktor yang gagal ambang tetap tampil untuk transparansi tapi tidak diberi bobot.
 - Data kurang dari histori minimum menghasilkan IC tidak stabil; lihat `n_days`.
 - Bila job `daily_ic` gagal, halaman menampilkan run terakhir yang berhasil (tanggal `run_date` tidak berubah).
-- [BELUM TERVERIFIKASI] Nama tabel `research.factor_ic_history` vs skema SQL di `sql/`; cocokkan sebelum dijadikan acuan migrasi.
+- **Terverifikasi 16 Okt 2026**: `sql/factor_ic_history.sql` memuat `research.factor_ic_history` dengan kunci `(run_date, factor, horizon)`; berkasnya dimuat bersih ke DB, jadi aman dijadikan acuan migrasi.
