@@ -42,7 +42,7 @@ Ingest EOD asing (Postgres: foreign_flow, latest_pit.foreign_net)
 ```
 
 ## 5. Cara Pengambilan / Update Data
-- **On-demand** dengan cache in-process; data dasar diisi job pipeline `refresh_s2` (16:05 WIB) dan `refresh_s2_late` (16:20 WIB).
+- **On-demand** dengan cache in-process; data dasar diisi job pipeline `refresh_s2` (16:10 WIB).
 - **Refresh UI**: SWR 30 detik; data tetap EOD sehingga tidak berubah intraday.
 - **Reset cache**: `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)).
 - **Idempotensi**: net dihitung ulang dari data tersimpan; deterministik.

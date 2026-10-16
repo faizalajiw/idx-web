@@ -220,7 +220,7 @@ export function BrokerFlowCard({
       ) : isLoading || !data ? (
         <Skeleton className="h-44 w-full" />
       ) : data.n_brokers === 0 || data.total_value === null ? (
-        <EmptyState message="Belum ada data broker. Isi lewat `idx serve` (job 16:30 WIB) atau `python -m scripts.backfill_broker_eod`." />
+        <EmptyState message="Belum ada data broker. Isi lewat `idx serve` (job refresh_s2 16:10 WIB) atau `python -m scripts.backfill_broker_eod`." />
       ) : (
         <div className="space-y-4">
           <ShareBar

@@ -8,7 +8,7 @@ Prioritas: pasar Indonesia lebih dulu, lalu makro global, lalu crypto dan emas s
 
 | Sumber | Fokus | Catatan |
 |---|---|---|
-| idx.co.id | Data resmi BEI: pengumuman, laporan keuangan | Sumber primer. Diakses lewat browser (Cloudflare) |
+| idx.co.id | Data resmi BEI: pengumuman, laporan keuangan | Sumber primer. Diakses lewat HTTP murni (curl_cffi); Chrome hanya cadangan bila Cloudflare menolak |
 | cnbcindonesia.com | Berita market dan analisis institusional | |
 | bisnis.com | Berita pasar modal domestik | |
 | kontan.co.id | Berita pasar modal domestik | |

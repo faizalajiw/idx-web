@@ -72,7 +72,7 @@ IDX EOD → ingest → Postgres (prices_pit, stock_summary_daily/foreign, orderb
 
 ## 5. Cara Pengambilan / Update Data
 - **Perhitungan**: on-demand saat request (filter diterapkan di backend lalu di klien).
-- **Job/scheduler**: tidak ada job khusus screener; bergantung pada job refresh EOD (`refresh_s2` 16:05 WIB, dll) yang mengisi `prices_pit` dan capture order-book saat jam bursa.
+- **Job/scheduler**: tidak ada job khusus screener; bergantung pada job refresh EOD (`refresh_s2` 16:10 WIB, dll) yang mengisi `prices_pit` dan capture order-book saat jam bursa.
 - **Refresh UI**: SWR (hook screener) 30 detik.
 - **Idempotensi**: sumber data bitemporal (`prices_pit`) → hasil deterministik per as-of.
 - **Fallback**: order-book kosong → kolom OB kosong; skor broker kosong sampai run IC ada.

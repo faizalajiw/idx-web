@@ -52,7 +52,7 @@ flowchart LR
 | Analisis | `/ruang-keputusan` | Ruang Keputusan | Skor keputusan + konteks | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
 | Analisis | `/jejak-sinyal` | Jejak Sinyal | Track record sinyal vs pasar | 4 | `research.signal_log` | job `idx signal-log` |
 | Analisis | `/backtest` | Backtest | Simulasi point-in-time | 8 | `research.prices_pit` | on-demand (POST, tanpa tulis DB) |
-| Analisis | `/faktor` | Faktor & Kalibrasi | Bobot IC, regime, registry faktor | 6 | `research.factor_ic_history`, `regime_daily` | job `idx ic` (harian 06:30) |
+| Analisis | `/faktor` | Faktor & Kalibrasi | Bobot IC, regime, registry faktor | 6 | `research.factor_ic_history`, `regime_daily` | job `idx ic` (harian 16:50) |
 | Flow | `/radar` | Radar Smart Money | Akumulasi/distribusi asing | 6 | `research.latest_pit` | on-demand + SWR 300s |
 | Flow | `/foreign` | Foreign Flow | Arus asing harian + top | 2 | `research.latest_pit` | on-demand + SWR 30s |
 | Flow | `/flow` | Aliran Dana Emiten | Timeline aliran per emiten | 4 | `research.broker_daily` | on-demand + SWR 300s |
@@ -162,11 +162,11 @@ sequenceDiagram
     participant LIVE as live_capture
     participant PG as PostgreSQL
     participant API as FastAPI cache
-    SCH->>JOB: cron refresh_s2 (16:05)
+    SCH->>JOB: cron refresh_s2 (16:10)
     JOB->>LIVE: sweep EOD
     LIVE->>PG: upsert raw_eod/prices_pit/broker_daily
     JOB->>API: POST /api/cache/clear
-    Note over SCH,JOB: interval idx/wl 60s, daily_ic 06:30, ownership_weekly Sen 06:45
+    Note over SCH,JOB: interval idx/wl 60s, daily_ic 16:50, ownership_weekly Sen 17:00
 ```
 
 ## Mapping Menu → Endpoint → Modul Backend → Tabel → Job
@@ -191,7 +191,7 @@ sequenceDiagram
 | Valuasi (endpoint backend, tanpa halaman UI) | `/api/valuation` | `analytics.get_valuation` | `research.latest_pit` | on-demand |
 | Jejak Sinyal | `/api/signals/track` | `analytics.get_signal_track` | `research.signal_log` | job `idx signal-log` |
 | Backtest | `/api/backtest/config` + `/run` | `simulation` | `research.prices_pit` | on-demand (POST) |
-| Faktor | `/api/factors/overview` | `analytics.get_factors_overview` | `research.factor_ic_history` | job harian `daily_ic` 06:30 |
+| Faktor | `/api/factors/overview` | `analytics.get_factors_overview` | `research.factor_ic_history` | job harian `daily_ic` 16:50 |
 | Faktor | `/api/market/regime/history` | `analytics.get_regime_history` | `research.regime_daily` | idempoten, backfill dari `index_summary_daily` |
 | Radar | `/api/smart-money/radar` | `analytics.get_smart_money_radar` | `research.latest_pit` | on-demand |
 | Radar | `/api/smart-money/track-record` | `analytics.get_smart_money_track_record` | `research.latest_pit` | on-demand |
@@ -222,18 +222,20 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 | `idx` | interval, `IDX_INDEX_INTERVAL` (default 60s) | refresh index |
 | `wl` | interval, `IDX_WATCHLIST_INTERVAL` (default 60s) | refresh watchlist |
 | `alerts` | interval, `IDX_ALERT_INTERVAL` (default 300s) | evaluasi aturan alert (bila Telegram aktif) |
-| `refresh_preopen` | Mon–Fri 08:45 | pra-buka (`do_eod=False`) |
+| `refresh_preopen` | Mon-Fri 08:50 | pra-buka (`do_eod=False`) |
 | `refresh_s1` | Mon–Thu 12:00 | sesi 1 (EOD) |
 | `refresh_s1_fri` | Fri 11:30 | sesi 1 Jumat (EOD) |
-| `refresh_s2` | Mon–Fri 16:05 | sesi 2 / EOD |
-| `refresh_s2_late` | Mon–Fri 16:20 | EOD susulan |
-| `health_eod` | Mon–Fri 17:00 | cek kesehatan EOD |
+| `refresh_s2` | Mon–Fri 16:10 | sesi 2 / EOD (termasuk broker summary) |
+| `eod_fallback` | Mon–Fri 16:30, lalu tiap jam s/d 20:30 | jaring kedua EOD: keluar cepat kalau EOD hari ini sudah lengkap, kalau belum jalankan pipeline penuh |
+| `health_eod` | Mon–Fri 16:45 | cek kesehatan EOD (setelah `eod_fallback`) |
 | `refresh_weekend_am` | Sat–Sun 08:45 | refresh akhir pekan |
 | `refresh_weekend_pm` | Sat–Sun 16:00 | refresh akhir pekan |
-| `daily_ic` | Mon–Fri 06:30 | hitung IC faktor → `factor_ic_history` |
-| `ownership_weekly` | interval 1 minggu, mulai Sen 06:45 | snapshot ownership |
+| `daily_ic` | Mon–Fri 16:50 | hitung IC faktor → `factor_ic_history` |
+| `ownership_weekly` | interval 1 minggu, mulai Sen 17:00 | snapshot ownership |
 
-> **Startup catchup**: saat serve mulai, backend mengecek `prices_pit` dan `index_quotes`; bila kosong/stale ia memicu refresh (lihat [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) sekitar baris 1180).
+> **Startup catchup**: saat serve mulai, backend mengecek `prices_pit` dan `index_quotes`; bila kosong/stale ia memicu refresh lewat `_eod_catchup()` — fungsi yang sama dipakai job `eod_fallback` (lihat [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py)).
+>
+> **Lubang hari bursa lampau**: `_eod_catchup()` punya dua fase — hari ini, lalu hari bursa lampau yang bolong (`_backfill_hari_lampau`, default 5 hari bursa, atur lewat `IDX_BACKFILL_DAYS`). Jadi mesin yang tidur/off melewati jendela sore tetap ditambal, tanpa menunggu `serve` di-restart (tick sore berikutnya yang melihat ke belakang). Hanya **saham** yang bisa ditarik ulang; close resmi indeks untuk tanggal lampau tidak punya sumber non-live.
 
 ## Cara Menjalankan Backend (agar semua data update)
 
@@ -245,8 +247,8 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
    ```
    Jangan jalankan proses `score_eval` lain secara paralel tanpa alasan.
 3. **Cek health**: `curl http://localhost:8000/health` → 200.
-4. **Pastikan transport Chrome** untuk data live: profile `IDX_CHROME_PROFILE_DIR` (mis. `p3`). Bila Chrome lain memegang profile → cf-transport gagal ("existing browser session"). Cooldown revive 600s membatasi pengulangan.
-5. **Biarkan scheduler berjalan minimal satu siklus EOD** (`refresh_s2` 16:05 WIB) agar `raw_eod`/`prices_pit`/`broker_daily` terisi.
+4. **Transport data live**: jalur utama **HTTP murni** (`curl_cffi`, `IDX_TRANSPORT=auto`) — tanpa kuki dan tanpa browser. Chrome hanya **cadangan**, dipakai bila IDX menolak jalur HTTP (atau `IDX_TRANSPORT=browser`); di Linux dianjurkan `IDX_TRANSPORT=http`. Bila jatuh ke Chrome, pastikan profile `IDX_CHROME_PROFILE_DIR` (mis. `p3`) tidak dipegang proses lain ("existing browser session"). Cooldown revive 600s membatasi pengulangan.
+5. **Biarkan scheduler berjalan minimal satu siklus EOD** (`refresh_s2` 16:10 WIB) agar `raw_eod`/`prices_pit`/`broker_daily` terisi.
 6. **Backfill manual** bila perlu: `idx eod <YYYYMMDD>`, `idx ic`, `idx signal-log`, `idx recommend`.
 
 ## Delete-Zone (Fitur UI yang Sengaja Dihapus)

@@ -56,7 +56,7 @@ EOD (prices_pit) + orderbook → analytics.recommendations (gate, skor, grade)
 ## 5. Cara Pengambilan / Update Data
 - **Perhitungan**: on-demand saat request; hasil mengikuti data EOD terbaru.
 - **Pencatatan**: `recommendation_log` diisi saat kalkulasi (dasar Track Record).
-- **Job**: tidak ada job khusus; ikut pipeline EOD (`refresh_s2` 16:05 WIB, `refresh_s2_late` 16:20 WIB).
+- **Job**: tidak ada job khusus; ikut pipeline EOD (`refresh_s2` 16:10 WIB).
 - **Refresh UI**: rekomendasi 300 s; track record 3600 s.
 - **Idempotensi**: log dedup per (tanggal, kode) [BELUM TERVERIFIKASI — cek constraint tabel `recommendation_log`].
 - **Fallback**: data kosong → EmptyState (tanpa fallback sumber lain).

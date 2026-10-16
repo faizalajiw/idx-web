@@ -110,7 +110,7 @@ IDX/DataIDX → `cf_transport.py` → `live_capture.py` → PostgreSQL (`index_q
 
 ## 5. Cara Pengambilan / Update Data
 - **Kapan dibuat**: campuran — `overview`/`leaders` on-demand dari snapshot terbaru; `trade-summary` dari agregat EOD.
-- **Job**: interval `idx` (60s, refresh index), `wl` (60s, watchlist/leaders). Cron EOD `refresh_s2` 16:05 mengisi snapshot harian. Lihat [cli.py](../../idx-scraper/src/idx_scraper/cli.py).
+- **Job**: interval `idx` (60s, refresh index), `wl` (60s, watchlist/leaders). Cron EOD `refresh_s2` 16:10 mengisi snapshot harian. Lihat [cli.py](../../idx-scraper/src/idx_scraper/cli.py).
 - **Refresh UI**: SWR 30s (overview/leaders/signals/technical), 60s (trade-summary), 120s (news), 300s (regime).
 - **Idempotensi**: upsert pada `trade_date`/`code`.
 - **Fallback**: breadth dari `research.latest_pit` bila `index_summary_daily` kosong.

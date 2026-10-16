@@ -59,7 +59,7 @@ Ingest EOD (foreign_flow, broker_activity) → Postgres
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand** dengan cache in-process (600–3600 detik). Data sumber diisi job EOD.
-- **Job**: `refresh_s2` 16:05 WIB, `refresh_s2_late` 16:20 WIB; broker EOD 16:30 WIB ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
+- **Job**: pipeline EOD `refresh_s2` (16:10 WIB) — termasuk tahap broker summary/bandarmologi ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
 - **Refresh UI**: SWR 30 detik (foreign, broker flow), 300 detik (broker activity per emiten).
 - **Reset cache**: `POST /api/cache/clear`.
 - **Idempotensi**: upsert per (tanggal, emiten/broker) [BELUM TERVERIFIKASI detail upsert].

@@ -93,7 +93,7 @@ Broker/foreign EOD → Postgres (foreign_flow, latest_pit.foreign_net)
 ```
 
 ## 5. Cara Pengambilan / Update Data
-- **Precomputed vs on-demand**: hasil dihitung saat request, lalu di-cache in-process (1800–3600 detik). Sumber data EOD diisi oleh job pipeline `refresh_s2` (16:05 WIB) dan `refresh_s2_late` (16:20 WIB) ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
+- **Precomputed vs on-demand**: hasil dihitung saat request, lalu di-cache in-process (1800–3600 detik). Sumber data EOD diisi oleh job pipeline `refresh_s2` (16:10 WIB) ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
 - **Refresh UI**: SWR 300 detik (radar, detail) dan 1800/3600 detik (papan dan track record).
 - **Reset cache**: `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)), dipanggil setiap job pipeline.
 - **Idempotensi**: perhitungan murni dari data tersimpan; run ulang menghasilkan angka sama.

@@ -55,7 +55,7 @@ Harga & volume EOD (stock_quotes/stock_daily, latest_pit) + foreign_net
 ```
 
 ## 5. Cara Pengambilan / Update Data
-- **On-demand** dengan cache in-process; data sumber dari pipeline EOD (`refresh_s2` 16:05, `refresh_s2_late` 16:20 WIB).
+- **On-demand** dengan cache in-process; data sumber dari pipeline EOD (`refresh_s2` 16:10 WIB).
 - **Refresh UI**: SWR 30 detik (peta) dan 300 detik (rotasi).
 - **Reset cache**: `POST /api/cache/clear`.
 - **Idempotensi**: deterministik dari data tersimpan.

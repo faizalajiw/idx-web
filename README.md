@@ -318,7 +318,7 @@ flowchart TD
   end
 
   subgraph Ingest["idx-scraper (Python + APScheduler)"]
-    CF[cf_transport.py<br/>Chrome persisten share cookie CF]
+    CF[cf_transport.py<br/>HTTP murni (curl_cffi); Chrome cadangan]
     JOB[Scheduler jobs<br/>preopen / intraday / EOD]
     RESEARCH[Research layer PIT<br/>regime, signal_log, sentiment, faktor]
   end
@@ -350,9 +350,7 @@ Tahapannya:
 1. **Sumber** — Angka utama dari **IDX** (`GetIndexList` untuk IHSG, `GetStockSummary`
    untuk EOD semua emiten). **Yahoo Finance** hanya fallback historis. Endpoint IDX
    diproteksi Cloudflare.
-2. **Ingest (idx-scraper)** — `cf_transport.py` menjalankan Chrome persisten yang sudah
-   lolos challenge Cloudflare, lalu menembak JSON IDX lewat `page.evaluate(fetch(...))`
-   agar ikut memakai cookie yang bersih. **APScheduler** (timezone WIB) menjalankan job
+2. **Ingest (idx-scraper)** — `cf_transport.py` default-nya menembak JSON IDX lewat HTTP murni (`curl_cffi`), tanpa browser dan tanpa kuki. Chrome persisten hanya **cadangan**: dipakai bila IDX menolak jalur HTTP, lalu JSON ditembak lewat `page.evaluate(fetch(...))` agar ikut memakai cookie yang bersih. **APScheduler** (timezone WIB) menjalankan job
    preopen / intraday / EOD. Setelah raw data masuk, **research layer point-in-time**
    menghitung regime IHSG, jejak sinyal, sentimen, dan faktor kuantitatif.
 3. **Store (Postgres/Supabase)** — Semua ditulis idempotent (upsert `ON CONFLICT`).

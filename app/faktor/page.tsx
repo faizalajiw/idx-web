@@ -198,7 +198,7 @@ function RegimeSummary() {
   if (!s || s.days === 0)
     return (
       <p className="text-muted text-sm">
-        Histori kondisi IHSG belum tersedia — job harian 16:20 WIB akan mengisinya
+        Histori kondisi IHSG belum tersedia — job harian 16:10 WIB akan mengisinya
         (atau buka halaman ini lagi untuk memicu backfill).
       </p>
     );

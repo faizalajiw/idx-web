@@ -70,7 +70,7 @@ Ingest broker EOD + harga + foreign → Postgres (broker_daily, latest_pit, stoc
 Snapshot yang sama juga dipakai [Screener](screener.md) (`min_broker_score`) dan [Ruang Keputusan](ruang-keputusan.md).
 
 ## 5. Cara Pengambilan / Update Data
-- **Precomputed sebagian**: data broker EOD diisi job `refresh_s2` (16:05) dan backfill broker 16:30 WIB ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)). IC diisi job `daily_ic` (Senin–Jumat 06:30 WIB).
+- **Precomputed sebagian**: data broker EOD diisi tahap broker summary di dalam pipeline `refresh_s2` (16:10 WIB) ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)). IC diisi job `daily_ic` (Senin-Jumat 16:50 WIB).
 - **On-demand**: snapshot dihitung saat request pertama setelah cache kosong.
 - **Reset cache**: `POST /api/cache/clear`, dipanggil setiap pipeline refresh.
 - **Refresh UI**: SWR 300 detik.

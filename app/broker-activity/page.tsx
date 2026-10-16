@@ -236,7 +236,7 @@ function MarketStructure() {
   const m = data.market;
   if (m.n_brokers === 0)
     return (
-      <EmptyState message="Belum ada data broker pasar. Isi lewat `idx serve` (job 16:30 WIB) atau `python -m scripts.backfill_broker_eod`." />
+      <EmptyState message="Belum ada data broker pasar. Isi lewat `idx serve` (job refresh_s2 16:10 WIB) atau `python -m scripts.backfill_broker_eod`." />
     );
 
   return (

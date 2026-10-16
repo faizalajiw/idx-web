@@ -86,13 +86,13 @@ Menampilkan faktor mana yang terbukti memprediksi return (uji IC), bobot composi
 ## 4. Data Flow (end-to-end)
 ```
 Harga EOD (Postgres) → research.ic (build panel, IC harian)
-  → research.factor_ic_history (per run_date)   [job daily_ic 06:30 WIB]
+  → research.factor_ic_history (per run_date)   [job daily_ic 16:50 WIB]
   → analytics.get_factors_overview (cache default)
   → GET /api/factors/overview → useFactorsOverview (600 s) → kartu faktor
 ```
 
 ## 5. Cara Pengambilan / Update Data
-- **Precomputed**: IC dihitung job terjadwal `daily_ic` (Senin–Jumat 06:30 WIB, [cli.py](../../idx-scraper/src/idx_scraper/cli.py)) dan disimpan ke `research.factor_ic_history`. Halaman hanya membaca.
+- **Precomputed**: IC dihitung job terjadwal `daily_ic` (Senin-Jumat 16:50 WIB, [cli.py](../../idx-scraper/src/idx_scraper/cli.py)) dan disimpan ke `research.factor_ic_history`. Halaman hanya membaca.
 - **Manual**: `idx ic` (disebut di pesan kosong [analytics.py](../../idx-scraper/src/idx_scraper/api/analytics.py)).
 - **Cache**: respons di-cache in-process; `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)) mengosongkannya.
 - **Refresh UI**: SWR 600 detik.
