@@ -228,7 +228,7 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 | `refresh_s1_fri` | Fri 11:30 | sesi 1 Jumat (EOD) |
 | `refresh_s2` | Mon–Fri 16:10 | sesi 2 / EOD (termasuk broker summary) |
 | `eod_fallback` | Mon–Fri 16:30, lalu tiap jam s/d 20:30 | jaring kedua EOD: keluar cepat kalau EOD hari ini sudah lengkap, kalau belum jalankan pipeline penuh |
-| `health_eod` | Mon–Fri 16:45 | cek kesehatan EOD (setelah `eod_fallback`) |
+| `health_eod` | Mon–Fri 16:45 | empat penjaga data (kesegaran, cakupan kolom, sesi separuh, lubang sesi) → log + Telegram; setelah `eod_fallback`. Pemeriksa baris melewati sesi hari ini; `misfire_grace_time` 2 jam |
 | `refresh_weekend_am` | Sat–Sun 08:45 | refresh akhir pekan |
 | `refresh_weekend_pm` | Sat–Sun 16:00 | refresh akhir pekan |
 | `daily_ic` | Mon–Fri 16:50 | hitung IC faktor → `factor_ic_history` |
