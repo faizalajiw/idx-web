@@ -44,7 +44,7 @@ flowchart LR
 
 | Group | Route | Menu | Fungsi (1 baris) | Card | Sumber data utama | Update |
 |---|---|---|---|---|---|---|
-| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 8 | `index_quotes`, `index_summary_daily`, `research.latest_pit` | on-demand + SWR 30s |
+| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 9 | `index_quotes`, `index_summary_daily`, `research.latest_pit`, `research.raw_eod` | on-demand + SWR 30s (kesehatan data 60s) |
 | Utama | `/pantau` | Pantau | Watchlist + alert + chart | 5 | `watchlist`, `stock_quotes` | on-demand + SWR 30s |
 | Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + SWR 30s |
 | Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
@@ -176,6 +176,7 @@ sequenceDiagram
 | Dashboard | `/api/market/overview` | `services.get_market_overview` | `index_quotes` | interval `idx` 60s |
 | Dashboard | `/api/market/trade-summary` | `services.get_market_trade_summary` | `research.market_segment_daily` | EOD refresh |
 | Dashboard | `/api/market/regime` | `analytics.get_market_regime` | `index_summary_daily`, `research.latest_pit` | on-demand |
+| Dashboard | `/api/data-health` | `services.get_data_health` → `idx_scraper.health` | `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` | SWR 60s |
 | Dashboard | `/api/market/leaders` | `services.get_market_leaders` | `stock_summary_daily`/`stock_quotes` | interval `wl` 60s |
 | Dashboard | `/api/market/top-brokers` | `services.get_top_brokers` | `research.broker_daily` | EOD refresh |
 | Dashboard | `/api/signals` | `services.get_signals` | `research.latest_pit` | on-demand |

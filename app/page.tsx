@@ -9,6 +9,7 @@ import { TopBrokersPanel } from "@/components/TopBrokersPanel";
 import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { MarketRegimeCard } from "@/components/MarketRegimeCard";
+import { DataHealthCard } from "@/components/DataHealthCard";
 import { useMarketOverview, useMarketTradeSummary } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact, fmtDateStr } from "@/lib/format";
 import {
@@ -226,6 +227,8 @@ export default function DashboardPage() {
 
       {/* Hero IHSG: volume/value total + rincian pasar reguler vs non-reguler */}
       <HeroIndex />
+      {/* Gerbang kepercayaan: kalau data bolong, sisa angka di bawah ikut diragukan */}
+      <DataHealthCard />
       <MarketRegimeCard />
       <LatestNewsCard />
       <MarketOverview />

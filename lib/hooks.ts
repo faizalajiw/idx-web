@@ -50,6 +50,7 @@ import type {
   RecommendationResponse,
   StockRecommendation,
   RecommendationTrack,
+  DataHealth,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -460,6 +461,20 @@ export function useStockRecommendation(code: string | null) {
 export function useRecommendationTrack() {
   return useSWR<RecommendationTrack>("/api/recommendations/track", fetcher, {
     refreshInterval: 3_600_000,
+    shouldRetryOnError: false,
+  });
+}
+
+/**
+ * Kesehatan data EOD: kesegaran + cakupan kolom `foreign_*` + jumlah baris per
+ * sesi + lubang sesi. Dipakai kartu "Kesehatan Data" di Dashboard.
+ *
+ * Pemeriksa baris & kolom memindai seluruh `research.raw_eod`, jadi 60 detik
+ * cukup (bukan 30 seperti data pasar) — angkanya bergerak harian, bukan per-30s.
+ */
+export function useDataHealth() {
+  return useSWR<DataHealth>("/api/data-health", fetcher, {
+    refreshInterval: 60_000,
     shouldRetryOnError: false,
   });
 }

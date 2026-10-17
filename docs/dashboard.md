@@ -5,8 +5,8 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 
 ## 2. Route & Berkas
 - URL: `/` → [`app/page.tsx`](../../idx-web/app/page.tsx)
-- Komponen: [MarketOverview](../../idx-web/components/MarketOverview.tsx), [MarketNarration](../../idx-web/components/MarketNarration.tsx), [TopLeadersPanel](../../idx-web/components/TopLeadersPanel.tsx), [TopBrokersPanel](../../idx-web/components/TopBrokersPanel.tsx), [SignalsPanel](../../idx-web/components/SignalsPanel.tsx), [TechnicalChart](../../idx-web/components/TechnicalChart.tsx), [MarketRegimeCard](../../idx-web/components/MarketRegimeCard.tsx), [LastUpdated](../../idx-web/components/LastUpdated.tsx)
-- Hooks: `useMarketOverview`, `useMarketTradeSummary`, `useMarketRegime`, `useMarketLeaders`, `useTopBrokers`, `useSignals`, `useTechnical`, `useNarration` ([hooks.ts](../../idx-web/lib/hooks.ts))
+- Komponen: [MarketOverview](../../idx-web/components/MarketOverview.tsx), [MarketNarration](../../idx-web/components/MarketNarration.tsx), [TopLeadersPanel](../../idx-web/components/TopLeadersPanel.tsx), [TopBrokersPanel](../../idx-web/components/TopBrokersPanel.tsx), [SignalsPanel](../../idx-web/components/SignalsPanel.tsx), [TechnicalChart](../../idx-web/components/TechnicalChart.tsx), [MarketRegimeCard](../../idx-web/components/MarketRegimeCard.tsx), [DataHealthCard](../../idx-web/components/DataHealthCard.tsx), [LastUpdated](../../idx-web/components/LastUpdated.tsx)
+- Hooks: `useMarketOverview`, `useMarketTradeSummary`, `useDataHealth`, `useMarketRegime`, `useMarketLeaders`, `useTopBrokers`, `useSignals`, `useTechnical`, `useNarration` ([hooks.ts](../../idx-web/lib/hooks.ts))
 
 ## 3. Penjelasan Per-Card
 
@@ -21,6 +21,20 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Periode/Window | Sesi terbaru; volume dalam lot (1 lot = 100 lembar) |
 | Interaksi | Hover `InfoHint` untuk definisi pasar |
 | Empty/Loading/Error | Bila `trade.date` null → teks "data sesi terbaru belum tersedia" |
+
+### Kesehatan Data (gerbang kepercayaan)
+| Field | Isi |
+|---|---|
+| Nama card | Kesehatan Data |
+| Komponen | [DataHealthCard.tsx](../../idx-web/components/DataHealthCard.tsx) |
+| Fungsi | Menjawab "boleh percaya angka di layar ini?": kesegaran EOD, cakupan kolom `foreign_*`, jumlah baris per sesi vs median, hari bursa tanpa sesi. Ditempatkan tepat setelah hero supaya sisa halaman dibaca dengan kesadaran itu |
+| Sumber data | `GET /api/data-health` ([app.py](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_data_health` ([services.py](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` |
+| Rumus/Logika | Evaluator murni di `idx_scraper/health.py`. Dipakai bersama `idx health` + job `health_eod`: `evaluate_health` (tanggal vs hari bursa) & `evaluate_field_coverage` (`foreign_net` per sesi). Dua penjaga baru — `evaluate_row_counts` (baris < 50% median) & `evaluate_session_gaps` (+ `count_sessions_between`: berapa sesi tertinggal) — SAAT INI hanya dipakai endpoint ini; jalur alarm CLI/Telegram belum tersambung (lihat "Jembatan yang belum ditutup" di `RENCANA-P0-P7.md`) |
+| Periode/Window | 30 sesi terakhir untuk kolom & baris; seluruh riwayat `raw_eod` untuk lubang sesi |
+| Interaksi | Hover `InfoHint`; badge status Sehat / Menunggu / Waspada / Bermasalah |
+| Status & bahaya | `Menunggu` = sesi hari ini belum masuk (normal sebelum ±16:15 WIB) — BUKAN alarm. `Waspada` = sesi tertinggal, kolom bolong, sesi separuh, atau pemeriksa yang tak memeriksa apa pun (`checked == 0`). `Bermasalah` = sudah lewat batas 16:00 WIB. Payload `ok` = "bersih DAN lengkap", jadi hari kerja pagi `ok: false` itu wajar; penanda darurat adalah `freshness.overdue` |
+| Empty/Loading/Error | Endpoint belum aktif → teks kuning "penjaga data tidak terbaca … perlakukan angka dengan curiga" |
+| Catatan | Hari bursa dipilah dari kalender IHSG (`index_summary_daily` ∪ `index_quotes`) — libur nasional tidak perlu daftar manual. Bila acuan IHSG kosong, evaluator jatuh ke basis hari-kerja dan footer kartu mengatakannya; bila acuan lebih pendek dari rentang `raw_eod`, basis ditandai `kalender-bursa-pendek` karena lubang di luar cakupannya tidak terlihat |
 
 ### Suasana Pasar (Regime)
 | Field | Isi |

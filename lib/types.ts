@@ -1314,3 +1314,53 @@ export interface RecommendationTrack {
   recent: RecommendationTrackRecent[];
   reason: string | null;
 }
+
+/** Satu pemeriksa cakupan data: berapa sesi dinilai + sesi yang bermasalah. */
+export interface DataHealthCheck {
+  checked: number;
+  worst_pct: number | null;
+  troublemakers: string[];
+}
+
+/** Jumlah baris per sesi vs median jendela terakhir (deteksi sesi "separuh"). */
+export interface DataHealthRowCount extends DataHealthCheck {
+  median_rows: number;
+  threshold_pct: number;
+}
+
+/** Kesegaran EOD: tanggal terbaru vs hari bursa yang diharapkan. */
+export interface DataHealthFreshness {
+  expected: string | null;
+  eod_latest: string | null;
+  index_latest: string | null;
+  overdue: boolean;
+  missing: string[];
+  /** Sesi bursa yang tertinggal per sumber (0 = cuma sesi hari ini yang belum masuk). */
+  stocks_behind: number;
+  index_behind: number;
+}
+
+/** Hari bursa tanpa baris raw_eod; `basis` = cara hari bursa ditentukan. */
+export interface DataHealthSessionGaps {
+  first: string | null;
+  last: string | null;
+  sessions: number;
+  missing: string[];
+  basis: "kalender-bursa" | "kalender-bursa-pendek" | "hari-kerja";
+}
+
+/**
+ * Ringkasan "boleh percaya angka di dashboard?" — kesegaran + 3 pemeriksa.
+ *
+ * `ok` = bersih DAN lengkap, bukan "tak perlu tindakan": di hari kerja sebelum
+ * ±16:15 WIB `ok` memang `false` karena sesi hari ini belum masuk. Yang menandai
+ * keadaan darurat adalah `freshness.overdue`.
+ */
+export interface DataHealth {
+  checked_at: string;
+  ok: boolean;
+  freshness: DataHealthFreshness;
+  field_coverage: DataHealthCheck;
+  row_counts: DataHealthRowCount;
+  session_gaps: DataHealthSessionGaps;
+}
