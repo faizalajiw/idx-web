@@ -1248,6 +1248,33 @@ export interface RankBasis {
   values: (number | string | null)[];
 }
 
+/** Plafon yang berlaku untuk satu nama, dalam % modal (spec P5 5.1). */
+export interface PositionPlanCaps {
+  per_name: number | null;
+  liquidity: number | null;
+  regime: number | null;
+  portfolio: number | null;
+}
+
+/**
+ * Rencana posisi lapis 3: persen, rupiah, lot, dan rugi kalau stop kena.
+ *
+ * Dihitung backend SESUDAH cache, dari empat angka keadaan yang diketik pemilik.
+ * `null` berarti "tidak bisa dihitung" (tanpa modal, atau stop tidak valid),
+ * bukan nol; `binding_cap` = plafon yang benar-benar memotong.
+ */
+export interface PositionPlan {
+  pct: number | null;
+  pct_raw: number | null;
+  binding_cap: string | null;
+  caps: PositionPlanCaps | null;
+  concurrent_risk_pct: number | null;
+  rupiah: number | null;
+  lots: number | null;
+  risk_rupiah: number | null;
+  note: string | null;
+}
+
 /** Satu kandidat beli: skor + grade + level eksekusi + alasan. */
 export interface RecommendationRow {
   code: string;
@@ -1276,6 +1303,8 @@ export interface RecommendationRow {
   horizon_days: number | null;
   confidence: string | null;
   position_pct: number | null;
+  /** Rencana posisi lapis 3 (spec P5); `null` = tanpa modal atau baris ditahan. */
+  plan?: PositionPlan | null;
   patterns: string[];
   reasons: string[];
   warnings: string[];

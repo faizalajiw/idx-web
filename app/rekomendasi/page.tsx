@@ -9,8 +9,11 @@ import { LastUpdated } from "@/components/LastUpdated";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { TickerLogo } from "@/components/TickerLogo";
-import { fmtNum, fmtPct, fmtCompact, trendClass } from "@/lib/format";
+import { PortfolioStrip } from "@/components/PortfolioStrip";
+import { fmtNum, fmtNum1, fmtPct, fmtCompact, trendClass } from "@/lib/format";
+import { asNumber, portfolioQuery, usePortfolio } from "@/lib/portfolio";
 import type {
+  PositionPlan,
   RecommendationRow,
   RecommendationLayerStatus,
   RecommendationTrack,
@@ -72,12 +75,69 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
   );
 }
 
+/** Nama plafon dalam bahasa manusia (kunci `binding_cap` dari backend). */
+const PLAFON_LABEL: Record<string, string> = {
+  per_name: "per nama",
+  liquidity: "likuiditas",
+  regime: "rezim",
+  portfolio: "portofolio",
+};
+
+/**
+ * Baris rencana posisi di kartu papan (permukaan A, spec P5): porsi, nilai beli,
+ * lot, dan rugi kalau stop kena. Tanpa modal hanya porsi persen yang tampil -
+ * rupiah dan lot yang dikarang lebih buruk daripada tidak ada.
+ */
+function PlanLine({ plan, modal }: { plan: PositionPlan; modal: number | null }) {
+  if (plan.pct === null) return null;
+  const plafon = plan.binding_cap ? (PLAFON_LABEL[plan.binding_cap] ?? plan.binding_cap) : null;
+  const adaModal = plan.rupiah !== null;
+  const adaLot = adaModal && plan.lots !== null && plan.lots > 0;
+  // Risiko yang berlaku = rugi stop dibagi modal, dibulatkan satu desimal seperti
+  // angka lain di layar. Angkanya dari backend, jadi pembulatan lot sudah ikut -
+  // bukan persen yang diminta dibulatkan lagi.
+  const rasio = adaLot && modal !== null && modal > 0 && plan.risk_rupiah !== null
+    ? (plan.risk_rupiah / modal) * 100
+    : null;
+  const risikoModal = rasio === null ? null : fmtNum(Math.round(rasio * 10) / 10);
+  const catatan = plan.lots === 0 || plan.binding_cap !== null ? plan.note : null;
+  const sisa = adaLot
+    ? ` · ${rp(plan.rupiah)} · ${fmtNum(plan.lots)} lot`
+    : adaModal
+      ? ""
+      : " modal";
+  const sebutPlafon = plafon ? ` (plafon ${plafon})` : "";
+
+  return (
+    <div className="mt-3 rounded-lg border border-dashed border-[var(--border)] p-3 text-xs">
+      <p className="font-semibold tabular-nums">
+        Porsi {fmtNum1(plan.pct)}%{sebutPlafon}
+        {sisa}
+      </p>
+      {adaLot && (
+        <p className="text-muted mt-0.5 tabular-nums">
+          stop kena = rugi {rp(plan.risk_rupiah)}
+          {risikoModal ? ` (${risikoModal}% modal)` : ""}
+        </p>
+      )}
+      {catatan && (
+        <p className="mt-1 text-[11px] leading-snug" style={{ color: "var(--warn)" }}>
+          {catatan}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function CandidateCard({
   row,
   withheldNote,
+  modal,
 }: {
   row: RecommendationRow;
   withheldNote: string | null;
+  /** Modal pemilik (Rp) dari strip portofolio; `null` = belum diisi. */
+  modal: number | null;
 }) {
   const grade = GRADE_META[row.grade as Grade] ?? GRADE_META.C;
   // Verdict bisa ditahan karena dua sebab berbeda: data basi (spec D1) atau rezim
@@ -135,7 +195,7 @@ function CandidateCard({
           role="status"
         >
           <ShieldAlert size={13} className="mt-0.5 shrink-0" aria-hidden />
-          <span>{withheldNote ?? "Verdict ditahan: grade & saran porsi belum bisa dipakai."}</span>
+          <span>{withheldNote ?? "Verdict ditahan: grade & rencana posisi belum bisa dipakai."}</span>
         </p>
       )}
 
@@ -144,6 +204,8 @@ function CandidateCard({
         <Stat label="Batas rugi" value={rp(row.stop)} tone="text-down" />
         <Stat label="Target" value={rp(row.target)} tone="text-up" />
       </div>
+
+      {!withheld && row.plan && <PlanLine plan={row.plan} modal={modal} />}
 
       {row.warnings.length > 0 && (
         <p className="mt-3 flex gap-1.5 text-[11px] leading-snug text-[var(--warn)]">
@@ -172,12 +234,6 @@ function CandidateCard({
               label="Untung vs rugi"
               value={row.rr === null ? "-" : `1 : ${row.rr.toFixed(1)}`}
             />
-            {!withheld && (
-              <Stat
-                label="Saran porsi"
-                value={row.position_pct === null ? "-" : `${row.position_pct}% modal`}
-              />
-            )}
             <Stat
               label="Vs riwayat sendiri"
               value={
@@ -373,17 +429,23 @@ function TrackRecord({ track }: { track: RecommendationTrack }) {
 export default function RekomendasiPage() {
   const [minGrade, setMinGrade] = useState<Grade>("C");
   const [limit, setLimit] = useState(20);
-  const { data, error, isLoading } = useRecommendations(limit, minGrade);
-  const { data: all } = useRecommendations(100, "C");
+  // Empat angka keadaan pemilik (modal, risiko, posisi terbuka, eksposur) hidup
+  // di localStorage browser ini dan hanya dikirim sebagai query - backend tidak
+  // pernah menyimpannya, dan cache papan tidak dipecah olehnya.
+  const { state: portfolio, setField } = usePortfolio();
+  const query = portfolioQuery(portfolio);
+  const modal = asNumber(portfolio.modal);
+  const { data, error, isLoading } = useRecommendations(limit, minGrade, query);
+  const { data: all } = useRecommendations(100, "C", query);
   const { data: track } = useRecommendationTrack();
 
   const topCount = data?.rows.filter((r) => r.grade === "A").length ?? 0;
   // Dua sebab penahanan yang berbeda (spec D1 vs 6.5/Q5): kalimatnya tidak boleh
   // saling tukar - yang satu soal data yang belum masuk, yang satu soal rezim.
   const withheldNote = data?.gate?.blocked
-    ? `Rezim sedang menolak: grade & saran porsi ditahan sampai kondisinya berubah. ${data.gate.reason}.`
+    ? `Rezim sedang menolak: grade & rencana posisi ditahan sampai kondisinya berubah. ${data.gate.reason}.`
     : data?.withheld
-      ? `${data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan saran porsi ditahan sampai datanya masuk.`
+      ? `${data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan rencana posisi ditahan sampai datanya masuk.`
       : null;
   // Verdict ditahan = hitungan grade tidak lagi bermakna: "0" di atas dua puluh
   // kartu yang jelas tampil akan terbaca sebagai halaman rusak. Sembunyikan
@@ -417,12 +479,12 @@ export default function RekomendasiPage() {
         {data?.gate?.blocked && (
           <p className="text-warn text-xs leading-relaxed" role="status">
             Gerbang rezim menahan tawaran baru: {data.gate.reason}. Angka, harga beli, batas rugi,
-            dan target tetap tampil — yang ditahan cuma grade dan saran porsi.
+            dan target tetap tampil — yang ditahan cuma grade dan rencana posisi.
           </p>
         )}
         {data?.withheld && (
           <p className="text-warn text-xs leading-relaxed" role="status">
-            {data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan saran porsi
+            {data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan rencana posisi
             ditahan sampai datanya masuk.
           </p>
         )}
@@ -435,6 +497,8 @@ export default function RekomendasiPage() {
       </header>
 
       <RegimeBanner />
+
+      <PortfolioStrip state={portfolio} setField={setField} />
 
       {error ? (
         <ErrorState message="Gagal memuat rekomendasi. Pastikan backend & database hidup." />
@@ -520,7 +584,12 @@ export default function RekomendasiPage() {
             ) : (
               <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {data.rows.map((row) => (
-                  <CandidateCard key={row.code} row={row} withheldNote={withheldNote} />
+                  <CandidateCard
+                    key={row.code}
+                    row={row}
+                    withheldNote={withheldNote}
+                    modal={modal}
+                  />
                 ))}
               </ul>
             )}

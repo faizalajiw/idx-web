@@ -3,10 +3,20 @@ const idFmt2 = new Intl.NumberFormat("id-ID", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+const idFmt1 = new Intl.NumberFormat("id-ID", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
 
 export function fmtNum(v: number | null | undefined, digits = 0): string {
   if (v === null || v === undefined || Number.isNaN(v)) return "-";
   return (digits > 0 ? idFmt2 : idFmt).format(v);
+}
+
+/** Angka dengan tepat satu desimal (koma desimal id-ID) — dipakai baris porsi. */
+export function fmtNum1(v: number | null | undefined): string {
+  if (v === null || v === undefined || Number.isNaN(v)) return "-";
+  return idFmt1.format(v);
 }
 
 export function fmtPct(v: number | null | undefined): string {
