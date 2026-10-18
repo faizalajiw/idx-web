@@ -6,6 +6,7 @@ import { ChevronDown, Gauge, Scale, History, Info, Search, Shield, TrendingUp } 
 import { useRecommendations, useStockDecision } from "@/lib/hooks";
 import { fmtCompact, fmtPct } from "@/lib/format";
 import type { StockDecision } from "@/lib/types";
+import { PositionPlanPanel } from "@/components/PositionPlanPanel";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 
 type Decision = NonNullable<StockDecision>;
@@ -470,6 +471,7 @@ export function DecisionWorkspace({ code }: { code: string | null }) {
         <>
           <Verdict d={data} />
           <ContextTiles d={data} />
+          {code && <PositionPlanPanel code={code} />}
           <DetailTabs d={data} />
           <p className="text-muted text-xs leading-relaxed">
             Dihitung {data.generated_at}. Bukan rekomendasi beli atau jual. Keputusan akhir tetap ada di tangan kamu.

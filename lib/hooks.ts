@@ -443,16 +443,25 @@ export function useRecommendations(limit = 20, minGrade = "C", query = "") {
   return useSWR<RecommendationResponse>(
     `/api/recommendations?limit=${limit}&min_grade=${minGrade}${query}`,
     fetcher,
-    { refreshInterval: 300_000 },
+    { refreshInterval: 300_000, keepPreviousData: true },
   );
 }
 
-/** Kandidat beli satu emiten (mesin skor sama dengan papan se-pasar). */
-export function useStockRecommendation(code: string | null) {
+/**
+ * Kandidat beli satu emiten (mesin skor sama dengan papan se-pasar).
+ *
+ * `query` = bagian keadaan pemilik (`&modal=...`, lihat `lib/portfolio.ts`);
+ * endpoint emiten diawali `?` sehingga `&` di depannya harus dipotong.
+ * `keepPreviousData` supaya angka di panel tidak berkedip kosong tiap ketikan.
+ */
+export function useStockRecommendation(code: string | null, query = "") {
   const key = code
-    ? `/api/stocks/${encodeURIComponent(code)}/recommendation`
+    ? `/api/stocks/${encodeURIComponent(code)}/recommendation${query ? `?${query.slice(1)}` : ""}`
     : null;
-  return useSWR<StockRecommendation>(key, fetcher, { refreshInterval: 300_000 });
+  return useSWR<StockRecommendation>(key, fetcher, {
+    refreshInterval: 300_000,
+    keepPreviousData: true,
+  });
 }
 
 /**
