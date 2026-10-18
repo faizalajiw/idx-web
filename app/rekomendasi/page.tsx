@@ -93,19 +93,20 @@ function PlanLine({ plan, modal }: { plan: PositionPlan; modal: number | null })
   const plafon = plan.binding_cap ? (PLAFON_LABEL[plan.binding_cap] ?? plan.binding_cap) : null;
   const adaModal = plan.rupiah !== null;
   const adaLot = adaModal && plan.lots !== null && plan.lots > 0;
-  // Risiko yang berlaku = rugi stop dibagi modal. Angkanya dari backend, jadi
-  // pembulatan lot sudah ikut - bukan persen yang diminta dibulatkan lagi.
-  const risikoModal =
-    adaLot && modal !== null && modal > 0 && plan.risk_rupiah !== null
-      ? fmtNum((plan.risk_rupiah / modal) * 100)
-      : null;
+  // Risiko yang berlaku = rugi stop dibagi modal, dibulatkan satu desimal seperti
+  // angka lain di layar. Angkanya dari backend, jadi pembulatan lot sudah ikut -
+  // bukan persen yang diminta dibulatkan lagi.
+  const rasio = adaLot && modal !== null && modal > 0 && plan.risk_rupiah !== null
+    ? (plan.risk_rupiah / modal) * 100
+    : null;
+  const risikoModal = rasio === null ? null : fmtNum(Math.round(rasio * 10) / 10);
   const catatan = plan.lots === 0 || plan.binding_cap !== null ? plan.note : null;
   const sisa = adaLot
     ? ` · ${rp(plan.rupiah)} · ${fmtNum(plan.lots)} lot`
     : adaModal
       ? ""
       : " modal";
-  const sebutPlafon = adaLot && plafon ? ` (plafon ${plafon})` : "";
+  const sebutPlafon = plafon ? ` (plafon ${plafon})` : "";
 
   return (
     <div className="mt-3 rounded-lg border border-dashed border-[var(--border)] p-3 text-xs">
