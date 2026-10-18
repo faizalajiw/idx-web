@@ -82,7 +82,7 @@ export function RegimeBanner() {
       <span className="text-muted hidden text-xs md:inline">
         {hint(data!.regime)}
       </span>
-      {data!.gate?.blocked && (
+      {(data!.gate?.blocked || data!.gate?.regime_fresh === false) && (
         <span className="text-xs font-medium" style={{ color: "var(--warn)" }}>
           {data!.gate.reason}
         </span>

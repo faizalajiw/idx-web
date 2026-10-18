@@ -72,10 +72,17 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
   );
 }
 
-function CandidateCard({ row }: { row: RecommendationRow }) {
+function CandidateCard({
+  row,
+  withheldNote,
+}: {
+  row: RecommendationRow;
+  withheldNote: string | null;
+}) {
   const grade = GRADE_META[row.grade as Grade] ?? GRADE_META.C;
-  // Verdict bisa ditahan backend saat data basi (spec D1): grade & ukuran
-  // posisi jadi `null`. Jangan render "null" - tampilkan satu baris penjelas.
+  // Verdict bisa ditahan karena dua sebab berbeda: data basi (spec D1) atau rezim
+  // yang eksplisit menolak (spec 6.5/Q5). Grade & ukuran posisi jadi `null` -
+  // jangan render "null", dan jangan salah menyebut sebabnya.
   const withheld = row.withheld === true || row.grade === null;
   const entry =
     row.entry_low !== null && row.entry_high !== null
@@ -102,12 +109,14 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
           ) : (
             <span className={grade.badge}>{grade.label}</span>
           )}
-          {/* Skala yang bisa dibandingkan (spec D3 poin 1): peringkat persentil
-              kolam, BUKAN skor mentah 0-100 yang gampang dibaca sebagai keyakinan. */}
+          {/* Skala yang bisa dibandingkan (spec D3 poin 1): peringkat persentil di
+              antara KANDIDAT yang lolos penyaringan hari itu - bukan kolam likuiditas
+              (itu `pool_size`), dan bukan skor mentah 0-100 yang gampang dibaca
+              sebagai keyakinan. */}
           <p className="text-muted mt-1 text-[11px] tabular-nums">
             {row.percentile === null || row.percentile === undefined
               ? "-"
-              : `Peringkat ${Math.round(row.percentile)}% kolam`}
+              : `Peringkat ${Math.round(row.percentile)}% dari kandidat`}
           </p>
         </div>
       </div>
@@ -126,10 +135,7 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
           role="status"
         >
           <ShieldAlert size={13} className="mt-0.5 shrink-0" aria-hidden />
-          <span>
-            Verdict ditahan: data sesi ini belum segar, jadi grade &amp; saran porsi belum
-            bisa dipakai sampai datanya masuk.
-          </span>
+          <span>{withheldNote ?? "Verdict ditahan: grade & saran porsi belum bisa dipakai."}</span>
         </p>
       )}
 
@@ -372,7 +378,19 @@ export default function RekomendasiPage() {
   const { data: track } = useRecommendationTrack();
 
   const topCount = data?.rows.filter((r) => r.grade === "A").length ?? 0;
+  // Dua sebab penahanan yang berbeda (spec D1 vs 6.5/Q5): kalimatnya tidak boleh
+  // saling tukar - yang satu soal data yang belum masuk, yang satu soal rezim.
+  const withheldNote = data?.gate?.blocked
+    ? `Rezim sedang menolak: grade & saran porsi ditahan sampai kondisinya berubah. ${data.gate.reason}.`
+    : data?.withheld
+      ? `${data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan saran porsi ditahan sampai datanya masuk.`
+      : null;
+  // Verdict ditahan = hitungan grade tidak lagi bermakna: "0" di atas dua puluh
+  // kartu yang jelas tampil akan terbaca sebagai halaman rusak. Sembunyikan
+  // angkanya, jangan melaporkan nol yang salah.
+  const countTidakBermakna = Boolean(data?.gate?.blocked || data?.withheld);
   const tabCount = (grade: Grade) => {
+    if (countTidakBermakna) return null;
     const rows = all?.rows ?? [];
     const allowed = grade === "A" ? ["A"] : grade === "B" ? ["A", "B"] : ["A", "B", "C"];
     // Grade `null` = verdict ditahan (spec D1): bukan kandidat, jangan dihitung.
@@ -396,10 +414,22 @@ export default function RekomendasiPage() {
           <LastUpdated sessionDate={data?.date} updatedAt={data?.generated_at} />
           <FreshnessBadge basis="panel" freshness={data?.freshness} />
         </div>
+        {data?.gate?.blocked && (
+          <p className="text-warn text-xs leading-relaxed" role="status">
+            Gerbang rezim menahan tawaran baru: {data.gate.reason}. Angka, harga beli, batas rugi,
+            dan target tetap tampil — yang ditahan cuma grade dan saran porsi.
+          </p>
+        )}
         {data?.withheld && (
           <p className="text-warn text-xs leading-relaxed" role="status">
             {data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan saran porsi
             ditahan sampai datanya masuk.
+          </p>
+        )}
+        {data?.gate && data.gate.regime_fresh === false && (
+          <p className="text-warn text-xs leading-relaxed" role="status">
+            {data.gate.reason} — penanda ini soal seri rezimnya, bukan soal panel saham: papan
+            tetap terbuka.
           </p>
         )}
       </header>
@@ -412,6 +442,8 @@ export default function RekomendasiPage() {
         <>
           <section className="card grid grid-cols-2 gap-4 p-4 sm:grid-cols-5">
             <Stat label="Kandidat hari ini" value={data ? `${data.total_candidates} saham` : "-"} />
+            {/* Kolam = nama yang berhak masuk papan (likuid & konsisten). Yang benar-benar
+                dinilai lebih sedikit dari itu, dan yang tampil lebih sedikit lagi. */}
             <Stat
               label="Kolam → tampil"
               value={
@@ -488,7 +520,7 @@ export default function RekomendasiPage() {
             ) : (
               <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {data.rows.map((row) => (
-                  <CandidateCard key={row.code} row={row} />
+                  <CandidateCard key={row.code} row={row} withheldNote={withheldNote} />
                 ))}
               </ul>
             )}

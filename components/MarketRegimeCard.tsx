@@ -134,7 +134,7 @@ export function MarketRegimeCard() {
       }
     >
       <div className="flex flex-col gap-4">
-        {data.gate?.blocked && (
+        {(data.gate?.blocked || data.gate?.regime_fresh === false) && (
           <p className="text-xs font-medium" style={{ color: "var(--warn)" }}>
             {data.gate.reason}
           </p>

@@ -1253,9 +1253,12 @@ export interface RecommendationRow {
   code: string;
   name: string | null;
   score: number;
-  /** `null` = verdict ditahan karena data basi (spec D1), bukan "grade C". */
+  /**
+   * `null` = verdict ditahan, bukan "grade C": data basi (spec D1) atau rezim
+   * yang eksplisit menolak (spec 6.5/Q5).
+   */
   grade: string | null; // A | B | C
-  /** Peringkat 0-100 di kolam sesi itu (spec D3) - bukan probabilitas. */
+  /** Peringkat 0-100 di antara kandidat sesi itu (spec D3) - bukan probabilitas. */
   percentile?: number | null;
   /** Skor terakhir vs riwayat emiten itu sendiri; `null` = riwayat < 20 sesi. */
   own_percentile?: number | null;
@@ -1278,7 +1281,7 @@ export interface RecommendationRow {
   warnings: string[];
   layers: Record<string, boolean>;
   metrics: RecommendationMetrics | null;
-  /** True = grade & ukuran posisi baris ini ditahan karena data tidak segar (D1). */
+  /** True = grade & ukuran posisi baris ini ditahan (data basi D1, atau gerbang rezim 6.5). */
   withheld?: boolean;
 }
 
@@ -1296,6 +1299,8 @@ export interface RecommendationResponse {
   /** Kesegaran panel: `withheld` True = grade & ukuran posisi ditahan (spec D1). */
   freshness?: Freshness | null;
   withheld?: boolean;
+  /** Gerbang rezim: `blocked` True = grade & saran porsi ditahan (spec 6.5/Q5). */
+  gate?: RegimeGate | null;
   rows: RecommendationRow[];
 }
 
@@ -1309,6 +1314,7 @@ export interface StockRecommendation {
   reason: string | null;
   freshness?: Freshness | null;
   withheld?: boolean;
+  gate?: RegimeGate | null;
   generated_at: string | null;
 }
 
