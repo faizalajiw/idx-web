@@ -75,6 +75,12 @@ function Field({
 }
 
 function TabelRencana({ plan, stop }: { plan: PositionPlan; stop: number | null }) {
+  // Sebab wajib terbaca begitu angka bisa menyesatkan: ada plafon memotong,
+  // porsi jatuh ke nol, atau modal belum diisi sehingga rupiah dan lot kosong
+  // (D14/R4: angka nol tidak boleh tampil tanpa sebab). Saat porsi penuh
+  // dipakai apa adanya, catatannya cuma "tidak ada plafon yang memotong".
+  const sebabPerlu =
+    plan.binding_cap !== null || plan.pct === 0 || plan.lots === null || plan.lots === 0;
   return (
     <>
       <table className="data-table mt-3 max-w-sm">
@@ -109,6 +115,11 @@ function TabelRencana({ plan, stop }: { plan: PositionPlan; stop: number | null 
           </tr>
         </tbody>
       </table>
+      {sebabPerlu && (
+        <p className="text-[var(--warn)] mt-2 text-xs leading-snug" role="status">
+          {plan.note}
+        </p>
+      )}
       <p className="text-[var(--warn)] mt-3 border-t border-dashed border-[var(--border)] pt-3 text-xs leading-snug">
         Rencana batal kalau harga menembus {rp(stop)}. Di bawah level itu tidak ada menambah posisi.
       </p>
