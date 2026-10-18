@@ -439,9 +439,9 @@ export function useStockOwnership(code: string | null) {
  * Papan kandidat beli se-pasar: skor + grade + level eksekusi per emiten.
  * Data EOD harian (hitung berat & cache 30 menit) — refresh 5 menit cukup.
  */
-export function useRecommendations(limit = 20, minGrade = "C") {
+export function useRecommendations(limit = 20, minGrade = "C", query = "") {
   return useSWR<RecommendationResponse>(
-    `/api/recommendations?limit=${limit}&min_grade=${minGrade}`,
+    `/api/recommendations?limit=${limit}&min_grade=${minGrade}${query}`,
     fetcher,
     { refreshInterval: 300_000 },
   );
