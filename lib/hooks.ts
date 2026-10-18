@@ -51,6 +51,7 @@ import type {
   StockRecommendation,
   RecommendationTrack,
   DataHealth,
+  Freshness,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -474,6 +475,19 @@ export function useRecommendationTrack() {
  */
 export function useDataHealth() {
   return useSWR<DataHealth>("/api/data-health", fetcher, {
+    refreshInterval: 60_000,
+    shouldRetryOnError: false,
+  });
+}
+
+/**
+ * Kesegaran data: "boleh percaya angka di dashboard?" - spec D1.
+ *
+ * Dua query `max(...)` di backend, jadi 60 detik cukup: angkanya bergerak
+ * harian, bukan per-30 detik.
+ */
+export function useFreshness() {
+  return useSWR<Freshness>("/api/freshness", fetcher, {
     refreshInterval: 60_000,
     shouldRetryOnError: false,
   });

@@ -7,6 +7,7 @@ import { useRecommendations, useRecommendationTrack } from "@/lib/hooks";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
 import { RegimeBanner } from "@/components/RegimeBanner";
+import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { TickerLogo } from "@/components/TickerLogo";
 import { fmtNum, fmtPct, fmtCompact, trendClass } from "@/lib/format";
 import type {
@@ -44,6 +45,12 @@ const CONFIDENCE_LABEL: Record<string, string> = {
   lemah: "Keyakinan rendah",
 };
 
+/** Label skor (spec D3) - beda dari `confidence` pola buru di atas. */
+const SCORE_CONFIDENCE_LABEL: Record<string, string> = {
+  meyakinkan: "Meyakinkan",
+  "belum terbukti": "Belum terbukti",
+};
+
 const rp = (v: number | null | undefined) =>
   v === null || v === undefined ? "-" : `Rp ${fmtNum(v)}`;
 
@@ -67,6 +74,9 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
 
 function CandidateCard({ row }: { row: RecommendationRow }) {
   const grade = GRADE_META[row.grade as Grade] ?? GRADE_META.C;
+  // Verdict bisa ditahan backend saat data basi (spec D1): grade & ukuran
+  // posisi jadi `null`. Jangan render "null" - tampilkan satu baris penjelas.
+  const withheld = row.withheld === true || row.grade === null;
   const entry =
     row.entry_low !== null && row.entry_high !== null
       ? `${rp(row.entry_low)} – ${fmtNum(row.entry_high)}`
@@ -87,8 +97,18 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <span className={grade.badge}>{grade.label}</span>
-          <p className="text-muted mt-1 text-[11px] tabular-nums">Skor {row.score.toFixed(0)}</p>
+          {withheld ? (
+            <span className="badge badge-hold">Ditahan</span>
+          ) : (
+            <span className={grade.badge}>{grade.label}</span>
+          )}
+          {/* Skala yang bisa dibandingkan (spec D3 poin 1): peringkat persentil
+              kolam, BUKAN skor mentah 0-100 yang gampang dibaca sebagai keyakinan. */}
+          <p className="text-muted mt-1 text-[11px] tabular-nums">
+            {row.percentile === null || row.percentile === undefined
+              ? "-"
+              : `Peringkat ${Math.round(row.percentile)}% kolam`}
+          </p>
         </div>
       </div>
 
@@ -96,6 +116,20 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
         <p className="mt-3 flex gap-2 text-xs leading-relaxed">
           <Lightbulb size={14} className="text-muted mt-0.5 shrink-0" aria-hidden />
           <span>{why}</span>
+        </p>
+      )}
+
+      {withheld && (
+        <p
+          className="mt-3 flex gap-1.5 text-[11px] leading-snug"
+          style={{ color: "var(--warn)" }}
+          role="status"
+        >
+          <ShieldAlert size={13} className="mt-0.5 shrink-0" aria-hidden />
+          <span>
+            Verdict ditahan: data sesi ini belum segar, jadi grade &amp; saran porsi belum
+            bisa dipakai sampai datanya masuk.
+          </span>
         </p>
       )}
 
@@ -132,9 +166,27 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
               label="Untung vs rugi"
               value={row.rr === null ? "-" : `1 : ${row.rr.toFixed(1)}`}
             />
+            {!withheld && (
+              <Stat
+                label="Saran porsi"
+                value={row.position_pct === null ? "-" : `${row.position_pct}% modal`}
+              />
+            )}
             <Stat
-              label="Saran porsi"
-              value={row.position_pct === null ? "-" : `${row.position_pct}% modal`}
+              label="Vs riwayat sendiri"
+              value={
+                row.own_percentile === null || row.own_percentile === undefined
+                  ? "-"
+                  : `${Math.round(row.own_percentile)}%`
+              }
+            />
+            <Stat
+              label="Keyakinan skor"
+              value={
+                row.score_confidence
+                  ? (SCORE_CONFIDENCE_LABEL[row.score_confidence] ?? row.score_confidence)
+                  : "-"
+              }
             />
           </div>
           {row.confidence && (
@@ -171,6 +223,15 @@ function CandidateCard({ row }: { row: RecommendationRow }) {
             </p>
           )}
           {row.entry_note && <p className="text-muted leading-snug">{row.entry_note}</p>}
+          {row.rank_basis && row.rank_basis.order.length > 0 && (
+            <p className="text-muted text-[11px] leading-snug">
+              Urutan saat skor seri: {row.rank_basis.order.join(" → ")}.
+            </p>
+          )}
+          <p className="text-muted text-[11px] leading-snug tabular-nums">
+            Skor dasar {row.score.toFixed(1)} — angka ini peringkat mentah, bukan ukuran
+            keyakinan.
+          </p>
           <div className="flex gap-4 pt-1 text-[11px]">
             <Link href={`/keputusan/${row.code}`} className="font-medium hover:underline">
               Ruang Keputusan →
@@ -314,7 +375,10 @@ export default function RekomendasiPage() {
   const tabCount = (grade: Grade) => {
     const rows = all?.rows ?? [];
     const allowed = grade === "A" ? ["A"] : grade === "B" ? ["A", "B"] : ["A", "B", "C"];
-    return all ? rows.filter((r) => allowed.includes(r.grade)).length : null;
+    // Grade `null` = verdict ditahan (spec D1): bukan kandidat, jangan dihitung.
+    return all
+      ? rows.filter((r) => r.grade !== null && allowed.includes(r.grade)).length
+      : null;
   };
 
   return (
@@ -328,7 +392,16 @@ export default function RekomendasiPage() {
           Saham yang menurut sistem paling layak dibeli hari ini, lengkap dengan harga beli, batas
           rugi, dan target. Pilih kandidat, baca alasannya, lalu putuskan sendiri.
         </p>
-        <LastUpdated sessionDate={data?.date} updatedAt={data?.generated_at} />
+        <div className="flex flex-wrap items-center gap-2">
+          <LastUpdated sessionDate={data?.date} updatedAt={data?.generated_at} />
+          <FreshnessBadge basis="panel" freshness={data?.freshness} />
+        </div>
+        {data?.withheld && (
+          <p className="text-warn text-xs leading-relaxed" role="status">
+            {data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan saran porsi
+            ditahan sampai datanya masuk.
+          </p>
+        )}
       </header>
 
       <RegimeBanner />
@@ -337,8 +410,16 @@ export default function RekomendasiPage() {
         <ErrorState message="Gagal memuat rekomendasi. Pastikan backend & database hidup." />
       ) : (
         <>
-          <section className="card grid grid-cols-2 gap-4 p-4 sm:grid-cols-4">
+          <section className="card grid grid-cols-2 gap-4 p-4 sm:grid-cols-5">
             <Stat label="Kandidat hari ini" value={data ? `${data.total_candidates} saham` : "-"} />
+            <Stat
+              label="Kolam → tampil"
+              value={
+                data && data.pool_size != null
+                  ? `${data.pool_size} → ${data.rows.length} saham`
+                  : "-"
+              }
+            />
             <Stat label="Kategori Teratas" value={data ? `${topCount} saham` : "-"} />
             <Stat label="Emiten dipindai" value={data ? `${data.scanned} saham` : "-"} />
             <Stat label="Data sesi" value={data?.date ?? "-"} />

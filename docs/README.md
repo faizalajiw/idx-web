@@ -44,10 +44,10 @@ flowchart LR
 
 | Group | Route | Menu | Fungsi (1 baris) | Card | Sumber data utama | Update |
 |---|---|---|---|---|---|---|
-| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 9 | `index_quotes`, `index_summary_daily`, `research.latest_pit`, `research.raw_eod` | on-demand + SWR 30s (kesehatan data 60s) |
+| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 9 | `index_quotes`, `index_summary_daily`, `research.latest_pit`, `research.raw_eod` | on-demand + SWR 30s (kesehatan data & kesegaran 60s) |
 | Utama | `/pantau` | Pantau | Watchlist + alert + chart | 5 | `watchlist`, `stock_quotes` | on-demand + SWR 30s |
 | Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + SWR 30s |
-| Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
+| Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + badge kesegaran + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
 | Analisis | `/keputusan` | Ruang Keputusan | Verdict per emiten + event study | 5 | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
 | Analisis | `/ruang-keputusan` | Ruang Keputusan | Skor keputusan + konteks | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
 | Analisis | `/jejak-sinyal` | Jejak Sinyal | Track record sinyal vs pasar | 4 | `research.signal_log` | job `idx signal-log` |

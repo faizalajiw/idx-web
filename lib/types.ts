@@ -48,6 +48,17 @@ export interface MarketTradeSummary {
   non_regular_share_value: number | null;
 }
 
+/** Gerbang rezim (spec 6.5): boleh menolak, tapi tak boleh membisukan tanpa sebab. */
+export interface RegimeGate {
+  blocked: boolean;
+  reason: string;
+  regime: string | null;
+  adx: number | null;
+  vol_state: string | null;
+  volatile: boolean;
+  regime_fresh: boolean;
+}
+
 /** Regime IHSG + volatilitas ter-annualisasi (banner konteks). */
 export interface MarketRegime {
   regime: "TRENDING_UP" | "TRENDING_DOWN" | "TRANSITION" | "RANGING" | null;
@@ -59,6 +70,8 @@ export interface MarketRegime {
   source: string | null;
   as_of: string | null;
   dir_hint: "up" | "down" | null;
+  /** Gerbang rezim: `blocked` True = layar menahan tawaran baru (spec 6.5). */
+  gate?: RegimeGate | null;
   /** Jam backend memperbarui regime ini (WIB, ISO). */
   generated_at?: string | null;
 }
@@ -1229,12 +1242,26 @@ export interface RecommendationLayerStatus {
   note: string | null;
 }
 
+/** Urutan pemutus yang dipakai peringkat kandidat (spec D3). */
+export interface RankBasis {
+  order: string[];
+  values: (number | string | null)[];
+}
+
 /** Satu kandidat beli: skor + grade + level eksekusi + alasan. */
 export interface RecommendationRow {
   code: string;
   name: string | null;
   score: number;
-  grade: string; // A | B | C
+  /** `null` = verdict ditahan karena data basi (spec D1), bukan "grade C". */
+  grade: string | null; // A | B | C
+  /** Peringkat 0-100 di kolam sesi itu (spec D3) - bukan probabilitas. */
+  percentile?: number | null;
+  /** Skor terakhir vs riwayat emiten itu sendiri; `null` = riwayat < 20 sesi. */
+  own_percentile?: number | null;
+  rank_basis?: RankBasis | null;
+  /** Label skor dari backend: "meyakinkan" | "belum terbukti". */
+  score_confidence?: string | null;
   setup: string | null; // pullback | breakout | trend | netral
   entry_low: number | null;
   entry_high: number | null;
@@ -1251,6 +1278,8 @@ export interface RecommendationRow {
   warnings: string[];
   layers: Record<string, boolean>;
   metrics: RecommendationMetrics | null;
+  /** True = grade & ukuran posisi baris ini ditahan karena data tidak segar (D1). */
+  withheld?: boolean;
 }
 
 /** Papan kandidat beli se-pasar untuk sesi terakhir. */
@@ -1259,9 +1288,14 @@ export interface RecommendationResponse {
   generated_at: string | null;
   scanned: number;
   total_candidates: number;
+  /** Anggota kolam sesi itu sebelum dipotong limit/min_grade (spec 6.6). */
+  pool_size?: number;
   limit: number;
   min_grade: string;
   layers: RecommendationLayerStatus;
+  /** Kesegaran panel: `withheld` True = grade & ukuran posisi ditahan (spec D1). */
+  freshness?: Freshness | null;
+  withheld?: boolean;
   rows: RecommendationRow[];
 }
 
@@ -1273,6 +1307,8 @@ export interface StockRecommendation {
   candidate: RecommendationRow | null;
   layers: RecommendationLayerStatus;
   reason: string | null;
+  freshness?: Freshness | null;
+  withheld?: boolean;
   generated_at: string | null;
 }
 
@@ -1363,4 +1399,24 @@ export interface DataHealth {
   field_coverage: DataHealthCheck;
   row_counts: DataHealthRowCount;
   session_gaps: DataHealthSessionGaps;
+}
+
+export type FreshnessStatus = "segar" | "basi" | "tak diketahui";
+
+/**
+ * Kesegaran tiga-status dari `/api/freshness` (spec D1): "angka ini masih
+ * bisa dipercaya?". `withhold` True = verdict yang lahir dari data ini wajib
+ * ditahan; `index_status` penanda terpisah untuk bagian berindeks (tidak
+ * pernah mengubah status halaman).
+ */
+export interface Freshness {
+  status: FreshnessStatus;
+  withhold: boolean;
+  reason: string;
+  panel_latest: string | null;
+  index_latest: string | null;
+  index_status: FreshnessStatus;
+  expected: string | null;
+  checked_at: string;
+  basis: string;
 }

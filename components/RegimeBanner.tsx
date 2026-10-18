@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { LastUpdated } from "./LastUpdated";
+import { FreshnessBadge } from "./FreshnessBadge";
 
 /** Warna & ikon per regime. */
 const REGIME_STYLE: Record<string, { badge: string; icon: LucideIcon; label: string }> = {
@@ -81,7 +82,13 @@ export function RegimeBanner() {
       <span className="text-muted hidden text-xs md:inline">
         {hint(data!.regime)}
       </span>
-      <span className="ml-auto">
+      {data!.gate?.blocked && (
+        <span className="text-xs font-medium" style={{ color: "var(--warn)" }}>
+          {data!.gate.reason}
+        </span>
+      )}
+      <span className="ml-auto flex items-center gap-2">
+        <FreshnessBadge basis="indeks" />
         <LastUpdated sessionDate={data!.as_of} updatedAt={data!.generated_at} />
       </span>
     </div>

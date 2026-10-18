@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "./Card";
 import { LastUpdated } from "./LastUpdated";
+import { FreshnessBadge } from "./FreshnessBadge";
 import { useMarketRegime, useRegimeHistory } from "@/lib/hooks";
 
 /** Ikon & warna per regime. */
@@ -100,7 +101,12 @@ export function MarketRegimeCard() {
       <Card
         title="Suasana Pasar"
         subtitle="Status tren & volatilitas IHSG"
-        right={<LastUpdated sessionDate={data?.as_of} updatedAt={data?.generated_at} />}
+        right={
+          <span className="flex items-center gap-2">
+            <FreshnessBadge basis="indeks" />
+            <LastUpdated sessionDate={data?.as_of} updatedAt={data?.generated_at} />
+          </span>
+        }
       >
         <p className="text-muted text-sm">Data kondisi IHSG belum tersedia.</p>
       </Card>
@@ -120,9 +126,19 @@ export function MarketRegimeCard() {
       title="Suasana Pasar"
       subtitle="Ringkasan tren & volatilitas IHSG (kondisi IHSG)"
       info="'Suasana pasar' (kondisi IHSG) = kondisi umum IHSG dari data historis: sedang naik, turun, atau menyamping. Timeline di bawah menunjukkan suasana tiap hari bursa 60 hari terakhir — warnanya mengikuti kondisi harian. Volatilitas = seberapa besar & cepat pergerakan harga."
-      right={<LastUpdated sessionDate={data.as_of} updatedAt={data.generated_at} />}
+      right={
+        <span className="flex items-center gap-2">
+          <FreshnessBadge basis="indeks" />
+          <LastUpdated sessionDate={data.as_of} updatedAt={data.generated_at} />
+        </span>
+      }
     >
       <div className="flex flex-col gap-4">
+        {data.gate?.blocked && (
+          <p className="text-xs font-medium" style={{ color: "var(--warn)" }}>
+            {data.gate.reason}
+          </p>
+        )}
         {/* Regime utama */}
         <div className="flex flex-wrap items-center gap-3">
           <span className={`badge text-sm ${style.badge}`}>

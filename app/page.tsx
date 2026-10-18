@@ -10,6 +10,7 @@ import { SignalsPanel } from "@/components/SignalsPanel";
 import { TechnicalChart } from "@/components/TechnicalChart";
 import { MarketRegimeCard } from "@/components/MarketRegimeCard";
 import { DataHealthCard } from "@/components/DataHealthCard";
+import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { useMarketOverview, useMarketTradeSummary } from "@/lib/hooks";
 import { fmtNum, fmtPct, fmtCompact, fmtDateStr } from "@/lib/format";
 import {
@@ -220,8 +221,10 @@ export default function DashboardPage() {
           <LayoutDashboard size={26} className="text-accent" aria-hidden />
           Dashboard <span className="gradient-text">Pasar</span>
         </h1>
-        <p className="text-muted mt-0.5 text-sm">
-          DataIDX delayed ~5–15 menit · auto-refresh 30 detik
+        <p className="text-muted mt-0.5 flex flex-wrap items-center gap-2 text-sm">
+          <span>DataIDX delayed ~5–15 menit · auto-refresh 30 detik</span>
+          {/* Gerbang kepercayaan di baris pertama yang dibaca mata (spec D1). */}
+          <FreshnessBadge />
         </p>
       </div>
 
