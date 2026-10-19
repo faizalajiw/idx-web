@@ -9,6 +9,10 @@ import {
   screenerQuery,
   createAlert,
   deleteAlert,
+  fetchJournalClaims,
+  fetchJournalSummary,
+  haltJournal,
+  resumeJournal,
 } from "./api";
 import type {
   StockDossier,
@@ -52,6 +56,9 @@ import type {
   RecommendationTrack,
   DataHealth,
   Freshness,
+  JournalClaim,
+  JournalGateState,
+  JournalSummary,
 } from "./types";
 
 // Auto-refresh cadence (ms). Market data is delayed anyway, so 30s is plenty.
@@ -500,4 +507,80 @@ export function useFreshness() {
     refreshInterval: 60_000,
     shouldRetryOnError: false,
   });
+}
+
+// --------------------------------------------------------- buku klaim (lapis 4)
+
+const JOURNAL_SUMMARY_KEY = "/api/journal/summary";
+const JOURNAL_STATE_KEY = "/api/journal/state";
+
+/**
+ * Rekaman aturan buku klaim: agregat, per sesi, verdict, kalimat rekaman.
+ * Diisi job terjadwal sesudah sesi tutup, jadi angkanya bergerak harian.
+ */
+export function useJournalSummary(rule?: string, code?: string) {
+  const p = new URLSearchParams();
+  if (rule) p.set("rule", rule);
+  if (code) p.set("code", code);
+  const q = p.toString();
+  return useSWR<JournalSummary>(
+    `${JOURNAL_SUMMARY_KEY}${q ? `?${q}` : ""}`,
+    fetcher,
+    { refreshInterval: 300_000, shouldRetryOnError: false },
+  );
+}
+
+/** Baris klaim satu sesi; `tradeDate` kosong = sesi bursa terakhir. */
+export function useJournalClaims(tradeDate?: string | null, limit = 50) {
+  const p = new URLSearchParams({ limit: String(limit) });
+  if (tradeDate) p.set("trade_date", tradeDate);
+  return useSWR<JournalClaim[]>(`/api/journal/claims?${p}`, fetcher, {
+    refreshInterval: 300_000,
+    shouldRetryOnError: false,
+  });
+}
+
+/**
+ * Keadaan gerbang klaim: boleh/tidak menulis klaim baru sekarang, dengan sebab
+ * pertamanya (manual, data, regime, verdict). 60 detik cukup: keadaannya
+ * berubah saat pemilik menekan halt, bukan tiap detik.
+ */
+export function useJournalState() {
+  return useSWR<JournalGateState>(JOURNAL_STATE_KEY, fetcher, { refreshInterval: 60_000 });
+}
+
+/** Angka buku ikut berubah begitu gerbangnya berubah (klaim baru / penolakan). */
+function refreshJournal(mutate: ReturnType<typeof useSWRConfig>["mutate"]) {
+  mutate(
+    (key) =>
+      typeof key === "string" &&
+      (key.startsWith(JOURNAL_SUMMARY_KEY) || key.startsWith("/api/journal/claims")),
+    undefined,
+  );
+}
+
+export function useJournalHalt() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (reason: string, by = "pemilik") => {
+      const state = await haltJournal(reason, by);
+      await mutate(JOURNAL_STATE_KEY, state, { revalidate: false });
+      refreshJournal(mutate);
+      return state;
+    },
+    [mutate],
+  );
+}
+
+export function useJournalResume() {
+  const { mutate } = useSWRConfig();
+  return useCallback(
+    async (by = "pemilik") => {
+      const state = await resumeJournal(by);
+      await mutate(JOURNAL_STATE_KEY, state, { revalidate: false });
+      refreshJournal(mutate);
+      return state;
+    },
+    [mutate],
+  );
 }

@@ -13,6 +13,9 @@ import type {
   SectorAnalysis,
   StockBrokerSummary,
   ForeignFlow,
+  JournalClaim,
+  JournalGateState,
+  JournalSummary,
     WatchlistRow,
 } from "./types";
 
@@ -149,3 +152,48 @@ export function screenerQuery(f: ScreenerFilters): string {
   const q = p.toString();
   return q ? `?${q}` : "";
 }
+
+// --------------------------------------------------------- buku klaim (lapis 4)
+
+/** Rekaman aturan buku klaim; `rule` kosong = aturan papan (bawaan backend). */
+export async function fetchJournalSummary(
+  rule?: string,
+  code?: string,
+): Promise<JournalSummary> {
+  const p = new URLSearchParams();
+  if (rule) p.set("rule", rule);
+  if (code) p.set("code", code);
+  const q = p.toString();
+  return get<JournalSummary>(`/api/journal/summary${q ? `?${q}` : ""}`);
+}
+
+/** Baris buku klaim satu sesi (kosong = sesi bursa terakhir). */
+export async function fetchJournalClaims(
+  tradeDate?: string | null,
+  limit = 50,
+): Promise<JournalClaim[]> {
+  const p = new URLSearchParams({ limit: String(limit) });
+  if (tradeDate) p.set("trade_date", tradeDate);
+  return get<JournalClaim[]>(`/api/journal/claims?${p}`);
+}
+
+async function mutateJournal(path: string, body: unknown): Promise<JournalGateState> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw await parseError(res);
+  return res.json() as Promise<JournalGateState>;
+}
+
+/**
+ * Hentikan penulisan klaim baru. `reason` wajib: backend menolak dengan 422
+ * kalau kosong, karena halt tanpa sebab tidak bisa dibedakan dari mesin rusak.
+ */
+export const haltJournal = (reason: string, by = "pemilik"): Promise<JournalGateState> =>
+  mutateJournal("/api/journal/halt", { reason, by });
+
+/** Buka lagi penulisan klaim; waktu dan pelakunya tetap tercatat. */
+export const resumeJournal = (by = "pemilik"): Promise<JournalGateState> =>
+  mutateJournal("/api/journal/resume", { by });

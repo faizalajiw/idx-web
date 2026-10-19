@@ -1455,3 +1455,94 @@ export interface Freshness {
   checked_at: string;
   basis: string;
 }
+
+// --------------------------------------------------------- buku klaim (lapis 4)
+
+/** Satu sesi buku klaim: berapa klaim, dan rata-rata abnormalnya. */
+export interface JournalSessionSummary {
+  trade_date: string;
+  claims: number;
+  /** Fraksi (0.014 = +1,4%); `null` = sesi itu belum punya hasil terukur. */
+  mean_abnormal: number | null;
+}
+
+/** Verdict aturan: "terbukti" / "tidak terbukti" / "belum cukup". */
+export interface JournalVerdict {
+  status: string;
+  reason: string;
+  claims: number;
+  measured_claims: number;
+  sessions: number;
+  mean_abnormal: number | null;
+}
+
+/**
+ * Rekaman aturan buku klaim. Rata-rata dihitung per sesi dulu, baru antar sesi,
+ * jadi satu sesi dengan banyak nama tidak mendominasi rekaman.
+ *
+ * `measured_claims` = klaim yang sudah punya angka; itu yang dipakai verdict,
+ * bukan `claims`. `mean_abnormal` dalam fraksi, `null` = belum terukur.
+ */
+export interface JournalSummary {
+  claims: number;
+  measured_claims: number;
+  sessions: number;
+  hit_target: number;
+  hit_stop: number;
+  expired: number;
+  open: number;
+  horizon_mismatch: number;
+  mean_abnormal: number | null;
+  per_session: JournalSessionSummary[];
+  verdict: JournalVerdict | null;
+  /** Kalimat rekaman (P3): satu baris yang mengikat mesin pada klaimnya. */
+  record_line: string;
+}
+
+/** Satu baris buku klaim apa adanya, termasuk yang masih terbuka. */
+export interface JournalClaim {
+  code: string;
+  trade_date: string | null;
+  rule: string | null;
+  grade: string | null;
+  ref_raw: number | null;
+  stop_raw: number | null;
+  target_raw: number | null;
+  horizon_days: number | null;
+  size_pct: number | null;
+  /** "terbuka" | "kena_target" | "kena_stop" | "kedaluwarsa". */
+  status: string;
+  /** Fraksi; `null` = belum terukur (bukan nol). */
+  outcome_abn: number | null;
+  touch_date: string | null;
+}
+
+/** Keadaan halt manual pemilik. */
+export interface JournalHalt {
+  halted: boolean;
+  reason: string | null;
+  at: string | null;
+  by: string | null;
+  note: string | null;
+}
+
+/** Sesi tanpa klaim DAN tanpa penolakan: job-nya tidak menulis apa pun. */
+export interface JournalGap {
+  trade_date: string;
+  sebab: string;
+}
+
+/**
+ * Keadaan gerbang klaim sekarang. `reason` = "manual" | "data" | "regime" |
+ * "verdict"; hanya sebab pertama yang dilaporkan. `note` terisi kalau ada yang
+ * tidak terbaca (mis. buku belum bisa dibaca): gerbangnya dibiarkan terbuka,
+ * keadaannya ditulis apa adanya.
+ */
+export interface JournalGateState {
+  allowed: boolean;
+  reason: string | null;
+  message: string;
+  halt: JournalHalt;
+  gaps: JournalGap[];
+  note: string | null;
+}
