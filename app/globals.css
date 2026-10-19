@@ -3,30 +3,38 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #0b0e14;
-  --bg-elev: #1e222d;
-  --bg-card: #131722;
-  --bg-card-solid: #131722;
-  --border: #2a2e39;
-  --border-strong: #363a45;
-  --fg: #d1d4dc;
-  /* Teks redup tetap harus terbaca di kartu gelap (--bg-card #131722):
-     5,78:1, di atas ambang WCAG AA 4,5:1. Nilai lama #787b86 hanya 4,24:1. */
+  --bg: #0a0b0f;
+  --bg-elev: #171a23;
+  --bg-card: #101218;
+  --bg-card-solid: #101218;
+  /* Garis rambut, bukan garis pekat: pemisah antar permukaan cukup samar di kanvas gelap. */
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.11);
+  --fg: #eceef4;
+  /* 6,2:1 di atas --bg-card #101218, di atas ambang WCAG AA 4,5:1. */
   --fg-muted: #8b93a7;
-  --accent: #2962ff;
+  /* Alias: banyak komponen menulis var(--muted) padahal token lama bernama
+     --fg-muted. Tanpa alias ini warnanya tak sah dan teks mewarisi warna induk. */
+  --muted: var(--fg-muted);
+  /* Dua token aksen, karena satu warna tak bisa lolos dua arah sekaligus:
+     --accent jadi latar tombol (putih di atasnya 5,0:1),
+     --accent-text jadi warna teks & ikon di kanvas gelap (5,5:1). */
+  --accent: #3562f5;
+  --accent-text: #5b83ff;
   --accent-2: #26a69a;
-  --up: #26a69a;
+  --up: #37b3a4;
   --down: #ef5350;
-  --neutral: #787b86;
-  --warn: #f5a623;
+  --neutral: #8b90a0;
+  --warn: #e0a144;
   --rail-w: 4rem;
   --r-sm: 8px;
-  --r: 12px;
-  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.2);
-  --elev-2: 0 6px 18px rgba(0, 0, 0, 0.34), 0 2px 6px rgba(0, 0, 0, 0.22);
-  --glass-bg: rgba(19, 23, 34, 0.72);
-  --glow-1: rgba(41, 98, 255, 0.1);
-  --glow-2: rgba(38, 166, 154, 0.07);
+  --r: 14px;
+  /* Kartu memakai garis rambut, bukan bayangan. Bayangan hanya untuk yang melayang. */
+  --elev-1: none;
+  --elev-2: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.32);
+  --glass-bg: rgba(16, 18, 24, 0.74);
+  --glow-1: rgba(59, 107, 255, 0.08);
+  --glow-2: rgba(55, 179, 164, 0.05);
 
   /* Palet chart (mode gelap) — dikalibrasi ulang di html.light. Dipakai lewat
      var() langsung di atribut SVG recharts, jadi ikut tema tanpa re-render. */
@@ -62,21 +70,26 @@ html.light {
   --bg-elev: #eceff3;
   --bg-card: #ffffff;
   --bg-card-solid: #ffffff;
-  --border: #e3e6ea;
-  --border-strong: #c9d0d9;
+  --border: rgba(15, 23, 42, 0.09);
+  --border-strong: rgba(15, 23, 42, 0.16);
   --fg: #161b22;
+  /* 6,3:1 di atas putih, di atas ambang WCAG AA 4,5:1. */
   --fg-muted: #5b6572;
+  --muted: var(--fg-muted);
+  /* Empat warna di bawah ini dinaikkan dari nilai lama karena gagal AA di atas
+     putih: --up 3,38:1, --down 4,28:1, --warn 4,24:1, --neutral 2,90:1. */
   --accent: #2962ff;
+  --accent-text: #2450e6;
   --accent-2: #00897b;
-  --up: #0f9d8a;
-  --down: #e03e3e;
-  --neutral: #8b94a1;
-  --warn: #b26a00;
-  --elev-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.05);
-  --elev-2: 0 6px 18px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glow-1: rgba(41, 98, 255, 0.07);
-  --glow-2: rgba(0, 137, 123, 0.05);
+  --up: #0d7d6f;
+  --down: #d03636;
+  --neutral: #6b7280;
+  --warn: #9a5c00;
+  --elev-1: none;
+  --elev-2: 0 12px 32px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.76);
+  --glow-1: rgba(41, 98, 255, 0.06);
+  --glow-2: rgba(0, 137, 123, 0.04);
 
   /* Palet chart mode terang — kontras lebih tinggi di latar putih. */
   --chart-axis: #64748b;
@@ -159,20 +172,20 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  box-shadow: var(--elev-1);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.18s ease;
 }
 
 /* Catatan: tanpa transform/lift karena animasi fade-up (fill: both) menimpanya. */
 .card-hover:hover {
   border-color: var(--border-strong);
-  box-shadow: var(--elev-2);
 }
 
+/* Kaca hanya untuk rangka yang melayang di atas isi: header, sidebar, footer,
+   panel drawer, palet perintah. Kartu, banner, dan tabel tetap solid. */
 .glass-strong {
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
 }
 
 /* ---------- typography helpers ---------- */
@@ -198,12 +211,12 @@ body {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.badge-buy { background: rgba(38, 166, 154, 0.14); color: var(--up); }
+.badge-buy { background: rgba(55, 179, 164, 0.14); color: var(--up); }
 .badge-sell { background: rgba(239, 83, 80, 0.14); color: var(--down); }
-.badge-hold { background: rgba(120, 123, 134, 0.16); color: var(--fg-muted); }
-.badge-warn { background: rgba(245, 166, 35, 0.15); color: var(--warn); }
-.badge-pre { background: rgba(245, 166, 35, 0.15); color: var(--warn); }
-.badge-accent { background: rgba(41, 98, 255, 0.15); color: var(--accent); }
+.badge-hold { background: rgba(139, 144, 160, 0.16); color: var(--fg-muted); }
+.badge-warn { background: rgba(224, 161, 68, 0.15); color: var(--warn); }
+.badge-pre { background: rgba(224, 161, 68, 0.15); color: var(--warn); }
+.badge-accent { background: rgba(53, 98, 245, 0.15); color: var(--accent-text); }
 
 .chip {
   display: inline-flex;
@@ -396,14 +409,17 @@ body {
   transition: width 0.2s ease;
 }
 
-/* Footer fixed di bawah viewport; left mengikuti lebar sidebar */
+/* Footer fixed di bawah viewport; left mengikuti lebar sidebar.
+   Di bawah 1024px berhenti melayang, jadi tidak menutupi isi (lihat blok rangka). */
 .app-footer {
   position: fixed;
   left: var(--rail-w);
   right: 0;
   bottom: 0;
   z-index: 30;
-  background: var(--bg);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
   border-top: 1px solid var(--border);
   transition: left 0.2s ease;
 }
@@ -508,14 +524,15 @@ html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 2
   outline-offset: 2px;
 }
 
-.chip { border-radius: 999px; }
-.badge { border-radius: 999px; padding: 3px 9px; }
+/* Tanpa bentuk pil: radius tetap sejalan dengan permukaan lain. */
+.chip { border-radius: var(--r-sm); }
+.badge { border-radius: 6px; padding: 3px 8px; }
 .input { border-radius: var(--r-sm); }
-.btn { border-radius: var(--r-sm); }
-.nav-link { border-radius: var(--r-sm); }
+.btn { border-radius: 10px; }
+.nav-link { border-radius: 10px; }
 
 .btn-primary {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(41, 98, 255, 0.25);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(53, 98, 245, 0.28);
 }
 .btn:active { transform: translateY(1px); }
 
@@ -527,22 +544,20 @@ html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 2
   border-radius: var(--r);
   border: 1px solid var(--border);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--stat-c) 9%, transparent) 0%, transparent 65%),
+    linear-gradient(180deg, color-mix(in srgb, var(--stat-c) 6%, transparent) 0%, transparent 60%),
     var(--bg-card);
-  box-shadow: var(--elev-1);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 .stat-box::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 3px;
+  height: 2px;
   background: var(--stat-c);
-  opacity: 0.85;
+  opacity: 0.5;
 }
 .stat-box:hover {
-  border-color: color-mix(in srgb, var(--stat-c) 35%, var(--border));
-  box-shadow: var(--elev-2);
+  border-color: color-mix(in srgb, var(--stat-c) 30%, var(--border));
 }
 
 .data-table thead th { border-bottom-color: var(--border-strong); }
@@ -551,3 +566,229 @@ html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 2
 /* Scrollbar lebih ramping */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { border-width: 1px; }
+
+/* ---------- rangka responsif: drawer & header di bawah 1024px ---------- */
+
+/* Navigasi tidak dikurangi, hanya pindah rumah: di bawah 1024px sidebar penuh
+   diganti drawer, supaya rail 64px tidak memakan 16% lebar layar ponsel. */
+
+@media (max-width: 1023px) {
+  .app-sidebar,
+  .app-topbar { display: none; }
+  .app-main {
+    padding-left: 0;
+    padding-bottom: 0; /* footer ikut mengalir di dokumen, bukan menutupi isi */
+  }
+  .app-footer {
+    position: static;
+    left: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-mobile-chrome { display: none; }
+}
+
+/* Header ponsel: tetap kaca, menempel di atas saat isi digulir. */
+.m-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3.625rem;
+  padding: 0 0.75rem;
+  padding-top: env(safe-area-inset-top);
+  border-bottom: 1px solid var(--border);
+}
+.m-header .brand-link { min-width: 0; }
+.m-header .brand-text { display: inline; }
+
+/* Strip status: satu baris tanpa garis, isinya kesegaran data + keadaan bursa. */
+.m-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 10.5px;
+  color: var(--fg-muted);
+}
+.m-status > * {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Di 390px kedua teks tak muat sebaris (190 + 184 px di ruang 358 px), jadi
+   di bawah 640px keduanya dapat barisnya sendiri: utuh, tidak dipotong. */
+@media (max-width: 639px) {
+  .m-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding-bottom: 0.3rem;
+  }
+  .m-status > * { max-width: 100%; }
+}
+
+/* Tombol ikon: kotak sentuh 44px, ikonnya tetap kecil. */
+.m-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--fg-muted);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.m-icon-btn:hover { color: var(--fg); background: var(--bg-elev); }
+
+/* Drawer. Hanya panel yang melayang, jadi hanya panel yang berbayang. */
+.drawer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  transition: opacity 0.18s ease;
+}
+/* Tertutup: lapisan tetap terpasang supaya animasi jalan, tapi tidak terlihat
+   dan tidak bisa disentuh. Atribut `inert` menutup jalur keyboard & pembaca
+   layar sekaligus. */
+.drawer-layer[data-open="false"] { opacity: 0; pointer-events: none; }
+.drawer-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.18s ease both;
+}
+.drawer-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(19rem, 85vw);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--elev-2);
+  animation: drawerIn 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes drawerIn {
+  from { transform: translateX(-100%); }
+  to { transform: none; }
+}
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 3.625rem;
+  padding: 0 0.5rem 0 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.drawer-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0.5rem;
+  overscroll-behavior: contain;
+}
+.drawer-foot {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+}
+
+/* Di dalam drawer label nav selalu tampil: ruangnya ada, dan ikon tanpa label
+   bukan navigasi yang bisa dibaca. */
+.drawer-panel .nav-group-title { display: block; }
+.drawer-panel .nav-label { display: inline; }
+/* Kepala drawer juga menampilkan wordmark, bukan hanya ikon. */
+.drawer-head .brand-text { display: inline; }
+.drawer-panel .nav-link {
+  min-height: 44px;
+  justify-content: flex-start;
+  padding: 0 0.75rem;
+}
+.drawer-panel .nav-link-active { box-shadow: inset 2px 0 0 var(--accent); }
+
+/* Kunci gulir halaman saat drawer terbuka. */
+html.drawer-open { overflow: hidden; }
+
+/* Wadah geser tabel: kolom tidak dipotong, hanya bisa digeser. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.table-scroll-hint {
+  display: none;
+  padding: 0.35rem 0.75rem 0.5rem;
+  font-size: 10.5px;
+  color: var(--fg-muted);
+}
+
+@media (max-width: 1023px) {
+  /* Pendar tepi kanan: penanda masih ada kolom di sebelah kanan. Hilang saat
+     sudah digeser sampai ujung. */
+  .table-scroll:not(.at-end) {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+  .table-scroll-hint { display: block; }
+
+  /* Target sentuh minimum 44px tanpa memperbesar tampilan: kotak sentuh
+     dinaikkan lewat lapisan tembus pandang. */
+  [aria-label].tap-44,
+  .tap-44 { position: relative; }
+  .tap-44::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+  .btn { min-height: 44px; }
+  .chip { min-height: 44px; }
+  /* Kontrol mandiri lain: kotak sentuh 44px. Tautan di tengah kalimat ikut
+     aturan ini tapi tetap kecil, karena min-height tidak berlaku untuk elemen
+     inline (dan WCAG 2.5.8 memang mengecualikan target inline). */
+  .app-main button,
+  .app-main a,
+  .app-main select,
+  .app-main input:not([type="checkbox"]):not([type="radio"]) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Kotak centang & radio mengikuti ambang WCAG 2.5.8 (24px), bukan 44px. */
+  .app-main input[type="checkbox"],
+  .app-main input[type="radio"] { min-width: 24px; min-height: 24px; }
+  /* Tautan brand di header tingginya 36px; dinaikkan ke 44px. */
+  .m-header .brand-link { min-height: 44px; }
+  /* Tombol penjelasan (ikon 13px): kotak 44px, tapak visualnya tetap 18px. */
+  .app-main button[aria-label="Penjelasan"] {
+    min-width: 44px;
+    min-height: 44px;
+    margin: -13px;
+  }
+  .data-table tbody td,
+  .data-table thead th { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+  /* 16px: di bawah ini iOS memperbesar halaman sendiri saat input difokus. */
+  .input, .input:not([type="checkbox"]) { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel, .drawer-scrim { animation: none; }
+  .m-icon-btn { transition: none; }
+}

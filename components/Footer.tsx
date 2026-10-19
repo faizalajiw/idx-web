@@ -10,7 +10,7 @@ export function Footer() {
           href="https://github.com/faizalajiw"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted inline-flex items-center gap-1.5 transition-colors hover:text-[var(--accent)]"
+          className="text-muted inline-flex items-center gap-1.5 transition-colors hover:text-[var(--accent-text)]"
         >
           <svg
             width="15"

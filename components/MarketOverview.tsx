@@ -12,7 +12,7 @@ import { LastUpdated } from "./LastUpdated";
 function MoverList({ items, kind }: { items: Mover[]; kind: "gain" | "lose" }) {
   return (
     <div>
-      <div className="text-muted grid grid-cols-[1.5rem_1fr_5rem_4rem] items-center gap-3 border-b border-[var(--border)] px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wide">
+      <div className="text-muted grid grid-cols-[1.25rem_1fr_4.5rem_4.5rem] items-center gap-2 border-b border-[var(--border)] px-2 pb-1.5 text-[10px] font-medium uppercase tracking-wide sm:grid-cols-[1.5rem_1fr_5rem_4rem] sm:gap-3">
         <span className="text-right">#</span>
         <span>Kode</span>
         <span className="text-right">Harga</span>
@@ -22,7 +22,7 @@ function MoverList({ items, kind }: { items: Mover[]; kind: "gain" | "lose" }) {
         {items.map((m, i) => (
           <li
             key={m.code}
-            className="grid grid-cols-[1.5rem_1fr_5rem_4rem] items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/[0.04]"
+            className="grid grid-cols-[1.25rem_1fr_4.5rem_4.5rem] items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/[0.04] sm:grid-cols-[1.5rem_1fr_5rem_4rem] sm:gap-3"
           >
             <span className="text-muted text-right text-xs tabular-nums">{i + 1}</span>
             <span className="flex items-center gap-2 font-medium">

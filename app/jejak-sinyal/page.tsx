@@ -66,7 +66,7 @@ function HorizonTabs({
                 : "border-[var(--border)] hover:bg-[var(--bg-elev)]"
             }`}
           >
-            <p className={`text-sm font-semibold ${on ? "text-[var(--accent)]" : ""}`}>{l.title}</p>
+            <p className={`text-sm font-semibold ${on ? "text-[var(--accent-text)]" : ""}`}>{l.title}</p>
             <p className="text-muted text-[11px]">{l.hint}</p>
           </button>
         );

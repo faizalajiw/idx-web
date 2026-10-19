@@ -38,7 +38,7 @@ function StockPicker({ value }: { value: string | null }) {
         }}
       >
         <div className="group relative flex-1">
-          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" />
+          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent-text)]" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value.toUpperCase())}

@@ -35,7 +35,7 @@ export function ErrorState({ message, occurredAt, onRetry }: ErrorStateProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--accent)] text-[var(--accent)] text-sm font-medium hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-1"
+          className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--accent)] text-[var(--accent-text)] text-sm font-medium hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-1"
           aria-label="Coba lagi"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

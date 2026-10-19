@@ -81,7 +81,7 @@ function StockPicker({ value }: { value: string | null }) {
         }}
       >
         <div className="group relative flex-1">
-          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent)]" />
+          <Search className="text-muted absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors group-focus-within:text-[var(--accent-text)]" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value.toUpperCase())}
@@ -133,7 +133,7 @@ function Guide() {
       <ol className="mt-3 space-y-2.5">
         {steps.map((s, i) => (
           <li key={s} className="flex items-start gap-3 text-sm leading-relaxed">
-            <span className="bg-[var(--accent)]/15 text-[var(--accent)] flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
+            <span className="bg-[var(--accent)]/15 text-[var(--accent-text)] flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
               {i + 1}
             </span>
             <span className="text-muted">{s}</span>
@@ -201,7 +201,7 @@ function Verdict({ d }: { d: Decision }) {
             <button
               type="button"
               onClick={() => setShowAll((v) => !v)}
-              className="text-[var(--accent)] flex items-center gap-1 text-xs font-semibold hover:underline"
+              className="text-[var(--accent-text)] flex items-center gap-1 text-xs font-semibold hover:underline"
             >
               {showAll ? "Sembunyikan" : `Lihat ${reasons.length - 3} alasan lainnya`}
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showAll ? "rotate-180" : ""}`} />
