@@ -96,14 +96,21 @@ function GerbangKontrol({ state }: { state: JournalGateState }) {
   const [sibuk, setSibuk] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const pemicuRef = useRef<HTMLButtonElement | null>(null);
   const halt = useJournalHalt();
   const resume = useJournalResume();
+
+  /** Tutup dialog dan kembalikan fokus ke tombol yang membukanya. */
+  function tutup() {
+    setTerbuka(false);
+    pemicuRef.current?.focus();
+  }
 
   useEffect(() => {
     if (!terbuka) return;
     inputRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setTerbuka(false);
+      if (e.key === "Escape") tutup();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -162,6 +169,7 @@ function GerbangKontrol({ state }: { state: JournalGateState }) {
   return (
     <div className="space-y-2">
       <button
+        ref={pemicuRef}
         type="button"
         className="btn btn-ghost min-h-11 w-full sm:w-auto"
         onClick={() => setTerbuka(true)}
@@ -207,7 +215,7 @@ function GerbangKontrol({ state }: { state: JournalGateState }) {
             <button
               type="button"
               className="btn btn-ghost min-h-11"
-              onClick={() => setTerbuka(false)}
+              onClick={tutup}
               disabled={sibuk}
             >
               Batal
@@ -249,115 +257,128 @@ export function ClaimRecord() {
         ) : undefined
       }
     >
-      {error ? (
-        <ErrorState message={`Gagal memuat rekaman klaim: ${error.message}`} />
-      ) : isLoading || !summary ? (
-        <Skeleton className="h-40" />
-      ) : (
-        <div className="space-y-4">
-          <p className="text-sm font-medium">{summary.record_line}</p>
+      <div className="space-y-4">
+        {/* Rekaman: satu-satunya bagian yang boleh gagal tanpa menyembunyikan gerbang. */}
+        {error ? (
+          <ErrorState message={`Gagal memuat rekaman klaim: ${error.message}`} />
+        ) : isLoading || !summary ? (
+          <Skeleton className="h-40" />
+        ) : (
+          <>
+            {summary.note && (
+              <p className="text-warn text-xs leading-relaxed">{summary.note}</p>
+            )}
 
-          {summary.claims === 0 ? (
-            <p className="text-muted text-xs leading-relaxed">
-              Buku ini masih kosong: belum ada klaim yang tertulis. Klaim pertama ditulis job
-              terjadwal sesudah sesi bursa tutup, lalu hasilnya diperiksa setelah horizonnya
-              berjalan (21 hari bursa).
-            </p>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                <Stat label="Klaim tertulis" value={fmtNum(summary.claims)} />
-                <Stat label="Sudah terukur" value={fmtNum(summary.measured_claims)} />
-                <Stat label="Kena target" value={fmtNum(summary.hit_target)} tone="text-up" />
-                <Stat label="Kena stop" value={fmtNum(summary.hit_stop)} tone="text-down" />
-                <Stat
-                  label="Rata-rata vs pasar"
-                  value={abn(summary.mean_abnormal)}
-                  tone={
-                    summary.mean_abnormal === null
-                      ? "text-muted"
-                      : summary.mean_abnormal > 0
-                        ? "text-up"
-                        : "text-down"
-                  }
-                />
-                <Stat label="Sesi tercatat" value={fmtNum(summary.sessions)} />
-              </div>
+            <p className="text-sm font-medium">{summary.record_line}</p>
 
-              <p className="text-muted text-xs tabular-nums">
-                {fmtNum(summary.open)} masih terbuka · {fmtNum(summary.expired)} kedaluwarsa
-                {summary.horizon_mismatch > 0
-                  ? ` · ${fmtNum(summary.horizon_mismatch)} horizonnya tidak cocok`
-                  : ""}
-                . Rata-rata dihitung per sesi dulu, baru antar sesi.
+            {summary.claims === 0 && !summary.note && (
+              <p className="text-muted text-xs leading-relaxed">
+                Buku ini masih kosong: belum ada klaim yang tertulis. Klaim pertama ditulis job
+                terjadwal sesudah sesi bursa tutup, lalu hasilnya diperiksa setelah horizonnya
+                berjalan (21 hari bursa).
               </p>
+            )}
 
-              <details>
-                <summary className="text-muted cursor-pointer text-xs">
-                  Rincian per sesi{sesi ? ` (terbaru ${sesi})` : ""}
-                </summary>
-                <ul className="mt-2 space-y-0.5 text-xs tabular-nums">
-                  {perSesi.slice(0, 5).map((s) => (
-                    <li key={s.trade_date} className="flex flex-wrap gap-x-3">
-                      <span className="text-muted">{s.trade_date}</span>
-                      <span>{fmtNum(s.claims)} klaim</span>
-                      <span className="text-muted ml-auto">{abn(s.mean_abnormal)}</span>
-                    </li>
-                  ))}
-                </ul>
-                {sesi && claims && claims.length > 0 && (
-                  <ul className="mt-2">
-                    {claims.map((row) => (
-                      <BarisKlaim key={`${row.code}-${row.trade_date}`} row={row} />
+            {summary.claims > 0 && (
+              <>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                  <Stat label="Klaim tertulis" value={fmtNum(summary.claims)} />
+                  <Stat label="Sudah terukur" value={fmtNum(summary.measured_claims)} />
+                  <Stat label="Kena target" value={fmtNum(summary.hit_target)} tone="text-up" />
+                  <Stat label="Kena stop" value={fmtNum(summary.hit_stop)} tone="text-down" />
+                  <Stat
+                    label="Rata-rata vs pasar"
+                    value={abn(summary.mean_abnormal)}
+                    tone={
+                      summary.mean_abnormal === null
+                        ? "text-muted"
+                        : summary.mean_abnormal > 0
+                          ? "text-up"
+                          : "text-down"
+                    }
+                  />
+                  <Stat label="Sesi terukur" value={fmtNum(summary.sessions)} />
+                </div>
+
+                <p className="text-muted text-xs tabular-nums">
+                  {fmtNum(summary.open)} masih terbuka · {fmtNum(summary.expired)} kedaluwarsa
+                  {summary.horizon_mismatch > 0
+                    ? ` · ${fmtNum(summary.horizon_mismatch)} horizonnya tidak cocok`
+                    : ""}
+                  {" · "}
+                  {fmtNum(summary.claim_sessions)} sesi menulis klaim, {fmtNum(summary.sessions)}{" "}
+                  sesi sudah terukur. Rata-rata dihitung per sesi dulu, baru antar sesi.
+                </p>
+
+                <details>
+                  <summary className="text-muted cursor-pointer text-xs">
+                    Rincian per sesi{sesi ? ` (terbaru ${sesi})` : ""}
+                  </summary>
+                  <ul className="mt-2 space-y-0.5 text-xs tabular-nums">
+                    {perSesi.slice(0, 5).map((s) => (
+                      <li key={s.trade_date} className="flex flex-wrap gap-x-3">
+                        <span className="text-muted">{s.trade_date}</span>
+                        <span>{fmtNum(s.claims)} klaim</span>
+                        <span className="text-muted ml-auto">{abn(s.mean_abnormal)}</span>
+                      </li>
                     ))}
                   </ul>
-                )}
-              </details>
-            </>
-          )}
+                  {sesi && claims && claims.length > 0 && (
+                    <ul className="mt-2">
+                      {claims.map((row) => (
+                        <BarisKlaim key={`${row.code}-${row.trade_date}`} row={row} />
+                      ))}
+                    </ul>
+                  )}
+                </details>
+              </>
+            )}
+          </>
+        )}
 
-          {state && (
-            <div className="rounded-lg border border-dashed border-[var(--border)] p-3">
-              <p className="flex items-center gap-1.5 text-xs font-medium">
-                {state.allowed ? (
-                  <ShieldCheck size={14} className="text-up shrink-0" aria-hidden />
-                ) : (
-                  <ShieldAlert
-                    size={14}
-                    className="mt-0.5 shrink-0"
-                    style={{ color: "var(--warn)" }}
-                    aria-hidden
-                  />
-                )}
-                Gerbang klaim
-              </p>
-              <p
-                className={`mt-1 text-xs leading-relaxed ${state.allowed ? "text-muted" : "text-warn"}`}
-                role="status"
-              >
-                {state.allowed
-                  ? "Terbuka: sesudah sesi tutup, mesin menulis klaim baru seperti biasa."
-                  : state.message}
-              </p>
-              {state.note && (
-                <p className="text-warn mt-1 text-xs leading-relaxed">{state.note}</p>
+        {/* Gerbang dibaca terpisah dari rekaman: buku yang belum terbaca tidak boleh
+            menyembunyikan keadaan gerbang, dan tombol halt harus tetap bisa dipakai. */}
+        {state && (
+          <div className="rounded-lg border border-dashed border-[var(--border)] p-3">
+            <p className="flex items-center gap-1.5 text-xs font-medium">
+              {state.allowed ? (
+                <ShieldCheck size={14} className="text-up shrink-0" aria-hidden />
+              ) : (
+                <ShieldAlert
+                  size={14}
+                  className="mt-0.5 shrink-0"
+                  style={{ color: "var(--warn)" }}
+                  aria-hidden
+                />
               )}
-              <div className="mt-3">
-                <GerbangKontrol state={state} />
-              </div>
-            </div>
-          )}
-
-          {celah.length > 0 && (
-            <p className="text-muted text-xs leading-relaxed tabular-nums">
-              {fmtNum(celah.length)} sesi terakhir tanpa klaim dan tanpa penolakan, jadi job-nya
-              tidak menulis apa pun untuk sesi itu:{" "}
-              {celah.slice(0, 5).map((g) => g.trade_date).join(" · ")}
-              {celah.length > 5 ? ` dan ${fmtNum(celah.length - 5)} sesi lain` : ""}.
+              Gerbang klaim
             </p>
-          )}
-        </div>
-      )}
+            <p
+              className={`mt-1 text-xs leading-relaxed ${state.allowed ? "text-muted" : "text-warn"}`}
+              role="status"
+            >
+              {state.allowed
+                ? "Terbuka: sesudah sesi tutup, mesin menulis klaim baru seperti biasa."
+                : state.message}
+            </p>
+            {state.note && (
+              <p className="text-warn mt-1 text-xs leading-relaxed">{state.note}</p>
+            )}
+            <div className="mt-3">
+              <GerbangKontrol state={state} />
+            </div>
+          </div>
+        )}
+
+        {celah.length > 0 && (
+          <p className="text-muted text-xs leading-relaxed tabular-nums">
+            {fmtNum(celah.length)} sesi terakhir tanpa klaim dan tanpa penolakan, jadi job-nya
+            tidak menulis apa pun untuk sesi itu:{" "}
+            {celah.slice(0, 5).map((g) => g.trade_date).join(" · ")}
+            {celah.length > 5 ? ` dan ${fmtNum(celah.length - 5)} sesi lain` : ""}.
+          </p>
+        )}
+      </div>
     </Card>
   );
 }

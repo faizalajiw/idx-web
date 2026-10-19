@@ -1486,7 +1486,10 @@ export interface JournalVerdict {
 export interface JournalSummary {
   claims: number;
   measured_claims: number;
+  /** Sesi yang menyumbang angka terukur (ambang verdict), bukan sesi yang menulis. */
   sessions: number;
+  /** Sesi yang menulis klaim, termasuk yang belum matang. */
+  claim_sessions: number;
   hit_target: number;
   hit_stop: number;
   expired: number;
@@ -1497,6 +1500,8 @@ export interface JournalSummary {
   verdict: JournalVerdict | null;
   /** Kalimat rekaman (P3): satu baris yang mengikat mesin pada klaimnya. */
   record_line: string;
+  /** Terisi kalau bukunya belum terbaca (bentuk balasannya tetap sama). */
+  note: string | null;
 }
 
 /** Satu baris buku klaim apa adanya, termasuk yang masih terbuka. */
