@@ -17,7 +17,7 @@ export function HistoryTable({ code }: { code: string }) {
       ) : data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="max-h-[420px] overflow-y-auto">
+        <div className="table-scroll max-h-[420px] overflow-y-auto">
           <table className="data-table">
             <thead>
               <tr>

@@ -150,7 +150,7 @@ function NewsModal({ items, onClose }: { items: NewsItem[]; onClose: () => void 
                   {i + 1}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="line-clamp-2 text-sm font-medium leading-snug transition group-hover:text-[var(--accent)]">
+                  <span className="line-clamp-2 text-sm font-medium leading-snug transition group-hover:text-[var(--accent-text)]">
                     {n.title}
                   </span>
                   <span className="mt-1.5 flex items-center gap-2 text-xs text-[var(--fg-muted)]">

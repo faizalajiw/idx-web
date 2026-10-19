@@ -194,7 +194,7 @@ function CandidateCard({
 
       {withheld && (
         <p
-          className="mt-3 flex gap-1.5 text-[11px] leading-snug"
+          className="mt-3 flex flex-wrap gap-1.5 text-[11px] leading-snug"
           style={{ color: "var(--warn)" }}
           role="status"
         >
@@ -212,7 +212,7 @@ function CandidateCard({
       {!withheld && row.plan && <PlanLine plan={row.plan} modal={modal} />}
 
       {row.warnings.length > 0 && (
-        <p className="mt-3 flex gap-1.5 text-[11px] leading-snug text-[var(--warn)]">
+        <p className="mt-3 flex flex-wrap gap-1.5 text-[11px] leading-snug text-[var(--warn)]">
           <ShieldAlert size={13} className="mt-0.5 shrink-0" aria-hidden />
           <span>{row.warnings[0]}</span>
         </p>

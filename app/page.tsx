@@ -55,7 +55,7 @@ function StatTile({
         <Icon size={18} aria-hidden />
       </span>
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className={`truncate text-[11px] font-medium ${warn ? "text-warn" : "text-muted"}`}>
+        <p className={`text-[11px] leading-tight font-medium ${warn ? "text-warn" : "text-muted"}`}>
           {label}
         </p>
         <p className="text-base font-semibold tabular-nums sm:text-lg">{value}</p>

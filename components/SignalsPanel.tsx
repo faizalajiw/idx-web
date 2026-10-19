@@ -88,7 +88,7 @@ function SignalRow({ s, onSelect, selected }: { s: Signal; onSelect?: (c: string
         {s.div_adjusted && (
           <span
             title={`SELL mentah dibatalkan: harga turun mekanis ex-dividend (Rp ${s.div_cash ?? 0}/saham) — bukan tekanan jual`}
-            className="shrink-0 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--accent)]"
+            className="shrink-0 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--accent-text)]"
           >
             ex-div
           </span>

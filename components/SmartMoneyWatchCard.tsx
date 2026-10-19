@@ -125,12 +125,12 @@ export function SmartMoneyWatchCard() {
                   <FilterIcon
                     size={15}
                     aria-hidden
-                    className={active ? "text-[var(--accent)]" : "opacity-70 group-hover:opacity-100"}
+                    className={active ? "text-[var(--accent-text)]" : "opacity-70 group-hover:opacity-100"}
                   />
                   {f.label}
                   <span
                     className={`rounded-full px-1.5 text-[10px] font-semibold tabular-nums ${
-                      active ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-white/5 text-muted"
+                      active ? "bg-[var(--accent)]/15 text-[var(--accent-text)]" : "bg-white/5 text-muted"
                     }`}
                   >
                     {counts[f.key]}

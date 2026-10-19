@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar, Topbar } from "@/components/Sidebar";
+import { MobileNav } from "@/components/MobileNav";
 import { CommandPalette } from "@/components/CommandPalette";
 import { Footer } from "@/components/Footer";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
     >
       <body>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <MobileNav />
         <Sidebar />
         <div className="app-main">
           <Topbar />

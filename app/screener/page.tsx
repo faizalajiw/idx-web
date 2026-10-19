@@ -486,7 +486,7 @@ function ScreenerView() {
               <PresetIcon
                 size={15}
                 aria-hidden
-                className={isActive ? "text-[var(--accent)]" : "opacity-70 group-hover:opacity-100"}
+                className={isActive ? "text-[var(--accent-text)]" : "opacity-70 group-hover:opacity-100"}
               />
               {p.label}
             </button>
@@ -513,7 +513,7 @@ function ScreenerView() {
                   className="group rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-4 text-left transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                 >
                   <span className="flex items-center gap-2 text-sm font-semibold">
-                    <PresetIcon size={16} className="text-[var(--accent)]" aria-hidden />
+                    <PresetIcon size={16} className="text-[var(--accent-text)]" aria-hidden />
                     {p.label}
                   </span>
                   <span className="text-muted mt-1.5 block text-xs leading-relaxed">{p.desc}</span>
@@ -547,7 +547,7 @@ function ScreenerView() {
                   key={k}
                   className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 text-xs"
                 >
-                  <Check size={12} className="text-[var(--accent)]" aria-hidden />
+                  <Check size={12} className="text-[var(--accent-text)]" aria-hidden />
                   {k}
                 </span>
               ))}
@@ -624,7 +624,7 @@ function ScreenerView() {
                           className="flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-xs hover:bg-[var(--bg-elev)]"
                         >
                           <span className={on ? "text-[var(--fg)]" : "text-[var(--fg-muted)]"}>{c.label}</span>
-                          {on && <Check size={13} className="text-[var(--accent)]" />}
+                          {on && <Check size={13} className="text-[var(--accent-text)]" />}
                         </button>
                       );
                     })}

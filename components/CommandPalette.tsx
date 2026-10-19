@@ -79,8 +79,14 @@ export function CommandPalette() {
       }
       if (e.key === "Escape") close();
     };
+    // Di layar sentuh tidak ada Ctrl+K, jadi header ponsel memicu event ini.
+    const onOpenEvent = () => toggle();
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("ml:palette", onOpenEvent);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("ml:palette", onOpenEvent);
+    };
   }, [toggle, close]);
 
   // Autofocus input saat dibuka.

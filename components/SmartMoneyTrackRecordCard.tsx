@@ -29,7 +29,7 @@ function confidence(tstat: number | null | undefined): {
     return { label: "−", cls: "text-muted" };
   const a = Math.abs(tstat);
   if (a >= 2) return { label: "tinggi", cls: "text-up" };
-  if (a >= 1) return { label: "sedang", cls: "text-[var(--accent)]" };
+  if (a >= 1) return { label: "sedang", cls: "text-[var(--accent-text)]" };
   return { label: "lemah", cls: "text-muted" };
 }
 

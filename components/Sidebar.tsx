@@ -81,7 +81,7 @@ function toggleSidebar() {
   } catch {}
 }
 
-function Brand() {
+export function Brand() {
   return (
     <Link href="/" className="brand-link flex items-center gap-2.5 px-1" aria-label="Market Labs">
       <span
@@ -100,7 +100,7 @@ function Brand() {
   );
 }
 
-function NavList() {
+export function NavList() {
   const pathname = usePathname();
   return (
     <nav className="flex flex-col gap-5" aria-label="Navigasi utama">
@@ -161,7 +161,7 @@ export function Sidebar() {
 /** Top bar: brand (mobile / saat sidebar jadi rail) di kiri, kontrol di kanan. */
 export function Topbar() {
   return (
-    <header className="glass-strong sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-[var(--border)] px-4 sm:px-6">
+    <header className="app-topbar glass-strong sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-[var(--border)] px-4 sm:px-6">
       <span className="topbar-brand lg:hidden">
         <Brand />
       </span>

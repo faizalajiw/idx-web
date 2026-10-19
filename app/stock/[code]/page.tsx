@@ -50,7 +50,7 @@ export default function StockDetailPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
-      <header className="mb-6 flex items-start justify-between gap-4">
+      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <nav className="text-muted text-xs" aria-label="Breadcrumb">
             <Link href="/" className="hover:underline">
@@ -62,7 +62,10 @@ export default function StockDetailPage() {
           <h1 className="mt-1 text-2xl font-bold tracking-tight">{code}</h1>
         </div>
 
-        <nav className="flex shrink-0 items-center gap-2" aria-label="Navigasi emiten">
+        <nav
+          className="flex max-w-full shrink-0 items-center gap-2 overflow-x-auto"
+          aria-label="Navigasi emiten"
+        >
           <Link href={`/dossier/${code}`} className={NAV_BTN} title="Buka dossier analisis">
             Dossier
           </Link>
