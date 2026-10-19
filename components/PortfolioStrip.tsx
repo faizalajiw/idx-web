@@ -15,6 +15,8 @@ const DEFAULT_RISK_PCT = 1;
 interface PortfolioStripProps {
   state: PortfolioState;
   setField: (field: PortfolioField, value: string) => void;
+  /** Gerbang rezim sedang menahan kandidat: angka di sini belum dipakai kartu. */
+  gated?: boolean;
 }
 
 function Metric({ label, value, tone }: { label: string; value: string; tone?: string }) {
@@ -64,7 +66,7 @@ function Field({
  * Strip portofolio di atas papan kandidat (permukaan C, spec P5): menjawab
  * "masih boleh masuk berapa nama lagi?". Angka porsi sendiri ada di tiap kartu.
  */
-export function PortfolioStrip({ state, setField }: PortfolioStripProps) {
+export function PortfolioStrip({ state, setField, gated = false }: PortfolioStripProps) {
   const modal = asNumber(state.modal);
   const risk = asNumber(state.riskPct);
   const open = asNumber(state.openPositions);
@@ -123,6 +125,13 @@ export function PortfolioStrip({ state, setField }: PortfolioStripProps) {
           onChange={(v) => setField("exposurePct", v)}
         />
       </div>
+
+      {gated && (
+        <p className="text-[var(--warn)] mt-2 text-[11px] leading-snug" role="status">
+          Gerbang rezim menahan kandidat hari ini: angka di atas belum dipakai, jadi kartu di bawah
+          cuma menampilkan level harga (tanpa baris porsi).
+        </p>
+      )}
 
       <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
         <Metric

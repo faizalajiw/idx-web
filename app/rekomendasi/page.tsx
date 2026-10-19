@@ -498,7 +498,11 @@ export default function RekomendasiPage() {
 
       <RegimeBanner />
 
-      <PortfolioStrip state={portfolio} setField={setField} />
+      <PortfolioStrip
+        state={portfolio}
+        setField={setField}
+        gated={Boolean(data?.gate?.blocked)}
+      />
 
       {error ? (
         <ErrorState message="Gagal memuat rekomendasi. Pastikan backend & database hidup." />
