@@ -10,7 +10,9 @@
   --border: #2a2e39;
   --border-strong: #363a45;
   --fg: #d1d4dc;
-  --fg-muted: #787b86;
+  /* Teks redup tetap harus terbaca di kartu gelap (--bg-card #131722):
+     5,78:1, di atas ambang WCAG AA 4,5:1. Nilai lama #787b86 hanya 4,24:1. */
+  --fg-muted: #8b93a7;
   --accent: #2962ff;
   --accent-2: #26a69a;
   --up: #26a69a;

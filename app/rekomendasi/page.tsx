@@ -3,13 +3,14 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Target, Crown, Award, List, Lightbulb, ShieldAlert, ChevronDown } from "lucide-react";
-import { useRecommendations, useRecommendationTrack } from "@/lib/hooks";
+import { useRecommendations, useRecommendationTrack, useJournalSummary } from "@/lib/hooks";
 import { EmptyState, ErrorState, Skeleton } from "@/components/States";
 import { LastUpdated } from "@/components/LastUpdated";
 import { RegimeBanner } from "@/components/RegimeBanner";
 import { FreshnessBadge } from "@/components/FreshnessBadge";
 import { TickerLogo } from "@/components/TickerLogo";
 import { PortfolioStrip } from "@/components/PortfolioStrip";
+import { ClaimRecord } from "@/components/ClaimRecord";
 import { fmtNum, fmtNum1, fmtPct, fmtCompact, trendClass } from "@/lib/format";
 import { asNumber, portfolioQuery, usePortfolio } from "@/lib/portfolio";
 import type {
@@ -133,11 +134,14 @@ function CandidateCard({
   row,
   withheldNote,
   modal,
+  recordLine,
 }: {
   row: RecommendationRow;
   withheldNote: string | null;
   /** Modal pemilik (Rp) dari strip portofolio; `null` = belum diisi. */
   modal: number | null;
+  /** Baris rekaman aturan (spec D11): janji mesin, ikut tampil di kartunya. */
+  recordLine: string | null;
 }) {
   const grade = GRADE_META[row.grade as Grade] ?? GRADE_META.C;
   // Verdict bisa ditahan karena dua sebab berbeda: data basi (spec D1) atau rezim
@@ -212,6 +216,10 @@ function CandidateCard({
           <ShieldAlert size={13} className="mt-0.5 shrink-0" aria-hidden />
           <span>{row.warnings[0]}</span>
         </p>
+      )}
+
+      {recordLine && (
+        <p className="text-muted mt-3 text-[11px] leading-snug tabular-nums">{recordLine}</p>
       )}
 
       <details className="group mt-auto pt-3">
@@ -438,6 +446,10 @@ export default function RekomendasiPage() {
   const { data, error, isLoading } = useRecommendations(limit, minGrade, query);
   const { data: all } = useRecommendations(100, "C", query);
   const { data: track } = useRecommendationTrack();
+  // Rekaman aturan (lapis 4): satu baris yang sama untuk semua kartu, karena
+  // klaimnya lahir dari satu aturan. Ambil sekali, bukan satu request per kartu.
+  const { data: journal } = useJournalSummary();
+  const recordLine = journal?.record_line ?? null;
 
   const topCount = data?.rows.filter((r) => r.grade === "A").length ?? 0;
   // Dua sebab penahanan yang berbeda (spec D1 vs 6.5/Q5): kalimatnya tidak boleh
@@ -503,6 +515,10 @@ export default function RekomendasiPage() {
         setField={setField}
         gated={Boolean(data?.gate?.blocked)}
       />
+
+      {/* Rekaman klaim berdiri sendiri di atas papan: papan yang gagal dimuat
+          tidak boleh ikut menghapus rekaman dan tombol halt dari layar. */}
+      <ClaimRecord />
 
       {error ? (
         <ErrorState message="Gagal memuat rekomendasi. Pastikan backend & database hidup." />
@@ -593,6 +609,7 @@ export default function RekomendasiPage() {
                     row={row}
                     withheldNote={withheldNote}
                     modal={modal}
+                    recordLine={recordLine}
                   />
                 ))}
               </ul>
