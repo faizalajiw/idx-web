@@ -516,6 +516,10 @@ export default function RekomendasiPage() {
         gated={Boolean(data?.gate?.blocked)}
       />
 
+      {/* Rekaman klaim berdiri sendiri di atas papan: papan yang gagal dimuat
+          tidak boleh ikut menghapus rekaman dan tombol halt dari layar. */}
+      <ClaimRecord />
+
       {error ? (
         <ErrorState message="Gagal memuat rekomendasi. Pastikan backend & database hidup." />
       ) : (
@@ -536,8 +540,6 @@ export default function RekomendasiPage() {
             <Stat label="Emiten dipindai" value={data ? `${data.scanned} saham` : "-"} />
             <Stat label="Data sesi" value={data?.date ?? "-"} />
           </section>
-
-          <ClaimRecord />
 
           <section className="space-y-4">
             <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[var(--border)]">
