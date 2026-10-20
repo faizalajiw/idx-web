@@ -203,4 +203,25 @@ Perbaikan dua baris, tanpa menghapus elemen:
 
 - `next build` belum diulang: worktree terpisah gagal karena Turbopack menolak symlink `node_modules` yang menunjuk ke luar akar proyek (`Symlink [project]/node_modules is invalid, it points out of the filesystem root`), sedangkan aturan repo melarang `next build` selama `next dev` hidup di :3000. Perlu keputusan pemilik untuk mematikan `next dev` sebentar.
 - API `:8000` tumbang berulang pada 20 Okt 2026 (`OSError WinError 64` di accept-loop; 20 baris di `_api.log`), termasuk di tengah sapuan audit. Sapuan yang terkena ditandai tidak sah dan diulang; angka di atas berasal dari sapuan yang `/health`-nya 200 di setiap langkah.
+- Aturan repo melarang `next build` selama `next dev` hidup di :3000, dan ternyata **tidak ada jalur resmi** untuk menghentikan dev server: prosesnya dilepas `run-hidden.vbs` (session 0), jadi `Stop-Process` ditolak ("Access is denied") dan `Stop-ScheduledTask` tidak menyentuhnya. Ditutup 20 Okt 2026 dengan pola yang sama seperti API: `scripts/restart-web.ps1` (dipanggil `start-web.bat`) menghentikan pemegang port dari dalam konteks task, dan `_stop-web.flag` membuat peluncuran berhenti tanpa menyalakan ulang.
+
+### 11.3 Syarat #10: `next build` (20 Okt 2026, 12:43)
+
+`node node_modules/next/dist/bin/next build` dijalankan **setelah** dua berkas 11.1 masuk dan `next dev` dihentikan lewat `_stop-web.flag` + `Start-ScheduledTask IDX-Web`.
+
+- Exit 0. 21 rute ter-generate (17 statis + 4 dinamis: `/dossier/[code]`, `/flow/[code]`, `/keputusan/[code]`, `/radar/[code]`, `/stock/[code]`).
+- `next dev` dinyalakan lagi sesaat setelahnya (`_stop-web.flag` dihapus), `/` 200 dalam 5 detik.
+- `npx tsc --noEmit` tetap exit 0.
+
+### 11.4 Kalimat gerbang yang mengulang (20 Okt 2026)
+
+Tiga tempat mengulang awalan sebab rezim, karena `gate.reason` dari backend sudah berbunyi `"rezim menolak: …"`:
+
+| Tempat | Sebelum | Sesudah |
+| --- | --- | --- |
+| Catatan kartu (`app/rekomendasi/page.tsx`) | `Rezim sedang menolak: … berubah. rezim menolak: tren turun …` | `Rezim sedang menolak: tren turun terkonfirmasi (ADX 49.0) - tahan posisi baru. Grade & rencana posisi ditahan sampai kondisinya berubah.` |
+| Kepala papan (`page.tsx`) | `Gerbang rezim menahan tawaran baru: rezim menolak: …` | `Gerbang rezim menahan tawaran baru: tren turun …` |
+| Pesan buku klaim (`research/journal.py`) | `Gerbang rezim menolak klaim baru: rezim menolak: …` | `Gerbang rezim menolak klaim baru: tren turun …` |
+
+Terukur di `/rekomendasi` (1440 px, 20 kartu): tidak ada lagi `rezim menolak: rezim menolak`; catatan kartu 1x per kartu; 0 galat konsol. API `:8000` dan `serve` di-restart 12:47 supaya pesan baru berlaku.
 

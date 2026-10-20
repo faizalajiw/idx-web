@@ -61,6 +61,10 @@ const rp = (v: number | null | undefined) =>
 const pct = (v: number | null | undefined) =>
   v === null || v === undefined ? "-" : `${(v * 100).toFixed(2)}%`;
 
+/** `gate.reason` dari backend sudah diawali "rezim menolak:"; kalimat muka tidak mengulanginya. */
+const sebabGerbang = (reason: string | null | undefined) =>
+  (reason ?? "").replace(/^rezim menolak:\s*/i, "").trim();
+
 const FILTERS: { grade: Grade; label: string; icon: typeof Crown }[] = [
   { grade: "A", label: "Teratas", icon: Crown },
   { grade: "B", label: "Teratas + Bagus", icon: Award },
@@ -454,8 +458,11 @@ export default function RekomendasiPage() {
   const topCount = data?.rows.filter((r) => r.grade === "A").length ?? 0;
   // Dua sebab penahanan yang berbeda (spec D1 vs 6.5/Q5): kalimatnya tidak boleh
   // saling tukar - yang satu soal data yang belum masuk, yang satu soal rezim.
+  // Sebab rezim dipakai tanpa awalan "rezim menolak:" supaya tidak berbunyi
+  // "Rezim sedang menolak: ... rezim menolak: ...".
+  const sebabTahanRezim = sebabGerbang(data?.gate?.reason) || "kondisi pasar belum mendukung";
   const withheldNote = data?.gate?.blocked
-    ? `Rezim sedang menolak: grade & rencana posisi ditahan sampai kondisinya berubah. ${data.gate.reason}.`
+    ? `Rezim sedang menolak: ${sebabTahanRezim}. Grade & rencana posisi ditahan sampai kondisinya berubah.`
     : data?.withheld
       ? `${data.freshness?.reason ?? "Data sesi ini belum segar."} Grade dan rencana posisi ditahan sampai datanya masuk.`
       : null;
@@ -490,7 +497,7 @@ export default function RekomendasiPage() {
         </div>
         {data?.gate?.blocked && (
           <p className="text-warn text-xs leading-relaxed" role="status">
-            Gerbang rezim menahan tawaran baru: {data.gate.reason}. Angka, harga beli, batas rugi,
+            Gerbang rezim menahan tawaran baru: {sebabTahanRezim}. Angka, harga beli, batas rugi,
             dan target tetap tampil — yang ditahan cuma grade dan rencana posisi.
           </p>
         )}

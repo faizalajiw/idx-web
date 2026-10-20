@@ -14,3 +14,7 @@ docs/node_modules/
 
 logs/
 .playwright-cli/
+
+# Penanda launcher (dibuat/dihapus saat restart atau build; bukan isi repo)
+_restart-web.flag
+_stop-web.flag
