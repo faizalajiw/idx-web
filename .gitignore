@@ -18,3 +18,8 @@ logs/
 # Penanda launcher (dibuat/dihapus saat restart atau build; bukan isi repo)
 _restart-web.flag
 _stop-web.flag
+
+# Hasil Playwright
+test-results/
+playwright-report/
+playwright/.cache/
