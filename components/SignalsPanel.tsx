@@ -130,7 +130,7 @@ export function SignalsPanel({
       subtitle="SMA20/50 + RSI(14) rule-based"
       info="Sinyal beli/jual/tahan otomatis berdasarkan rumus teknikal (rata-rata harga & momentum). Ini alat bantu, BUKAN ajakan beli. Selalu cek konteks lain dan jangan ikut buta."
       right={
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           {data && data.length > 0 ? (
             <SignalTally data={data} active={filter} onToggle={toggleFilter} />
           ) : null}

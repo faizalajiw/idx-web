@@ -168,3 +168,39 @@ Semuanya menambah, tidak mengurangi, dan tidak menyentuh alur data.
   `app/rekomendasi/page.tsx`: pola ponsel dan perbaikan di bagian 8.
 - Sebelas berkas lain: penggantian nama token warna teks aksen saja.
 - `docs/revamp-ui/`: dokumen ini dan `DESKRIPSI-DESAIN.md`.
+
+## 11. Verifikasi independen 20 Okt 2026
+
+Diukur ulang di `main` `a5c70d8` (bukan di cabang), 16 rute, dengan API `:8000` dipantau: `/health` 200 di setiap langkah.
+
+| # | Syarat | Hasil pengukuran ulang |
+|---|---|---|
+| 4 | Luber 0 px di 390 px dan 320 px | 0 px di 16 rute pada 390 px; pada 320 px `/stock/PEGE` luber 33 px lalu diperbaiki ke 0 (bagian 11.1) |
+| 5 | Target sentuh berdiri sendiri ≥ 44 px | 0 pelanggaran di 16 rute x 2 lebar, setelah `[inert]` dan elemen tersembunyi dikecualikan; tautan brand header 159 x 44 px |
+| 6 | Tabel di dalam wadah geser | Setiap `table` yang ter-render (`/faktor` 2, `/sectors` 1, `/broker-activity` 2, `/stock/PEGE` 1) punya leluhur `overflow-x: auto`; 0 tabel di luar wadah |
+| 7 | Kontras WCAG AA dua tema | 24 pasang dihitung dari token `globals.css` yang berlaku (bukan dari dokumen ini): lolos semua, yang terendah `--neutral` 4,83:1 di putih |
+| 9 | Konsol bersih | 0 error, 0 warning di 32 pemuatan halaman |
+| 10 | `tsc --noEmit` | exit 0 (setelah perbaikan 11.1) |
+
+### 11.1 Temuan yang diperbaiki: judul kartu terjepit
+
+`Card.tsx` tidak mengizinkan header melipat, dan slot `right` tidak boleh mengecil di bawah lebar min-content-nya. Akibatnya slot kanan yang lebar (papan hitung sinyal `BUY/HOLD/SELL` + baris "Sesi bursa ..." = 300 px) menekan blok judul sampai tinggal sliver — di desktop juga, bukan cuma di ponsel:
+
+| Lebar | Judul "Trading Signals" sebelum | Luber sebelum | Sesudah |
+|---|---|---|---|
+| 1440 px | 17 x 39 px (terlipat vertikal) | 0 px | judul 176 x 20 px, luber 0 px |
+| 390 px | 4 x 39 px | 0 px | judul 176 x 20 px, luber 0 px |
+| 320 px | 0 px (tak terbaca) | 33 px | judul 176 x 20 px, luber 0 px |
+
+Perbaikan dua baris, tanpa menghapus elemen:
+
+- `components/Card.tsx`: header `flex items-start justify-between gap-3` menjadi `flex flex-wrap items-start justify-between gap-x-3 gap-y-2`.
+- `components/SignalsPanel.tsx`: slot kanan `flex items-center gap-2` menjadi `ml-auto flex flex-wrap items-center justify-end gap-2`.
+
+`flex-wrap` hanya melipat saat isi tidak muat, jadi kartu yang slot kanannya sempit (hanya `LastUpdated`) tidak berubah.
+
+### 11.2 Catatan alat
+
+- `next build` belum diulang: worktree terpisah gagal karena Turbopack menolak symlink `node_modules` yang menunjuk ke luar akar proyek (`Symlink [project]/node_modules is invalid, it points out of the filesystem root`), sedangkan aturan repo melarang `next build` selama `next dev` hidup di :3000. Perlu keputusan pemilik untuk mematikan `next dev` sebentar.
+- API `:8000` tumbang berulang pada 20 Okt 2026 (`OSError WinError 64` di accept-loop; 20 baris di `_api.log`), termasuk di tengah sapuan audit. Sapuan yang terkena ditandai tidak sah dan diulang; angka di atas berasal dari sapuan yang `/health`-nya 200 di setiap langkah.
+

@@ -20,7 +20,7 @@ export function Card({
   return (
     <section className={`card min-w-0 p-4 sm:p-5 ${hover ? "card-hover" : ""} ${className}`}>
       {(title || right) && (
-        <header className="mb-4 flex items-start justify-between gap-3">
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="min-w-0">
             {title && (
               <h2 className="flex items-center gap-1.5 text-[13px] font-semibold tracking-tight">
