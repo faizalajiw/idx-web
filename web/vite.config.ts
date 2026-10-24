@@ -8,6 +8,11 @@ export default defineConfig({
 	// :3000 dan :3100). strictPort: jangan diam-diam pindah port.
 	server: { port: 3100, strictPort: true },
 	preview: { port: 3100, strictPort: true },
+	// Vite hanya meng-inline variabel berawalan VITE_ secara bawaan, sedangkan
+	// alamat API memakai awalan PUBLIC_ (lihat `.env.example`). Tanpa baris ini
+	// `import.meta.env.PUBLIC_API_BASE_URL` selalu undefined dan build produksi
+	// diam-diam memakai localhost:8000.
+	envPrefix: ['VITE_', 'PUBLIC_'],
 	plugins: [
 		tailwindcss(),
 		sveltekit({

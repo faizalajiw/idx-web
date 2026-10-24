@@ -20,6 +20,16 @@ emiten).
 alamat API berarti build ulang. Tanpa variabel itu, app memakai
 `http://localhost:8000`.
 
+Verifikasi sebelum mengunggah - alamatnya harus benar-benar ada di bundel:
+
+```bash
+grep -rl 'https://api.contoh.id' build/_app/immutable/chunks | head -1
+```
+
+Kosong berarti variabelnya tidak ter-inline dan halaman akan memanggil
+`localhost`. Vite hanya meng-inline awalan `VITE_` secara bawaan, karena itu
+`vite.config.ts` mendaftarkan `envPrefix: ['VITE_', 'PUBLIC_']`.
+
 ## 2. CORS di API
 
 API hanya menerima origin yang terdaftar di `IDX_API_CORS_ORIGINS`

@@ -280,6 +280,13 @@ Diubah supaya tidak lagi menjalankan Next:
   dan `dev`, serta semua PR. Job `next build` di akar dihapus.
 - `web/playwright.config.ts` — perintah `webServer` bisa diganti lewat
   `E2E_SERVER_CMD`; CI memakainya untuk menguji `deploy/serve.mjs 3100 build`.
+- `web/vite.config.ts` — `envPrefix: ['VITE_', 'PUBLIC_']`. Tanpa ini
+  `import.meta.env.PUBLIC_API_BASE_URL` selalu `undefined` (Vite hanya
+  meng-inline `VITE_`), jadi setiap build produksi diam-diam memanggil
+  `localhost:8000` dan instruksi `DEPLOY.md` tidak berefek.
+- `web/e2e/routes.spec.ts` — tes rute menerima `h1` **atau** `ErrorState`
+  (`role="alert"`). Rute yang datanya dari API mengembalikan ErrorState lebih
+  dulu saat backend mati (sama seperti app Next), dan CI tidak punya backend.
 - `README.md` dan `AGENTS.md` — ditulis ulang untuk SvelteKit; blok aturan Next
   yang ditulis ulang `next dev` dihapus.
 
@@ -295,6 +302,10 @@ Verifikasi:
 - `npx playwright test` **47 passed** terhadap build yang disajikan launcher
   (:3000) dan **47 passed** terhadap `node deploy/serve.mjs 3100 build` (jalur
   CI).
+- Kondisi CI (backend mati) direproduksi lokal: build dengan
+  `PUBLIC_API_BASE_URL=http://localhost:9` lalu jalankan suite → **47 passed**,
+  dan bundel memuat `localhost:9` (bukti `envPrefix` bekerja). Build
+  dikembalikan ke bawaan setelah uji.
 
 Catatan deviasi server: `vite preview` membalas 404 untuk rute tak dikenal
 (tidak ada fallback SPA), sehingga tes halaman galat gagal di sana. Karena itu
