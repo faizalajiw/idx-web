@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { ArrowLeftRight } from '@lucide/svelte';
-	import { page } from '$app/state';
-	import StubPage from '#lib/components/StubPage.svelte';
+	import { page } from "$app/state";
+	import FlowWorkspace from "#lib/components/FlowWorkspace.svelte";
 
-	const code = $derived((page.params.code ?? '').toUpperCase());
+	// `/flow/[code]` deep-link emiten, mis. /flow/BBRI.
+	const code = $derived((page.params.code ?? "").toUpperCase());
 </script>
 
-<StubPage title="Aliran Dana" accent={code} icon={ArrowLeftRight} />
+<svelte:head>
+	<title>Aliran Dana Emiten · Market Labs</title>
+</svelte:head>
+
+<FlowWorkspace code={code || null} />

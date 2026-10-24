@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { Scale } from '@lucide/svelte';
-	import { page } from '$app/state';
-	import StubPage from '#lib/components/StubPage.svelte';
+	import { page } from "$app/state";
+	import DecisionWorkspace from "#lib/components/DecisionWorkspace.svelte";
 
-	const code = $derived((page.params.code ?? '').toUpperCase());
+	const code = $derived((page.params.code ?? "").toUpperCase());
 </script>
 
-<StubPage title="Ruang Keputusan" accent={code} icon={Scale} />
+<svelte:head>
+	<title>Keputusan {code} · Market Labs</title>
+</svelte:head>
+
+<!-- /keputusan/[code] — deep-link emiten, mis. /keputusan/BBRI. -->
+<DecisionWorkspace code={code || null} />

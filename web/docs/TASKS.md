@@ -13,7 +13,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 3 | Pilot `/sectors` end-to-end | selesai |
 | 4 | 13 rute statis | selesai |
 | 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | selesai |
-| 6 | 5 rute dinamis dan workspace | belum |
+| 6 | 5 rute dinamis dan workspace | selesai |
 | 7 | Tes e2e dan audit paritas | belum |
 | 8 | Build produksi dan paket deploy | belum |
 | 9 | Cutover :3000 | belum |
@@ -121,6 +121,20 @@ Delapan rute terakhir, semuanya 13 rute statis kini lengkap:
 - `/keputusan`: `DecisionWorkspace code={null}` dan `PositionPlanPanel`.
 
 Paritas terukur (1440) terhadap `next start -p 3000`: h1, daftar h2, header tabel, jumlah baris, jumlah kartu, `scrollWidth` identik di kedelapan rute; tanpa error konsol. `/` 12 kartu, `/rekomendasi` 25 kartu, `/jejak-sinyal` 40 baris di kedua app.
+
+## Fase 6 — selesai 2026-10-24
+
+Lima rute dinamis. Param dibaca lewat `page.params.code` di dalam `$derived`, semua hook menerima getter supaya berpindah emiten tanpa remount tetap memicu query baru.
+
+- `/stock/[code]`: 15 kartu — smart money, rezim, chart teknikal, sinyal, aliran dana proxy, kepemilikan, arus asing, riwayat aliran, komposisi broker, aktivitas broker, event study, riwayat harga. Navigasi prev/next melingkar dari watchlist. Komponen baru: `HistoryTable`, `BrokerSummary`, `OwnershipCard`, `EventStudyCard`.
+- `/dossier/[code]`: tujuh seksi (Profil, Valuasi, Faktor & Verdict, Arus Asing, Aktivitas Broker, Sentimen, Catatan Risiko), badge basi per seksi, unduh PDF.
+- `/flow/[code]`: pembungkus `FlowWorkspace`.
+- `/radar/[code]`: `SmartMoneyBanner` + track record, tautan silang ke detail teknikal dan arus asing.
+- `/keputusan/[code]`: `DecisionWorkspace` dengan kode.
+
+Paritas terukur (1440) terhadap `next start -p 3000`: h1, daftar h2, header tabel, jumlah baris (`/stock/BBCA` 26), jumlah kartu (15/7/3/2/8), judul halaman — identik di kelima rute; tanpa error konsol.
+
+Reflow 390 px: 17 rute `scrollWidth` 382, `/keputusan` dan `/flow` 390 (tanpa scrollbar vertikal); tidak ada luber horizontal.
 
 ## Aturan kerja
 

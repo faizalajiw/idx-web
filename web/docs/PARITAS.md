@@ -15,20 +15,20 @@ Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
 | `/screener` | `app/screener/page.tsx` | filter, tabel hasil, ScreenerFactorsModal | selesai |
 | `/rekomendasi` | `app/rekomendasi/page.tsx` | PortfolioStrip, ClaimRecord, papan kandidat, track record | selesai |
 | `/keputusan` | `app/keputusan/page.tsx` | DecisionWorkspace (tanpa kode) | selesai |
-| `/keputusan/[code]` | `app/keputusan/[code]/page.tsx` | DecisionWorkspace | placeholder |
+| `/keputusan/[code]` | `app/keputusan/[code]/page.tsx` | DecisionWorkspace | selesai |
 | `/jejak-sinyal` | `app/jejak-sinyal/page.tsx` | tiga tab horizon, tabel sinyal terbaru | selesai |
 | `/backtest` | `app/backtest/page.tsx` | EquityCurveChart, RebalanceLedger, form parameter | selesai |
 | `/faktor` | `app/faktor/page.tsx` | tabel faktor, kalibrasi | selesai |
 | `/radar` | `app/radar/page.tsx` | SmartMoneyBanner, daftar emiten | selesai |
-| `/radar/[code]` | `app/radar/[code]/page.tsx` | SmartMoneyBanner, track record | placeholder |
+| `/radar/[code]` | `app/radar/[code]/page.tsx` | SmartMoneyBanner, track record | selesai |
 | `/foreign` | `app/foreign/page.tsx` | ForeignFlowCard, chart arus harian, daftar mover | selesai |
 | `/flow` | `app/flow/page.tsx` | FlowWorkspace (tanpa kode) | selesai |
-| `/flow/[code]` | `app/flow/[code]/page.tsx` | FlowWorkspace | placeholder |
+| `/flow/[code]` | `app/flow/[code]/page.tsx` | FlowWorkspace | selesai |
 | `/sentimen` | `app/sentimen/page.tsx` | gauge suhu pasar, breadth, akumulasi/distribusi | selesai |
 | `/broker-activity` | `app/broker-activity/page.tsx` | BrokerActivityCard, BrokerFlowCard, FlowTimelineCard | selesai |
 | `/sectors` | `app/sectors/page.tsx` | SectorRotationTable, peta sektor, RegimeBanner | selesai |
-| `/stock/[code]` | `app/stock/[code]/page.tsx` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard | placeholder |
-| `/dossier/[code]` | `app/dossier/[code]/page.tsx` | tujuh seksi dossier | placeholder |
+| `/stock/[code]` | `app/stock/[code]/page.tsx` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard, EventStudyCard | selesai |
+| `/dossier/[code]` | `app/dossier/[code]/page.tsx` | tujuh seksi dossier | selesai |
 
 ## `/sectors`
 
