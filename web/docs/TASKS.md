@@ -16,7 +16,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 6 | 5 rute dinamis dan workspace | selesai |
 | 7 | Tes e2e dan audit paritas | selesai |
 | 8 | Build produksi dan paket deploy | selesai |
-| 9 | Cutover :3000 | siap, menunggu tindakan pemilik |
+| 9 | Cutover :3000 | lokal selesai; VPS menunggu pemilik |
 
 ## Fase 1 — selesai 2026-10-24
 
@@ -171,6 +171,45 @@ Paket deploy:
 - `web/deploy/nginx.conf` — siap pakai: fallback `try_files`, cache immutable
   untuk `_app/immutable`, `no-cache` untuk `index.html`.
 - `web/.env.example` — variabel build yang dibaca `api.ts`.
+
+## Fase 9 — cutover lokal selesai 2026-10-24
+
+`next start` di :3000 dihentikan, diganti sajian statis hasil build:
+
+```bash
+cd web
+node deploy/serve.mjs 3000 build
+```
+
+Alasan :3000: CORS API hanya menerima `http://localhost:3000` dan
+`http://localhost:3100` (`idx-scraper/src/idx_scraper/api/config.py:39`), jadi
+cutover lokal harus dibuktikan di port yang terdaftar, bukan port lain.
+
+Hasil verifikasi:
+
+- `GET /`, `/sectors`, `/stock/BBCA`, `/dossier/BBCA`, `/flow/BBRI`,
+  `/keputusan/BBRI` → 200 dengan `text/html` (SPA fallback bekerja untuk rute
+  dinamis yang tidak punya berkas sendiri).
+- Aset ber-hash → `Cache-Control: public, max-age=31536000, immutable`;
+  `index.html` → `no-cache`; `/logos/*` → 604800 detik.
+- Aset yang tidak ada di bawah `/_app/`, `/logos/`, `/fonts/` → 404, bukan
+  `index.html`. Tanpa aturan ini browser menerima HTML sebagai JavaScript dan
+  galat MIME muncul saat HTML basi menunjuk bundel lama.
+- `HEAD /` → 200 dengan `Content-Length` benar.
+- `E2E_BASE_URL=http://localhost:3000 npx playwright test` → **45 passed**
+  (25,3 detik). Suite yang sama yang lulus di :3100 dan di app Next lama.
+- Data nyata termuat lewat CORS :3000: dashboard menampilkan IHSG 5.439,26;
+  `/stock/BBCA` 15 kartu dan 26 baris tabel; tanpa galat konsol.
+- Tangkapan layar: `docs/bukti/fase9-3000-dashboard-gelap.png`,
+  `-terang.png`, `fase9-3000-stock.png`.
+
+`:3100` tetap hidup sebagai cadangan (`npm run preview`). Dev harian:
+`npm run dev` setelah mematikan preview, karena port dikunci `strictPort`.
+
+Yang belum dikerjakan, butuh keputusan/tindakan pemilik: cutover VPS (build
+dengan `PUBLIC_API_BASE_URL`, tambah domain ke `IDX_API_CORS_ORIGINS`, arahkan
+root nginx ke `build/`), dan keputusan anggaran shell 61,9-64,2 KB vs target
+≤60 KB.
 
 ## Aturan kerja
 

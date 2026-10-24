@@ -70,6 +70,25 @@ mengembalikan `index.html` dengan status **200**, bukan 404. Rute dinamis
 (`/stock/[code]`, `/dossier/[code]`, `/flow/[code]`, `/radar/[code]`,
 `/keputusan/[code]`) tidak punya berkas sendiri.
 
+Pengecualian fallback: berkas di bawah `/_app/`, `/logos/`, `/fonts/` yang tidak
+ada harus tetap **404**. Kalau ikut jatuh ke `index.html`, browser menerima HTML
+dengan `Content-Type: text/javascript` dan gagal dengan galat MIME yang
+menyesatkan. `deploy/nginx.conf` sudah memakai `try_files $uri =404` di kedua
+lokasi aset.
+
+### Tanpa nginx/Caddy
+
+`deploy/serve.mjs` adalah server statis tanpa dependensi dengan perilaku yang
+sama (fallback 200 untuk rute, 404 untuk aset hilang, header cache, HEAD):
+
+```bash
+node deploy/serve.mjs 3000 build
+```
+
+Dipakai untuk memeriksa hasil build di mesin lokal, atau sebagai cadangan di
+server tanpa reverse proxy.
+
+
 ## 4. Cutover dari app Next
 
 Urutan yang aman, tanpa jendela mati:
