@@ -14,7 +14,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 4 | 13 rute statis | selesai |
 | 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | selesai |
 | 6 | 5 rute dinamis dan workspace | selesai |
-| 7 | Tes e2e dan audit paritas | belum |
+| 7 | Tes e2e dan audit paritas | selesai |
 | 8 | Build produksi dan paket deploy | belum |
 | 9 | Cutover :3000 | belum |
 
@@ -135,6 +135,20 @@ Lima rute dinamis. Param dibaca lewat `page.params.code` di dalam `$derived`, se
 Paritas terukur (1440) terhadap `next start -p 3000`: h1, daftar h2, header tabel, jumlah baris (`/stock/BBCA` 26), jumlah kartu (15/7/3/2/8), judul halaman — identik di kelima rute; tanpa error konsol.
 
 Reflow 390 px: 17 rute `scrollWidth` 382, `/keputusan` dan `/flow` 390 (tanpa scrollbar vertikal); tidak ada luber horizontal.
+
+## Fase 7 — selesai 2026-10-24
+
+Suite tes disalin dari app Next ke `web/e2e/` dengan baseURL `:3100`:
+
+- `routes.spec.ts` — 14 rute statis balas 200 dan `h1` tampil (project desktop dan mobile-390).
+- `layout-mobile.spec.ts` — 14 rute tidak luber horizontal di 390 px.
+- `console.spec.ts` — `/`, `/rekomendasi`, `/pantau` tiga halaman tanpa galat konsol; galat jaringan diabaikan karena API bisa mati.
+
+`npx playwright test` → **45 passed** (49,8 detik), jumlah tes sama dengan suite app Next.
+
+Audit paritas 19 rute ada di `PARITAS.md` (tabel terukur: h1, h2, header tabel, baris, kartu, `scrollWidth`).
+
+`@playwright/test@1.64.1` ditambahkan ke devDependencies `web/` supaya suite bisa dijalankan dari folder itu sendiri.
 
 ## Aturan kerja
 

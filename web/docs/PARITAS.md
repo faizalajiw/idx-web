@@ -39,6 +39,55 @@ Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
 - Catatan kaki klasifikasi sektor.
 - State: skeleton tinggi 96 saat memuat, `EmptyState` saat kosong, `ErrorState` saat gagal, pesan "belum tervalidasi" saat rotasi belum lolos IC.
 
+## Audit paritas 2026-10-24
+
+Diukur langsung terhadap dua app yang hidup bersamaan (`next start -p 3000`
+dan dev SvelteKit :3100), viewport 1440. Yang dibandingkan: `h1`, daftar `h2`,
+header tabel, jumlah baris `tbody`, jumlah `.card`, dan `scrollWidth`.
+
+| Rute | h1 | h2 | header tabel | baris | kartu | scrollW |
+|---|---|---|---|---|---|---|
+| `/` | sama | sama | - | - | 12 / 12 | 1432 / 1432 |
+| `/pantau` | sama | sama | - | - | 6 / 6 | 1432 / 1432 |
+| `/screener` | sama | sama | - | - | 1 / 1 | 1432 / 1432 |
+| `/rekomendasi` | sama | sama | - | - | 25 / 25 | 1432 / 1432 |
+| `/keputusan` | sama | sama | - | - | 2 / 2 | 1440 / 1440 |
+| `/jejak-sinyal` | sama | sama | 7 kolom sama | 40 / 40 | 9 / 9 | 1432 / 1432 |
+| `/backtest` | sama | sama | - | - | 7 / 7 | 1432 / 1432 |
+| `/faktor` | sama | sama | sama | 42 / 42 | - | 1432 / 1432 |
+| `/radar` | sama | sama | - | - | sama | 1432 / 1432 |
+| `/foreign` | sama | sama | - | - | 4 / 4 | 1432 / 1432 |
+| `/flow` | sama | sama | - | - | 1 / 1 | 1440 / 1440 |
+| `/sentimen` | sama | sama | - | - | 6 / 6 | 1432 / 1432 |
+| `/broker-activity` | sama | sama | sama | 44 / 44 | - | 1432 / 1440 |
+| `/sectors` | sama | sama | 6 kolom sama | 23 / 23 | 23 / 23 | 1432 / 1432 |
+| `/stock/BBCA` | sama | sama | 12 kolom sama | 26 / 26 | 15 / 15 | - |
+| `/dossier/BBCA` | sama | sama | - | - | 7 / 7 | - |
+| `/flow/BBRI` | sama | sama | - | - | 3 / 3 | - |
+| `/radar/BBRI` | sama | sama | - | - | 2 / 2 | - |
+| `/keputusan/BBRI` | sama | sama | - | - | 8 / 8 | - |
+
+Satu selisih `scrollWidth` di `/broker-activity` (1432 vs 1440): app Next
+menampilkan scrollbar vertikal, app Svelte tidak pada snapshot itu. Keduanya
+tidak luber (isi <= layar).
+
+Reflow 390 px di app Svelte: 19 rute, `scrollWidth` 382 atau 390 (sama dengan
+lebar layar bila tidak ada scrollbar). Tanpa luber horizontal.
+
+Perbedaan yang disengaja dan berlaku di semua rute:
+
+- Judul tab `<Halaman> · Market Labs`; app Next hanya "Market Labs" kecuali
+  tiga halaman yang punya metadata sendiri.
+- Recharts diganti `LineArea`/`Bars`; tooltip menampilkan nama seri, bukan
+  hanya label titik.
+- Ikon lucide 1.x: delapan nama yang dihapus dipetakan (lihat PANDUAN-PORT).
+
+## Suite tes
+
+`web/e2e/` menyalin suite app Next dengan baseURL `:3100`: 14 rute x (status
+200 + h1 tampil) dan (tidak luber di 390), tiga halaman bebas galat konsol.
+Total 45 tes, semuanya lulus.
+
 ## Checklist elemen (diisi per rute)
 
 Template yang dipakai untuk setiap rute:
