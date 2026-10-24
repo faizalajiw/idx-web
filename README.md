@@ -1,95 +1,54 @@
-# IDX Web Frontend
+# idx-web
 
-**Next.js + Recharts** UI for the IDX market‑data platform. All heavy calculations live in the FastAPI backend (`idx‑scraper/src/idx_scraper/api`). The frontend auto‑switches between the official IDX feed and a Yahoo Finance fallback.
+Frontend papan pasar IDX. Produksi sekarang **SvelteKit 3 + `adapter-static`** di
+folder `web/`; app Next lama di akar repo disimpan sebagai rujukan dan tidak
+lagi dijalankan. Seluruh perhitungan ada di backend FastAPI
+(`idx-scraper/src/idx_scraper/api`); UI hanya mengambil JSON lalu menampilkan.
+
+Dokumen pendamping di `web/docs/`:
+
+- `TASKS.md` - status tiap fase migrasi
+- `PARITAS.md` - checklist paritas 19 rute dan audit sisa migrasi
+- `HASIL-UKUR.md` - angka byte Next vs SvelteKit
+- `DEPLOY.md` - paket deploy (nginx atau `serve.mjs`)
 
 ---
 
 ## Quick Start
 
-1. **Install dependencies**
+1. **Pasang dependensi**
+
 ```powershell
-cd D:\Project\market-labs\idx-web
-npm ci   # or `pnpm install` if you prefer pnpm
+cd D:\Project\market-labs\idx-web\web
+npm ci
 ```
-2. **Configure environment** – copy the example and adjust the backend URL if needed:
+
+2. **Tentukan alamat backend** - dibaca saat build, bukan saat runtime:
+
 ```dotenv
-# .env.local (auto‑loaded by Next.js)
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+# web/.env (contoh lengkap di web/.env.example)
+PUBLIC_API_BASE_URL=http://localhost:8000
 ```
-3. **Run the development server**
+
+3. **Dev server**
+
 ```powershell
-npm run dev   # starts on http://localhost:3000
+npm run dev        # http://localhost:3100
 ```
-   The browser calls the backend directly at the URL in `NEXT_PUBLIC_API_BASE_URL`.
-4. **Build for production**
+
+   Port :3100 dikunci (`strictPort`); hentikan `npm run preview` dulu kalau
+   sedang hidup.
+
+4. **Build produksi dan sajikan di :3000**
+
 ```powershell
-npm run build && npm start
+npm run build                      # hasil: web/build (statis)
+node deploy/serve.mjs 3000 build   # server statis tanpa dependensi
 ```
-   The build produces a static‑optimized bundle in `.next`.
 
----
-
-## Menu & Features
-
-The sidebar groups the application into seven logical sections. Below each route is a short description of the UI elements and the data it presents.
-
-| Group | Route | Feature Summary |
-|-------|-------|-----------------|
-| **Utama** | `/` (Dashboard) | Hero panel with IHSG composite, market‑wide volume/value split (regular vs non‑regular), Regime Banner + Timeline, market narrative, top gainers/losers, liquidity leaders, broker activity, signal panel, and an interactive technical chart.
-| | `/watchlist` | Watch‑list view with real‑time price, volume, and smart‑money status per symbol. Includes a CRUD UI for alert rules (price, RSI, volume) and a Telegram status/debug panel.
-| | `/pantau` | Consolidated monitoring of watch‑list alerts, smart‑money tracks, and Telegram connectivity. Alerts fire once per crossing and reset after the condition clears.
-| **Screening** | `/screener` | Multi‑criteria filter (signals, RSI, momentum, value, foreign‑in, broker‑score). Results link to the detailed stock page. Broker‑score column appears only after IC validation.| **Analisis** | `/rekomendasi` | **Buy candidate board** — market‐wide ranked candidates with score/grade, entry zone, stop, target, R/R, position sizing, and a per‐grade track record. |
-| | `/jejak-sinyal` | Signal performance dashboard – hit‐rate, forward returns, abnormal returns, MFE/MAE per horizon (5/10/21 days) and regime breakdown.
-| | `/backtest` | Point‑in‑time back‑test simulator with equity curve, transaction‑cost model (commission, tax, slippage), rebalance frequency, and comparison against buy‑and‑hold.
-| | `/faktor` | Registry of quantitative factors (momentum, Amihud, foreign net, order‑book imbalance, etc.) with definitions and calibration metadata.
-| **Flow** | `/radar` | Market‑wide smart‑money radar showing the strongest foreign‑money inflow/outflow stocks (net buy / net sell) by value, with selectable windows (2/5/10/21 sessions), streak badges, and liquidity floor filters. Clicking a tile opens `/radar/[code]` for full signal history and technical chart.
-| | `/foreign` | Ranked list of foreign‑money net flows per stock.
-| | `/sentimen` | Sentiment gauge (0‑100) derived from market breadth, IHSG direction, and foreign‑money proportion; plus ranked lists of accumulation/distribution with order‑book imbalance metrics.
-| | `/broker-activity` | Broker activity dashboard – accumulation score per stock (IC‑weighted factor scores), statistical factor validation table (IC, t‑stat, direction), and market‑wide broker concentration metrics (CR1/CR3/CR5, HHI).
-| **Sektor** | `/sectors` | Sector‑by‑sector overview (average returns, breadth, transaction value, foreign‑money flow) plus **Sector Rotation** based on broker‑score trends (median score, direction over 5/21 sessions, sparkline history).
-
-All pages share a common layout: a responsive sidebar, a header with the current market time, and a content area that adapts to desktop and mobile breakpoints.
-
----
-
-## Framework Frontend (konvensi nyata, bukan agen otonom)
-
-Tidak ada "agen" otonom di repo ini — aturan di bawah ditegakkan lewat struktur
-kode, satu gerbang CI, dan review manual. Yang benar-benar ada:
-
-| Peran | Wujud nyata |
-|-------|-------------|
-| **Batas presentasi** | Frontend **presentation-only**: nol kalkulasi bisnis di web. Semua hitungan di backend FastAPI; UI hanya fetch JSON lewat SWR (`lib/hooks.ts`, auto-refresh 30 detik) lalu render. |
-| **Design system** | Token di `app/globals.css` (`--accent`, `--bg`/`--bg-elev`/`--border`, `--up`/`--down`/`--warn`/`--muted`) + primitif bersama: `.card`/`.card-hover`, `.badge` (buy/sell/hold/warn/accent/pre), `.btn`/`.btn-ghost`/`.btn-primary`, `.nav-link`, `.data-table`, `.skeleton`, `.gradient-text`, `.fade-up`. |
-| **Komponen bersama** | `Card`, `States` (`Skeleton`/`ErrorState`/`EmptyState`), `InfoHint`, `LastUpdated`, `RegimeBanner`, `Sidebar`/`Topbar`, `TickerLogo` — dipakai ulang lintas halaman; tipe mirror backend di `lib/types.ts`, klien fetch di `lib/api.ts`. |
-| **Aksesibilitas** | Atribut `aria-label` / `aria-hidden` / `aria-current` / `aria-modal` / `role` dipakai di ±31 berkas (nav, dialog mobile, tombol ikon); warna & kontras dari token `globals.css`. |
-| **Kualitas otomatis** | Satu gerbang CI (`.github/workflows/ci.yml`): `npm ci` → `tsc --noEmit` → `next build`. **Tidak ada unit/E2E test runner** di repo ini (tidak ada Vitest/Jest/Playwright di `package.json`). |
-| **"No AI slop"** | Checklist review manual (bukan agen): hindari hero generik, ikon seragam, copy placeholder, dan komponen hasil salin tanpa adaptasi. |
-
-### Evaluasi & kalibrasi (di backend, bukan agen frontend)
-
-Peran "Trainer" (Evaluation / Feedback Loop / Calibration) **tidak ada sebagai
-kode frontend**. Yang benar-benar mengukur kualitas keputusan ada di backend:
-`research/signal_log.py` (track record sinyal), `research/recommendation_log.py`
-(track record kandidat beli), dan track record pola `smart_money` — semuanya
-mengukur outcome forward + abnormal vs pasar supaya klaim bisa dicek, bukan
-dipercaya. (`signal_log` & `recommendation_log` mempersist ke tabel;
-track record `smart_money` dihitung saat diminta.) Di sisi frontend, satu-satunya gerbang otomatis adalah `tsc` + `next build`.
-
----
-
-## Running the Frontend
-1. Ensure the **backend** (`idx‑scraper`) is running and reachable at the URL defined in `NEXT_PUBLIC_API_BASE_URL`.
-2. In a terminal, start the dev server:
-```powershell
-npm run dev
-```
-3. Open <http://localhost:3000> in a browser. The app automatically polls the backend APIs according to the schedule defined in the backend (APScheduler).
-4. For production, build and start:
-```powershell
-npm run build && npm start
-```
-   The built files are served by the built‑in Next.js server.
+   `PUBLIC_API_BASE_URL` di-*inline* saat build: build ulang kalau alamatnya
+   berubah. Untuk nginx, arahkan root ke `web/build` dengan fallback
+   `index.html` - lihat `web/docs/DEPLOY.md`.
 
 ---
 
@@ -102,13 +61,6 @@ npm run build && npm start
 - **IC** – Information‑Coefficient, statistical measure of factor predictive power.
 
 ---
-
-*Last updated: 2026‑10‑06*
-
-Next.js + Recharts frontend for the IDX market-data platform. Presentation-only —
-all calculations happen in the FastAPI backend
-(`market-labs/idx-scraper/src/idx_scraper/api`). Data source auto-switches between
-the official IDX feed and Yahoo Finance fallback.
 
 ## Peta Navigasi
 
@@ -308,7 +260,7 @@ sebelumnya).
 ## Alur Data
 
 Frontend murni presentasi. Semua kalkulasi berat ada di backend; Postgres jadi satu-
-satunya sumber kebenaran; UI hanya fetch JSON lewat SWR dan render.
+satunya sumber kebenaran; UI hanya fetch JSON lewat hook query dan render.
 
 ```mermaid
 flowchart TD
@@ -331,10 +283,10 @@ flowchart TD
     EP["/api/market/*, /api/watchlist,<br/>/api/signals, /api/backtest, dll"]
   end
 
-  subgraph Web["idx-web (Next.js)"]
-    HOOKS[lib/hooks.ts<br/>SWR, refresh 30s]
-    CMP[components/*]
-    PAGE[Pages app/*]
+  subgraph Web["idx-web (SvelteKit)"]
+    HOOKS[lib/hooks.svelte.ts<br/>query, refresh 30s]
+    CMP[lib/components/*]
+    PAGE[routes/*]
   end
 
   IDX --> CF --> JOB
@@ -359,65 +311,65 @@ Tahapannya:
    di-set `Asia/Jakarta`.
 4. **API (FastAPI read-only)** — Hanya membaca dari DB, **nol kalkulasi**. Expose
    endpoint `/api/*` lewat connection pool (autocommit sebelum `SET time zone`).
-5. **Web (idx-web)** — `lib/hooks.ts` fetch JSON via **SWR** (auto-refresh 30 detik),
-   diteruskan ke `components/*`, dirakit di halaman `app/*`. Frontend murni presentasi.
+5. **Web (idx-web)** — `lib/hooks.svelte.ts` fetch JSON lewat hook query sendiri (auto-refresh 30 detik),
+   diteruskan ke `lib/components/*`, dirakit di `web/src/routes/*`. Frontend murni presentasi.
 
-## Setup
+---
 
-```bash
-cd d:/Project/market-labs/idx-web
-npm install
-```
+## Konvensi frontend (nyata, bukan agen otonom)
 
-Configure the backend URL in `.env.local`:
+Tidak ada "agen" otonom di repo ini - aturan di bawah ditegakkan lewat struktur
+kode, satu gerbang CI, dan review manual.
 
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-```
+| Peran | Wujud nyata |
+|-------|-------------|
+| **Batas presentasi** | Presentasi murni: nol kalkulasi bisnis di web. Semua hitungan di backend FastAPI; UI mengambil JSON lewat helper query di `web/src/lib/hooks.svelte.ts` (auto-refresh 30 detik) lalu render. |
+| **Design system** | Token di `web/src/app.css` (`--accent`, `--bg`/`--bg-elev`/`--border`, `--up`/`--down`/`--warn`/`--muted`) + primitif bersama: `.card`/`.card-hover`, `.badge`, `.btn`/`.btn-ghost`/`.btn-primary`, `.nav-link`, `.data-table`, `.skeleton`, `.gradient-text`, `.fade-up`. |
+| **Komponen bersama** | `Card`, `EmptyState`/`ErrorState`/`Skeleton`, `InfoHint`, `LastUpdated`, `RegimeBanner`, `Sidebar`/`Topbar`, `TickerLogo` di `web/src/lib/components/`; tipe mirror backend di `web/src/lib/types.ts`, klien fetch di `web/src/lib/api.ts`. |
+| **Aksesibilitas** | `aria-label` / `aria-hidden` / `aria-current` / `aria-modal` / `role` dipakai di nav, dialog mobile, dan tombol ikon; kontras dari token `app.css`. |
+| **Kualitas otomatis** | Satu gerbang CI (`.github/workflows/ci.yml`): `npm ci` -> `svelte-check` -> `vite build` -> Playwright (47 tes, dua viewport). |
+| **"No AI slop"** | Checklist review manual: hindari hero generik, ikon seragam, copy placeholder, dan komponen hasil salin tanpa adaptasi. |
 
-## Run
+### Evaluasi & kalibrasi (di backend, bukan frontend)
 
-Start the backend first (from `idx-scraper`, with Postgres env loaded):
+Peran "Trainer" (Evaluation / Feedback Loop / Calibration) tidak ada sebagai kode
+frontend. Yang mengukur kualitas keputusan ada di backend:
+`research/signal_log.py` (track record sinyal), `research/recommendation_log.py`
+(track record kandidat beli), dan track record pola `smart_money` - semuanya
+mengukur outcome forward + abnormal vs pasar supaya klaim bisa dicek, bukan
+dipercaya. Di sisi frontend, gerbang otomatisnya `svelte-check`, `vite build`,
+dan suite Playwright.
 
-```bash
-cd /d/Project/market-labs/idx-scraper
-set -a && . ./.env && set +a
-.venv/Scripts/python.exe -m uvicorn idx_scraper.api.app:app --port 8000
-```
+---
 
-Then the frontend:
+## Menjalankan frontend
 
-```bash
-cd /d/Project/market-labs/idx-web
-npm run dev        # http://localhost:3000
-```
+1. Pastikan backend `idx-scraper` hidup di alamat `PUBLIC_API_BASE_URL`.
+2. Dev: `cd web && npm run dev` -> <http://localhost:3100>.
+3. Produksi lokal: `cd web && npm run build`, lalu
+   `node deploy/serve.mjs 3000 build` -> <http://localhost:3000>. Task
+   `IDX-Web` menjalankan jalur yang sama lewat `scripts/start-web.bat`.
+4. Kalau memakai port selain 3000/3100, tambahkan ke `IDX_API_CORS_ORIGINS` di
+   backend.
 
-If you serve on a different port (e.g. 3100), add it to the backend's
-`IDX_API_CORS_ORIGINS` allowlist.
+---
 
-## Structure
+## Struktur
 
-- `lib/types.ts` — TypeScript mirrors of the backend Pydantic schemas
-- `lib/api.ts` — typed fetch client + SWR fetcher
-- `lib/hooks.ts` — SWR hooks (30s auto-refresh)
-- `lib/format.ts` — id-ID number / percent / compact-IDR formatting
-- `components/` — MarketOverview, MarketNarration, RegimeBanner, MarketBadge, WatchlistTable, SignalsPanel, TopLeadersPanel, TopBrokersPanel, TechnicalChart, HistoryTable, SectorRotationTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, EquityCurveChart, RebalanceLedger, AlertRules, TelegramStatus, EventStudyCard, BrokerActivityCard, OwnershipCard, TickerLogo, Sidebar, Card, States, InfoHint, LastUpdated
-- `app/page.tsx` — dashboard composition
-- `app/radar/page.tsx` — Radar Smart Money (papan akumulasi/distribusi + track record pola)
-- `app/radar/[code]/page.tsx` — jejak lengkap satu emiten (dari radar)
-- `app/pantau/page.tsx` — watchlist + signals + alert rules + Telegram wiring
-- `app/stock/[code]/page.tsx` — per-stock technical, history, brokers
-- `app/screener/page.tsx` — multi-criteria stock screener
-- `app/sectors/page.tsx` — sector analysis + rotasi aktivitas broker
-- `app/foreign/page.tsx` — foreign fund flow
-- `app/flow/page.tsx` + `app/flow/[code]/page.tsx` — aliran dana per emiten (arus asing, timeline skor, komposisi broker) dengan deep-link /flow/[code]
-- `app/rekomendasi/page.tsx` — buy candidate board (grade, entry/stop/target, R/R, sizing, per-grade track record)
-- `app/keputusan/page.tsx` + `app/keputusan/[code]/page.tsx` — Ruang Keputusan: verdict gabungan + regime + sentimen + jejak asing + level pembatalan + base rate event (deep-link /keputusan/[code])
-- `app/faktor/page.tsx` — registry faktor kuantitatif + kalibrasi
-- `app/jejak-sinyal/page.tsx` — track record sinyal (per horizon & regime)
-- `app/sentimen/page.tsx` — gauge sentimen pasar + daftar akumulasi/distribusi
-- `app/backtest/page.tsx` — strategy simulator (equity curve, rebalance cadence, cost model, gross/net metrics vs buy & hold)
-- `app/broker-activity/page.tsx` — aktivitas broker (skor aliran tervalidasi IC + komposisi asing/lokal/BUMN + struktur broker pasar)
+- `web/` - app SvelteKit (produksi)
+  - `web/src/routes/` - 19 rute (`+page.svelte` per halaman, `+error.svelte` untuk halaman galat)
+  - `web/src/lib/api.ts` - klien fetch bertipe
+  - `web/src/lib/hooks.svelte.ts` - 48 hook query (auto-refresh 30 detik)
+  - `web/src/lib/types.ts` - mirror skema Pydantic backend
+  - `web/src/lib/format.ts` - format angka/persen/IDR `id-ID`
+  - `web/src/lib/components/` - 43 komponen (MarketOverview, TechnicalChart, WatchlistTable, dan seterusnya)
+  - `web/e2e/` - suite Playwright
+  - `web/deploy/serve.mjs` - server statis tanpa dependensi
+  - `web/docs/` - TASKS, PARITAS, HASIL-UKUR, DEPLOY
+- `app/`, `components/`, `lib/`, `public/`, `e2e/` - app Next lama (arsip rujukan)
+- `scripts/start-web.bat`, `scripts/restart-web.ps1` - launcher task `IDX-Web` (:3000)
+
+---
 
 ## Chat Commands
 
@@ -425,9 +377,13 @@ Perintah singkat buat nyuruh AI jalanin project ini. Tinggal copy-paste di chat:
 
 | Perintah | Yang dijalankan |
 |---|---|
-| `jalanin web` | `npm run dev` (Next.js dev server, port 3000) |
-| `jalanin web + backend` | jalankan `npm run dev` + `python -m idx_scraper.cli serve` di idx-scraper |
+| `jalanin web` | `cd web && npm run dev` (SvelteKit, :3100) |
+| `jalanin web produksi` | `cd web && npm run build` lalu `node deploy/serve.mjs 3000 build` |
+| `jalanin web + backend` | dev server web + `python -m idx_scraper.cli serve` di idx-scraper |
 
-> **Note:** Frontend butuh backend jalan di `localhost:8000`. Kalau backend belum jalan, dashboard tetap load tapi data nggak muncul.
+> Frontend butuh backend hidup di `localhost:8000`. Tanpa backend, halaman tetap
+> terbuka dan menampilkan empty/error state, bukan data.
 
 Full change history for both repos: see `../idx-scraper/AUDIT.md`.
+
+*Terakhir diperbarui: 2026-10-24 - migrasi SvelteKit selesai, app Next diarsipkan.*

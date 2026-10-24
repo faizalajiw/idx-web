@@ -1,19 +1,26 @@
 name: CI
 
+# App produksi ada di web/ (SvelteKit 3 + adapter-static). App Next di akar repo
+# dipertahankan sebagai rujukan dan tidak lagi dibangun di sini.
+
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: web
+
 jobs:
-  frontend:
-    name: tsc + next build
+  web:
+    name: svelte-check + build + e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -21,16 +28,26 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck (tsc --noEmit)
-        run: npx tsc --noEmit
+      - name: Typecheck (svelte-check)
+        run: npm run check
 
-      - name: Build (next build)
+      - name: Build (vite build -> build/)
         run: npm run build
+
+      - name: Install Chromium untuk Playwright
+        run: npx playwright install --with-deps chromium
+
+      # E2E menguji artefak build, bukan dev server: webServer Playwright
+      # menjalankan server statis yang sama dengan cutover/CI produksi
+      # (`deploy/serve.mjs`), karena `vite preview` tidak punya fallback SPA -
+      # rute tak dikenal akan dibalas 404 dan halaman galat tidak pernah dirender.
+      - name: E2E (Playwright)
+        run: npx playwright test
         env:
-          # Pages are client components that fetch at runtime; the default
-          # http://localhost:8000 base URL is fine at build time.
-          NEXT_TELEMETRY_DISABLED: 1
+          E2E_BASE_URL: http://localhost:3100
+          E2E_SERVER_CMD: node deploy/serve.mjs 3100 build

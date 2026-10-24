@@ -18,6 +18,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 8 | Build produksi dan paket deploy | selesai |
 | 9 | Cutover :3000 | lokal selesai; VPS menunggu pemilik |
 | 10 | Audit sisa migrasi: halaman galat, bentuk URL `/flow`, koreksi ikon | selesai |
+| 11 | Pembersihan sisa app Next: `.next`, launcher `:3000`, CI, README/AGENTS | selesai |
 
 ## Fase 1 — selesai 2026-10-24
 
@@ -257,8 +258,55 @@ suite lama app Next di akar (`npx playwright test` di `idx-web/`, baseURL
 dan `/stock/` menampilkan halaman tidak ditemukan; `/flow/BBRI` dan
 `/flow?code=BBRI` masing-masing menampilkan workspace dan empty state.
 
+## Fase 11 — pembersihan sisa app Next, selesai 2026-10-24
+
+Dihapus (disetujui pemilik):
+
+- `.next/` — 2.757 berkas, 1.373 MB artefak build Next basi.
+- `_stop-web.flag`, `test-results/`, `logs/` di akar repo.
+- `web/src/lib/assets/favicon.svg` — logo Svelte bawaan `sv create`, tidak
+  dirujuk siapa pun; favicon aktif `web/static/favicon.svg`.
+
+Diubah supaya tidak lagi menjalankan Next:
+
+- `scripts/start-web.bat` — masuk ke `web/`, menyajikan `build/` lewat
+  `node deploy/serve.mjs 3000 build`. Guard port, flag stop/restart, cadangan
+  path node nvm, dan log launcher tetap.
+- `scripts/restart-web.ps1` — dokumentasi disesuaikan (yang dihentikan adalah
+  pemegang port 3000, bukan `next dev`), dan folder `logs/` dibuat sendiri
+  karena tidak lagi ada di repo.
+- `.github/workflows/ci.yml` — `working-directory: web`; `npm ci` →
+  `npm run check` → `npm run build` → Playwright. Jalan pada push ke `main`
+  dan `dev`, serta semua PR. Job `next build` di akar dihapus.
+- `web/playwright.config.ts` — perintah `webServer` bisa diganti lewat
+  `E2E_SERVER_CMD`; CI memakainya untuk menguji `deploy/serve.mjs 3100 build`.
+- `README.md` dan `AGENTS.md` — ditulis ulang untuk SvelteKit; blok aturan Next
+  yang ditulis ulang `next dev` dihapus.
+
+Verifikasi:
+
+- `npm run check` 0 error 0 warning; `npm run build` sukses.
+- Launcher diuji tiga jalur: start bersih dengan `_restart-web.flag` (flag
+  dihapus, :3000 hidup), `_stop-web.flag` (server berhenti dan tidak dinyalakan
+  lagi), dan instance kedua (dilewati guard-port, tetap satu listener).
+- :3000 dari launcher: `/` 200, `/flow/BBRI` 200, `/halaman-yang-tidak-ada` 200
+  (fallback SPA), `/favicon.svg` 200, aset `/_app/immutable/*.js` yang tidak ada
+  → 404.
+- `npx playwright test` **47 passed** terhadap build yang disajikan launcher
+  (:3000) dan **47 passed** terhadap `node deploy/serve.mjs 3100 build` (jalur
+  CI).
+
+Catatan deviasi server: `vite preview` membalas 404 untuk rute tak dikenal
+(tidak ada fallback SPA), sehingga tes halaman galat gagal di sana. Karena itu
+CI memakai `deploy/serve.mjs` yang perilakunya sama dengan cutover; server
+produksi wajib `try_files ... /index.html` (lihat `DEPLOY.md`).
+
 ## Aturan kerja
 
-- Jangan jalankan `next build` di akar selama dev server :3000 hidup. Saat ini :3000 mati dan `_stop-web.flag` ada.
+- Frontend produksi ada di `web/` (SvelteKit). Jangan jalankan `next dev` atau
+  `next build`; app Next di akar hanya arsip rujukan paritas.
+- :3000 dilayani `node deploy/serve.mjs 3000 build` lewat task `IDX-Web`
+  (`scripts/start-web.bat`). `_stop-web.flag` menghentikan dan menahan server
+  itu sampai flag dihapus; `_restart-web.flag` memaksa restart sekali.
 - Jangan sentuh API, DB, scraper, atau job terjadwal.
 - Hapus berkas atau branch hanya setelah konfirmasi pemilik.

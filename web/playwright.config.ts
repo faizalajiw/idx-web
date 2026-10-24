@@ -38,8 +38,10 @@ export default defineConfig({
 			testMatch: /(routes|layout-mobile)\.spec\.ts/
 		}
 	],
+	// Lokal: dev server (paling cepat, dan biasanya sudah hidup). CI: `preview`,
+	// supaya yang diuji artefak build produksi, bukan kode hasil compile ulang.
 	webServer: {
-		command: "npm run dev",
+		command: process.env.E2E_SERVER_CMD ?? "npm run dev",
 		url: BASE_URL,
 		reuseExistingServer: true,
 		timeout: 120_000

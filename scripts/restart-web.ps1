@@ -1,15 +1,18 @@
-# Hentikan `next dev` :3000 milik task IDX-Web.
+# Hentikan server statis idx-web :3000 milik task IDX-Web.
 #
-# Kenapa ada: `run-hidden.vbs` melepas proses dev, jadi `Stop-ScheduledTask`
+# Kenapa ada: `run-hidden.vbs` melepas prosesnya, jadi `Stop-ScheduledTask`
 # tidak menyentuhnya dan shell biasa ditolak ("Access is denied"). Instance task
 # berikutnya boleh menghentikannya -- pola yang sama dengan restart-api.ps1.
-# Wajib untuk `next build`: repo ini melarang build selama `next dev` hidup di
-# :3000 (dua-duanya memakai `.next`).
+#
+# Sejak migrasi ke SvelteKit, :3000 bukan lagi `next dev` melainkan
+# `node deploy/serve.mjs 3000 build` (lihat scripts\start-web.bat). Skrip ini
+# tidak peduli prosesnya apa: yang dihentikan adalah pemegang port 3000.
 #
 # Dua pemicu:
-#  1. `_restart-web.flag` -> hentikan, lalu start-web.bat menyalakan lagi.
-#  2. `_stop-web.flag`    -> hentikan dan JANGAN nyalakan (dipakai `next build`).
-#     Flag ini sengaja tidak dihapus skrip: pemilik yang menghapus setelah build.
+#   1. `_restart-web.flag` -> hentikan, lalu start-web.bat menyalakan lagi.
+#   2. `_stop-web.flag`    -> hentikan dan JANGAN nyalakan (mis. saat build
+#      ditimpa dan tidak boleh ada permintaan yang membaca build setengah jadi).
+#      Flag ini sengaja tidak dihapus skrip: pemilik yang menghapus.
 # Tanpa flag: hanya membuang proses yatim kalau :3000 tidak melayani.
 #
 # Jejak tiap eksekusi ditulis ke logs\_restart-web.log.
@@ -19,7 +22,8 @@ $ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
 $flagUlang = Join-Path $root '_restart-web.flag'
 $flagStop = Join-Path $root '_stop-web.flag'
-$jejak = Join-Path $root 'logs\_restart-web.log'
+$folderLog = Join-Path $root 'logs'
+$jejak = Join-Path $folderLog '_restart-web.log'
 
 function Catat([string]$pesan) {
     "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') $pesan" |
@@ -33,6 +37,12 @@ function Pendengar {
     catch {
         return $null
     }
+}
+
+# logs/ tidak disimpan di repo (gitignored) dan bisa saja belum ada di mesin
+# baru; tanpa folder ini setiap Catat() gagal diam-diam.
+if (-not (Test-Path $folderLog)) {
+    New-Item -ItemType Directory -Path $folderLog -Force | Out-Null
 }
 
 # Simpan sebagai boolean terpisah: variabel path-nya masih dipakai untuk
@@ -49,9 +59,9 @@ if (-not $adaUlang -and -not $adaStop -and $null -ne $pidDev) {
 
 if ($adaStop) { Catat '_stop-web.flag ada - :3000 dihentikan dan tidak dinyalakan' }
 elseif ($adaUlang) { Catat '_restart-web.flag ada - :3000 dihentikan lalu dinyalakan lagi' }
-else { Catat ':3000 tidak melayani - buang proses dev yatim' }
+else { Catat ':3000 tidak melayani - buang proses yatim' }
 
-# Hentikan pemegang port, ulangi sampai port benar-benar bebas: worker `next`
+# Hentikan pemegang port, ulangi sampai port benar-benar bebas: proses anak
 # bisa langsung mewarisi listener kalau hanya proses induk yang dibunuh.
 for ($i = 0; $i -lt 10; $i++) {
     $pidDev = Pendengar

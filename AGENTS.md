@@ -1,12 +1,28 @@
-<!-- BEGIN:nextjs-agent-rules -->
+<!-- BEGIN:web-agent-rules -->
 
-# This is NOT the Next.js you know
+# App produksi ada di `web/`
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+Frontend yang dipakai adalah **SvelteKit 3 + `adapter-static`** di `web/`; SSR
+mati, rute dinamis dilayani fallback SPA `index.html`. App Next di akar repo
+diarsipkan sebagai rujukan paritas: jangan menambah fitur di sana, dan jangan
+menjalankan `next dev`/`next build`. Blok aturan Next yang dulu ditulis ulang
+otomatis oleh `next dev` sudah dihapus bersama app-nya.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+- Data hanya dari FastAPI (`PUBLIC_API_BASE_URL`, di-*inline* saat build). Nol
+  kalkulasi bisnis di web.
+- Bentuk URL mengikuti app Next: `/flow/<kode>`, `/keputusan/<kode>`,
+  `/radar/<kode>`, `/stock/<kode>`, `/dossier/<kode>`.
+- Hook query: `web/src/lib/hooks.svelte.ts`. Klien fetch: `web/src/lib/api.ts`.
+  Tipe mirror backend: `web/src/lib/types.ts`.
+- Gerbang sebelum menyatakan selesai, dijalankan di `web/`: `npm run check`
+  (0 error, 0 warning), `npm run build`, lalu `npx playwright test`.
+- Port: :3100 dev dan preview (`strictPort`, tidak bisa bersamaan), :3000 server
+  statis `node deploy/serve.mjs 3000 build` - dijalankan task `IDX-Web` lewat
+  `scripts/start-web.bat`.
+- Paritas adalah kriteria selesai: baca `web/docs/PARITAS.md` sebelum mengubah
+  tampilan, dan catat deviasi yang disengaja di sana.
 
-<!-- END:nextjs-agent-rules -->
+<!-- END:web-agent-rules -->
 
 ## Dokumentasi Project
 
