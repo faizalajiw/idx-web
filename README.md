@@ -265,18 +265,18 @@ satunya sumber kebenaran; UI hanya fetch JSON lewat hook query dan render.
 ```mermaid
 flowchart TD
   subgraph Sumber
-    IDX[IDX GetIndexList / GetStockSummary<br/>via Cloudflare bypass]
-    YF[Yahoo Finance .JK<br/>fallback historis]
+    IDX["IDX GetIndexList / GetStockSummary<br/>via Cloudflare bypass"]
+    YF["Yahoo Finance .JK<br/>fallback historis"]
   end
 
   subgraph Ingest["idx-scraper (Python + APScheduler)"]
-    CF[cf_transport.py<br/>HTTP murni (curl_cffi); Chrome cadangan]
-    JOB[Scheduler jobs<br/>preopen / intraday / EOD]
-    RESEARCH[Research layer PIT<br/>regime, signal_log, sentiment, faktor]
+    CF["cf_transport.py<br/>HTTP murni (curl_cffi); Chrome cadangan"]
+    JOB["Scheduler jobs<br/>preopen / intraday / EOD"]
+    RESEARCH["Research layer PIT<br/>regime, signal_log, sentiment, faktor"]
   end
 
   subgraph Store
-    PG[(Postgres / Supabase<br/>raw_eod, prices_pit, index_quotes,<br/>broker_daily, signal_log, research.*)]
+    PG[("Postgres / Supabase<br/>raw_eod, prices_pit, index_quotes,<br/>broker_daily, signal_log, research.*")]
   end
 
   subgraph API["FastAPI (read-only)"]
@@ -284,9 +284,9 @@ flowchart TD
   end
 
   subgraph Web["idx-web (SvelteKit)"]
-    HOOKS[lib/hooks.svelte.ts<br/>query, refresh 30s]
-    CMP[lib/components/*]
-    PAGE[routes/*]
+    HOOKS["lib/hooks.svelte.ts<br/>query, refresh 30s"]
+    CMP["lib/components/*"]
+    PAGE["routes/*"]
   end
 
   IDX --> CF --> JOB
