@@ -276,7 +276,7 @@ flowchart TD
   end
 
   subgraph Store
-    PG[("Postgres / Supabase<br/>raw_eod, prices_pit, index_quotes,<br/>broker_daily, signal_log, research.*")]
+    PG[("Postgres<br/>raw_eod, prices_pit, index_quotes,<br/>broker_daily, signal_log, research.*")]
   end
 
   subgraph API["FastAPI (read-only)"]
@@ -305,7 +305,7 @@ Tahapannya:
 2. **Ingest (idx-scraper)** — `cf_transport.py` default-nya menembak JSON IDX lewat HTTP murni (`curl_cffi`), tanpa browser dan tanpa kuki. Chrome persisten hanya **cadangan**: dipakai bila IDX menolak jalur HTTP, lalu JSON ditembak lewat `page.evaluate(fetch(...))` agar ikut memakai cookie yang bersih. **APScheduler** (timezone WIB) menjalankan job
    preopen / intraday / EOD. Setelah raw data masuk, **research layer point-in-time**
    menghitung regime IHSG, jejak sinyal, sentimen, dan faktor kuantitatif.
-3. **Store (Postgres/Supabase)** — Semua ditulis idempotent (upsert `ON CONFLICT`).
+3. **Store (Postgres)** — Semua ditulis idempotent (upsert `ON CONFLICT`).
    Tabel inti: `raw_eod` (source of truth), `prices_pit`, `index_quotes` (IHSG close
    resmi IDX-live), `broker_daily`, `signal_log`, plus schema `research.*`. Timezone
    di-set `Asia/Jakarta`.
