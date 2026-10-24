@@ -146,6 +146,8 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   background:
     radial-gradient(1100px 520px at 12% -8%, var(--glow-1), transparent 60%),
     radial-gradient(900px 480px at 100% 0%, var(--glow-2), transparent 55%),
@@ -399,9 +401,19 @@ body {
 /* ---------- app shell: sidebar penuh / rail ikon ---------- */
 
 .app-main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
   padding-left: var(--rail-w);
-  padding-bottom: 3.25rem; /* ruang untuk .app-footer yang fixed */
   transition: padding-left 0.2s ease;
+}
+
+/* Kontainer halaman memakai `mx-auto`. Di dalam flex, margin auto pada sumbu
+   silang mematikan stretch, jadi lebarnya jadi selebar isi dan bisa melebihi
+   layar. width:100% mengembalikan perilaku blok: penuh, lalu max-w + margin auto
+   yang menengahkan. */
+.app-main > * {
+  width: 100%;
 }
 
 .app-sidebar {
@@ -409,19 +421,14 @@ body {
   transition: width 0.2s ease;
 }
 
-/* Footer fixed di bawah viewport; left mengikuti lebar sidebar.
-   Di bawah 1024px berhenti melayang, jadi tidak menutupi isi (lihat blok rangka). */
+/* Footer mengalir di akhir dokumen, di semua lebar layar: tidak menutupi isi
+   dan tidak butuh ruang cadangan di .app-main. Kalau isi halaman lebih pendek
+   dari layar, margin-top:auto mendorongnya ke dasar viewport, bukan
+   menggantung di tengah. */
 .app-footer {
-  position: fixed;
-  left: var(--rail-w);
-  right: 0;
-  bottom: 0;
-  z-index: 30;
+  margin-top: auto;
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  backdrop-filter: blur(20px) saturate(1.4);
   border-top: 1px solid var(--border);
-  transition: left 0.2s ease;
 }
 
 @media (min-width: 1024px) {
@@ -429,8 +436,6 @@ body {
   html.sidebar-collapsed .app-main { padding-left: var(--rail-w); }
   .app-sidebar { width: 15rem; }
   html.sidebar-collapsed .app-sidebar { width: var(--rail-w); }
-  .app-footer { left: 15rem; }
-  html.sidebar-collapsed .app-footer { left: var(--rail-w); }
 }
 
 /* Header: brand + tombol toggle (toggle hanya relevan di desktop) */
@@ -577,12 +582,6 @@ html.light [class~="hover:bg-white/[0.06]"]:hover { background-color: rgba(15, 2
   .app-topbar { display: none; }
   .app-main {
     padding-left: 0;
-    padding-bottom: 0; /* footer ikut mengalir di dokumen, bukan menutupi isi */
-  }
-  .app-footer {
-    position: static;
-    left: 0;
-    border-top: 1px solid var(--border);
   }
 }
 
