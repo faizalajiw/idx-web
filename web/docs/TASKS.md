@@ -10,7 +10,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 0 | Spec disetujui, anggaran byte, kerangka PARITAS.md | selesai |
 | 1 | Fondasi: shell, 19 rute placeholder, Tailwind, adapter-static, baseline ukur | selesai |
 | 2 | Lapisan data: `api.ts`, `types.ts`, 5 modul lib, helper query, 48 hook | selesai |
-| 3 | Pilot `/sectors` end-to-end | belum |
+| 3 | Pilot `/sectors` end-to-end | selesai |
 | 4 | 13 rute statis | belum |
 | 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | belum |
 | 6 | 5 rute dinamis dan workspace | belum |
@@ -65,6 +65,24 @@ Gate fase 2:
 - `npm run check` 0 error 0 warning.
 - Badge topbar menampilkan "Dimuat 24 Okt 2026 13.10.41" dari `/api/market/overview` nyata. Lulus.
 - Palet: ketik `BBRI` → satu baris `/stock/BBRI`, Enter membuka halaman saham. Lulus.
+
+## Fase 3 — selesai 2026-10-24
+
+Dikerjakan:
+
+- Komponen bersama: `Card` (`title` boleh string atau snippet), `InfoHint` (tooltip yang digeser agar tidak keluar layar), `Skeleton`, `EmptyState`, `ErrorState` (label tombol berubah jadi "Coba sekali lagi" bila percobaan terakhir > 10 detik), `FreshnessBadge` (tiga status, basis panel/indeks), `RegimeBanner` (ADX, DI, volatilitas, gerbang rezim), `SectorRotationTable` (kartu sektor + sparkline SVG sendiri).
+- Halaman `/sectors`: banner rezim, rotasi sektor, peta sektor 6 kolom dengan heatmap `color-mix`, catatan kaki mapping sektor.
+
+Gate fase 3 (dibandingkan langsung dengan `next start -p 3000`):
+
+- Judul, subjudul, tiga heading kartu, enam label kolom tabel sama.
+- 23 kartu rotasi dan 23 baris tabel di kedua app; nilai sel identik (Konglomerat +5,91% / 43,62 M / 8,12 Jt / WMPP +18,18% dan seterusnya).
+- `scrollWidth` sama: 1432 di viewport 1440, 382 di 390 (tanpa luber horizontal).
+- Tanpa error konsol di :3100.
+- Tema terang tampil benar (latar terang, kartu putih, badge tetap terbaca).
+- `npm run check` 0 error 0 warning.
+
+Bukti tangkapan layar: `docs/bukti/fase3-next-sectors-1440.png`, `fase3-svelte-sectors-1440.png`, varian `-390` dan `-1440-light`.
 
 ## Aturan kerja
 

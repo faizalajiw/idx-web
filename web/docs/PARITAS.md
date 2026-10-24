@@ -26,9 +26,18 @@ Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
 | `/flow/[code]` | `app/flow/[code]/page.tsx` | FlowWorkspace | placeholder |
 | `/sentimen` | `app/sentimen/page.tsx` | daftar berita, skor | placeholder |
 | `/broker-activity` | `app/broker-activity/page.tsx` | BrokerActivityCard | placeholder |
-| `/sectors` | `app/sectors/page.tsx` | SectorRotationTable, peta sektor, RegimeBanner | placeholder |
+| `/sectors` | `app/sectors/page.tsx` | SectorRotationTable, peta sektor, RegimeBanner | selesai |
 | `/stock/[code]` | `app/stock/[code]/page.tsx` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard | placeholder |
 | `/dossier/[code]` | `app/dossier/[code]/page.tsx` | tujuh seksi dossier | placeholder |
+
+## `/sectors`
+
+- Judul "Analisis Sektor", subjudul "Rata-rata pergerakan, nilai transaksi, dan arus asing per sektor · <tanggal>", `LastUpdated`.
+- Banner "Kondisi IHSG": badge rezim + ADX, DI +/−, volatilitas, saran taktis, gerbang rezim, `FreshnessBadge` basis indeks, `LastUpdated`.
+- Kartu "Rotasi Sektor — Aktivitas Broker": 23 kartu sektor, masing-masing nama, jumlah emiten, badge fase (Akumulasi/Membaik/Memudar/Terpuruk/Stabil), median skor, Δ 5 sesi, Δ 21 sesi, breadth, sparkline; paragraf penjelas metode di bawah grid.
+- Kartu "Peta Sektor": tabel 6 kolom (Sektor, Rata-rata %, Breadth, Value, Foreign Net, Top Stock), heatmap baris, bar breadth, tautan `/stock/<kode>` pada Top Stock.
+- Catatan kaki klasifikasi sektor.
+- State: skeleton tinggi 96 saat memuat, `EmptyState` saat kosong, `ErrorState` saat gagal, pesan "belum tervalidasi" saat rotasi belum lolos IC.
 
 ## Checklist elemen (diisi per rute)
 
