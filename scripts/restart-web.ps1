@@ -35,17 +35,20 @@ function Pendengar {
     }
 }
 
-$flagUlang = Test-Path $flagUlang
-$flagStop = Test-Path $flagStop
+# Simpan sebagai boolean terpisah: variabel path-nya masih dipakai untuk
+# menghapus flag. Menimpa $flagUlang dengan hasil Test-Path dulu membuat
+# `Remove-Item $flagUlang` menghapus `$true`, jadi flag tidak pernah hilang.
+$adaUlang = Test-Path $flagUlang
+$adaStop = Test-Path $flagStop
 $pidDev = Pendengar
 
-if (-not $flagUlang -and -not $flagStop -and $null -ne $pidDev) {
+if (-not $adaUlang -and -not $adaStop -and $null -ne $pidDev) {
     Catat 'tidak ada flag dan :3000 melayani - tidak ada yang dihentikan'
     exit 0
 }
 
-if ($flagStop) { Catat '_stop-web.flag ada - :3000 dihentikan dan tidak dinyalakan' }
-elseif ($flagUlang) { Catat '_restart-web.flag ada - :3000 dihentikan lalu dinyalakan lagi' }
+if ($adaStop) { Catat '_stop-web.flag ada - :3000 dihentikan dan tidak dinyalakan' }
+elseif ($adaUlang) { Catat '_restart-web.flag ada - :3000 dihentikan lalu dinyalakan lagi' }
 else { Catat ':3000 tidak melayani - buang proses dev yatim' }
 
 # Hentikan pemegang port, ulangi sampai port benar-benar bebas: worker `next`
@@ -66,7 +69,7 @@ for ($i = 0; $i -lt 10; $i++) {
 $bebas = $null -eq (Pendengar)
 Catat "port 3000 bebas: $bebas"
 
-if ($flagUlang) {
+if ($adaUlang) {
     Remove-Item $flagUlang -Force -ErrorAction SilentlyContinue
     Catat 'flag _restart-web.flag dihapus'
 }

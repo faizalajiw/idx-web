@@ -23,4 +23,15 @@ if errorlevel 1 (
   exit /b 0
 )
 set NEXT_TELEMETRY_DISABLED=1
-call npm.cmd run dev >> D:\Project\market-labs\idx-web\logs\_web.log 2>&1
+rem nvm baru (Author Software) hanya menyediakan shim npm.exe, bukan npm.cmd;
+rem `call npm.cmd` gagal walau node ada di PATH. Pakai `npm`, dengan shim nvm
+rem sebagai cadangan kalau PATH task tidak memuat node.
+set "NPM_CMD=npm"
+where npm >nul 2>nul
+if errorlevel 1 set "NPM_CMD=C:\Users\faiza\AppData\Local\Author Software\nvm\.nodejs\npm.exe"
+echo [%date% %time%] npm: %NPM_CMD% >> D:\Project\market-labs\idx-web\logs\_launcher.log
+if not exist "%NPM_CMD%" if /i not "%NPM_CMD%"=="npm" (
+  echo [%date% %time%] npm tidak ditemukan - %NPM_CMD% - web TIDAK dinyalakan >> D:\Project\market-labs\idx-web\logs\_launcher.log
+  exit /b 1
+)
+call "%NPM_CMD%" run dev >> D:\Project\market-labs\idx-web\logs\_web.log 2>&1
