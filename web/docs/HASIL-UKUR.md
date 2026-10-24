@@ -38,6 +38,17 @@ Isi JS: runtime Svelte 18,3 + runtime SvelteKit 14,9 + node layout 8,0 +
 entry dan chunk kecil sisanya. Ikon (`@lucide/svelte`) ikut ter-tree-shake ke
 dalam node layout, tidak ada chunk terpisah.
 
+## SvelteKit fase 2 (lapisan data: api + 48 hook + palet emiten)
+
+| Rute | JS (KB gzip) | CSS | Font | Total |
+|---|---|---|---|---|
+| 14 rute statis | 64,2 | 8,6 | 29,0 | 101,8 |
+| `/stock/[code]`, `/dossier/[code]` | 64,8 | 8,6 | 29,0 | 102,4 |
+
+Kenaikan dari fase 1 (+2,3 KB JS, +0,3 KB CSS) berasal dari lapisan data yang
+memang dipakai shell di semua rute: `api.ts`, `query.svelte.ts`, `hooks.svelte.ts`,
+`format.ts`, `portfolio.svelte.ts`, dan pencarian emiten di palet.
+
 ## Selisih
 
 | Ukuran | Next | SvelteKit | Selisih |

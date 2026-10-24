@@ -8,6 +8,11 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	/** Variabel publik yang dibaca `src/lib/api.ts` saat build. */
+	interface ImportMetaEnv {
+		readonly PUBLIC_API_BASE_URL?: string;
+	}
 }
 
 export {};
