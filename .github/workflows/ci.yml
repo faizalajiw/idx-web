@@ -36,6 +36,9 @@ jobs:
       - name: Typecheck (svelte-check)
         run: npm run check
 
+      - name: Docs contract (tautan & stack)
+        run: npm run check:docs
+
       - name: Build (vite build -> build/)
         run: npm run build
 

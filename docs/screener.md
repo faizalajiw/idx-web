@@ -4,9 +4,9 @@
 Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volume, foreign, skor broker, order-book). Menjawab "saham mana yang cocok dengan kriteria saya hari ini". Pengguna: trader/analis yang mencari kandidat. Dipakai untuk riset kandidat sebelum masuk ke Rekomendasi/Ruang Keputusan.
 
 ## 2. Route & Berkas
-- URL: `/screener` → [`app/screener/page.tsx`](../../idx-web/app/screener/page.tsx)
-- Komponen: [Card](../../idx-web/components/Card.tsx), [RegimeBanner](../../idx-web/components/RegimeBanner.tsx), [TickerLogo](../../idx-web/components/TickerLogo.tsx), [States](../../idx-web/components/States.tsx)
-- Hooks: `useScreener`, `useBrokerActivity` ([hooks.ts:216](../../idx-web/lib/hooks.ts))
+- URL: `/screener` → [`routes/screener/+page.svelte`](../web/src/routes/screener/+page.svelte)
+- Komponen: [Card](../web/src/lib/components/Card.svelte), [RegimeBanner](../web/src/lib/components/RegimeBanner.svelte), [TickerLogo](../web/src/lib/components/TickerLogo.svelte), [EmptyState](../web/src/lib/components/EmptyState.svelte)/[ErrorState](../web/src/lib/components/ErrorState.svelte)/[Skeleton](../web/src/lib/components/Skeleton.svelte)
+- Hooks: `useScreener`, `useBrokerActivity` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
 
 ## 3. Penjelasan Per-Card
 
@@ -14,7 +14,7 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Field | Isi |
 |---|---|
 | Nama card | Tab strategi (Momentum + Foreign In, Lonjakan Volume, Oversold Sehat, Trend Up Tenang, Akumulasi Broker) |
-| Komponen | `PRESETS` dan tab bar di [screener/page.tsx](../../idx-web/app/screener/page.tsx) |
+| Komponen | `PRESETS` dan tab bar di [screener/page.svelte](../web/src/routes/screener/+page.svelte) |
 | Fungsi | Memilih satu strategi; setiap tab mengisi beberapa filter sekaligus |
 | Sumber data | Klien-only (state); dikirim sebagai query ke `GET /api/screener` |
 | Rumus/Logika | Preset = kombinasi nilai filter (`min_momentum`, `foreign_in_only`, `min_vol_ratio`, `rsi_max`, `signal`, `min_broker_score`, `min_value`, `min_days`) |
@@ -27,14 +27,14 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 - Saat membuka `/screener` tanpa query, tidak ada tab yang aktif (`active = -1`) dan tidak ada request `GET /api/screener`.
 - Panel panduan menampilkan 5 kartu strategi yang bisa diklik untuk memulai.
 - Panel FACTORS, peringatan skor broker, dan tabel hasil hanya tampil setelah strategi dipilih.
-- Hook `useScreener` menerima `null`; SWR key bernilai null sehingga fetch dilewati.
+- Hook `useScreener` menerima `null`; auto-refresh key bernilai null sehingga fetch dilewati.
 - Deep link dengan query preset (mis. `/screener?min_momentum=0&min_vol_ratio=2&min_days=30`) langsung memilih tab yang cocok dan memuat hasil.
 
 ### Tabel Hasil Screener
 | Field | Isi |
 |---|---|
 | Nama card | Hasil (kolom: Close, RSI, Momentum 20d, Vol Ratio, ATR%, Jarak 52w, Hari sejak sinyal, Skor broker, OB imbalance, Absorption, Foreign net, Value) |
-| Komponen | `COLUMNS`/`SortKey` di [screener/page.tsx:84](../../idx-web/app/screener/page.tsx) |
+| Komponen | `COLUMNS`/`SortKey` di [screener/page.svelte:84](../web/src/routes/screener/+page.svelte) |
 | Fungsi | Daftar emiten lolos filter + metrik pendukung; sortable & kolom bisa disembunyikan |
 | Sumber data | `GET /api/screener` ([app.py:527](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_screener` ([analytics.py:1561](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit`, `research.orderbook` (1744–1755) |
 | Rumus/Logika | Momentum 20d = % perubahan 20 sesi; RSI(14); Vol ratio = volume÷rata-rata 20 sesi; ATR% = ATR(14)/close; Jarak 52w = posisi vs puncak 52 pekan; OB imbalance/absorption dari `research.orderbook`; Skor broker dari `research.factor_ic_history` (bobot lulus IC) |
@@ -46,7 +46,7 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Field | Isi |
 |---|---|
 | Nama card | Faktor (daftar definisi tiap kolom) |
-| Komponen | `FACTORS` di [screener/page.tsx:65](../../idx-web/app/screener/page.tsx) |
+| Komponen | `FACTORS` di [screener/page.svelte:65](../web/src/routes/screener/+page.svelte) |
 | Fungsi | Menjelaskan arti & cara baca tiap kolom |
 | Sumber data | Statis (teks) |
 | Rumus/Logika | Definisi tiap faktor |
@@ -66,14 +66,14 @@ Filter disimpan di query string (`/screener?min_momentum=5&foreign_in_only=true&
 ```
 IDX EOD → ingest → Postgres (prices_pit, stock_summary_daily/foreign, orderbook capture)
    → analytics.get_screener (hitung indikator + join orderbook + skor broker)
-   → GET /api/screener → SWR useScreener → tabel hasil + sort/filter
+   → GET /api/screener → auto-refresh useScreener → tabel hasil + sort/filter
    (skor broker butuh research.factor_ic_history dari run `idx ic`)
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **Perhitungan**: on-demand saat request (filter diterapkan di backend lalu di klien).
 - **Job/scheduler**: tidak ada job khusus screener; bergantung pada job refresh EOD (`refresh_s2` 16:10 WIB, dll) yang mengisi `prices_pit` dan capture order-book saat jam bursa.
-- **Refresh UI**: SWR (hook screener) 30 detik.
+- **Refresh UI**: auto-refresh (hook screener) 30 detik.
 - **Idempotensi**: sumber data bitemporal (`prices_pit`) → hasil deterministik per as-of.
 - **Fallback**: order-book kosong → kolom OB kosong; skor broker kosong sampai run IC ada.
 

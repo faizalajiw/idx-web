@@ -1,5 +1,7 @@
 # Hasil ukur: Next vs SvelteKit
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Tanggal: 2026-10-24
 Mesin: Windows, Node 24.22.1, Chromium headless (Playwright 1.64.1), layar 1440x900.
 

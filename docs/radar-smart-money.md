@@ -4,10 +4,10 @@
 Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar) dan distribusi (net sell asing terbesar) dalam N sesi. Dilengkapi papan pola, track record, dan detail per emiten. Pengguna: trader dan analis yang mencari jejak "uang pintar" (asing sebagai proksi). Data EOD, bukan real-time.
 
 ## 2. Route & Berkas
-- URL: `/radar` → [`app/radar/page.tsx`](../../idx-web/app/radar/page.tsx)
-- URL detail: `/radar/[code]` → [`app/radar/[code]/page.tsx`](../../idx-web/app/radar/[code]/page.tsx)
-- Komponen: `SmartMoneyBanner`, `SmartMoneyPatternsBoardCard`, `SmartMoneyTrackRecordCard` ([components/](../../idx-web/components/))
-- Hook: `useSmartMoneyRadar(10)` ([hooks.ts:423](../../idx-web/lib/hooks.ts), 300 detik); `useStockSmartMoney(code)` ([hooks.ts:435](../../idx-web/lib/hooks.ts), 300 detik); `useSmartMoneyPatternsBoard` ([hooks.ts:458](../../idx-web/lib/hooks.ts), 1800 detik); `useSmartMoneyTrackRecord` ([hooks.ts:446](../../idx-web/lib/hooks.ts), 3600 detik)
+- URL: `/radar` → [`routes/radar/+page.svelte`](../web/src/routes/radar/+page.svelte)
+- URL detail: `/radar/[code]` → [`routes/radar/[code]/+page.svelte`](../web/src/routes/radar/[code]/+page.svelte)
+- Komponen: `SmartMoneyBanner`, `SmartMoneyPatternsBoardCard`, `SmartMoneyTrackRecordCard` ([components/](../web/src/lib/components/))
+- Hook: `useSmartMoneyRadar(10)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 300 detik); `useStockSmartMoney(code)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 300 detik); `useSmartMoneyPatternsBoard` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 1800 detik); `useSmartMoneyTrackRecord` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 3600 detik)
 - Backend: `GET /api/smart-money/radar` ([app.py:413](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_smart_money_radar` ([analytics.py:497](../../idx-scraper/src/idx_scraper/api/analytics.py)); `GET /api/stocks/{code}/smart-money` ([app.py:427](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_smart_money` ([analytics.py:585](../../idx-scraper/src/idx_scraper/api/analytics.py)); `GET /api/smart-money/track-record` ([app.py:452](../../idx-scraper/src/idx_scraper/api/app.py)); `GET /api/smart-money/patterns` ([app.py:464](../../idx-scraper/src/idx_scraper/api/app.py)); `GET /api/smart-money/verdicts` ([app.py:478](../../idx-scraper/src/idx_scraper/api/app.py))
 
 ## 3. Penjelasan Per-Card / Per-Panel
@@ -16,7 +16,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Akumulasi |
-| Komponen | [radar/page.tsx](../../idx-web/app/radar/page.tsx) ~baris 150–205 |
+| Komponen | [radar/page.svelte](../web/src/routes/radar/+page.svelte) ~baris 150–205 |
 | Fungsi | Daftar emiten dengan net buy asing terbesar |
 | Sumber data | `GET /api/smart-money/radar?days=10` → `get_smart_money_radar` ([analytics.py:497](../../idx-scraper/src/idx_scraper/api/analytics.py)); sumber baris asing `latest_pit.foreign_net` / `foreign_flow` |
 | Rumus/Logika | Urutkan net asing (rupiah = volume asing × close) menurun; ambil teratas |
@@ -28,7 +28,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Distribusi |
-| Komponen | [radar/page.tsx](../../idx-web/app/radar/page.tsx) ~baris 150–205 |
+| Komponen | [radar/page.svelte](../web/src/routes/radar/+page.svelte) ~baris 150–205 |
 | Fungsi | Daftar emiten dengan net sell asing terbesar |
 | Sumber data | Sama dengan Akumulasi |
 | Rumus/Logika | Urutkan net asing menaik (paling negatif) |
@@ -40,7 +40,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Catatan data (footer) |
-| Komponen | [radar/page.tsx](../../idx-web/app/radar/page.tsx) ~baris 150–205 |
+| Komponen | [radar/page.svelte](../web/src/routes/radar/+page.svelte) ~baris 150–205 |
 | Fungsi | Menjelaskan keterlambatan EOD (±5–15 menit), definisi rupiah, dan jumlah emiten yang dipindai |
 | Sumber data | Teks statis + field `scanned` dari respons radar |
 | Rumus/Logika | Rupiah = volume asing × close |
@@ -52,7 +52,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Papan Pola (`SmartMoneyPatternsBoardCard`) |
-| Komponen | `components/SmartMoneyPatternsBoardCard.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/SmartMoneyPatternsBoardCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Pola aliran (mis. akumulasi berkelanjutan, flip) per emiten |
 | Sumber data | `GET /api/smart-money/patterns` ([app.py:464](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_smart_money_patterns_board` ([analytics.py:556](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `smart_money_patterns_board` 1800 detik |
 | Rumus/Logika | Dari deret net asing harian; detail di fungsi backend |
@@ -64,7 +64,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Track Record (`SmartMoneyTrackRecordCard`) |
-| Komponen | `components/SmartMoneyTrackRecordCard.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/SmartMoneyTrackRecordCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Seberapa baik sinyal aliran asing historis memprediksi return |
 | Sumber data | `GET /api/smart-money/track-record` ([app.py:452](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_smart_money_track_record` ([analytics.py:845](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache 3600 detik |
 | Rumus/Logika | Evaluasi sinyal pada horizon tetap; dibandingkan dengan pasar |
@@ -76,7 +76,7 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 | Field | Isi |
 |---|---|
 | Nama card | Banner Smart Money + Track Record emiten |
-| Komponen | [radar/[code]/page.tsx](../../idx-web/app/radar/[code]/page.tsx); `SmartMoneyBanner` |
+| Komponen | [routes/radar/[code]/+page.svelte](../web/src/routes/radar/[code]/+page.svelte); `SmartMoneyBanner` |
 | Fungsi | Ringkasan arah aliran asing satu emiten + posisi di radar |
 | Sumber data | `GET /api/stocks/{code}/smart-money` → `get_stock_smart_money` ([analytics.py:585](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `smart_money_stock:{code}` 1800 detik |
 | Rumus/Logika | Dari arus asing emiten; detail di fungsi backend |
@@ -88,13 +88,13 @@ Mendeteksi emiten dengan aliran asing dominan: akumulasi (net buy asing terbesar
 ```
 Broker/foreign EOD → Postgres (foreign_flow, latest_pit.foreign_net)
   → analytics.get_smart_money_radar / get_smart_money_patterns_board / get_smart_money_track_record
-  → GET /api/smart-money/* → SWR (300 s / 1800 s / 3600 s) → kartu radar
+  → GET /api/smart-money/* → auto-refresh (300 s / 1800 s / 3600 s) → kartu radar
   → klik → /radar/[code] → GET /api/stocks/{code}/smart-money → SmartMoneyBanner
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **Precomputed vs on-demand**: hasil dihitung saat request, lalu di-cache in-process (1800–3600 detik). Sumber data EOD diisi oleh job pipeline `refresh_s2` (16:10 WIB) ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
-- **Refresh UI**: SWR 300 detik (radar, detail) dan 1800/3600 detik (papan dan track record).
+- **Refresh UI**: auto-refresh 300 detik (radar, detail) dan 1800/3600 detik (papan dan track record).
 - **Reset cache**: `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)), dipanggil setiap job pipeline.
 - **Idempotensi**: perhitungan murni dari data tersimpan; run ulang menghasilkan angka sama.
 - **Fallback**: bila data asing kosong, kartu menampilkan empty state; tidak ada sumber alternatif.

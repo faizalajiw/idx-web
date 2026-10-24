@@ -4,9 +4,9 @@
 Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pasar equal-weight, dipecah per regime IHSG. Menjawab "kalau sinyal aplikasi ini diikuti, apakah benar-benar menang?". Pengguna: analis/PM yang menilai kredibilitas sinyal.
 
 ## 2. Route & Berkas
-- URL: `/jejak-sinyal` → [`app/jejak-sinyal/page.tsx`](../../idx-web/app/jejak-sinyal/page.tsx) (233 baris)
-- Komponen: `HorizonTabs`, `SignalResultCard`, `RegimeCard`, `SummaryStrip` (di file page), [LastUpdated](../../idx-web/components/LastUpdated.tsx), [States](../../idx-web/components/States.tsx)
-- Hooks: `useSignalTrack()` (600 s) ([hooks.ts](../../idx-web/lib/hooks.ts))
+- URL: `/jejak-sinyal` → [`routes/jejak-sinyal/+page.svelte`](../web/src/routes/jejak-sinyal/+page.svelte) (233 baris)
+- Komponen: `HorizonTabs`, `SignalResultCard`, `RegimeCard`, `SummaryStrip` (di file page), [LastUpdated](../web/src/lib/components/LastUpdated.svelte), [EmptyState](../web/src/lib/components/EmptyState.svelte)/[ErrorState](../web/src/lib/components/ErrorState.svelte)/[Skeleton](../web/src/lib/components/Skeleton.svelte)
+- Hooks: `useSignalTrack()` (600 s) ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
 
 ## 3. Penjelasan Per-Card
 
@@ -14,7 +14,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Field | Isi |
 |---|---|
 | Nama card | Ringkasan strip (jumlah sinyal, periode, tanggal data terakhir) |
-| Komponen | `SummaryStrip` [jejak-sinyal/page.tsx](../../idx-web/app/jejak-sinyal/page.tsx) |
+| Komponen | `SummaryStrip` [jejak-sinyal/page.svelte](../web/src/routes/jejak-sinyal/+page.svelte) |
 | Fungsi | Gambaran cepat cakupan track record |
 | Sumber data | `GET /api/signals/track` ([app.py:563](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.signal_track` ([analytics.py:2023](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
 | Rumus/Logika | Agregasi jumlah & rentang tanggal dari `signal_log` |
@@ -26,7 +26,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Field | Isi |
 |---|---|
 | Nama card | Kinerja per Sinyal |
-| Komponen | [jejak-sinyal/page.tsx](../../idx-web/app/jejak-sinyal/page.tsx) (`SignalResultCard`, `RegimeCard`) |
+| Komponen | [jejak-sinyal/page.svelte](../web/src/routes/jejak-sinyal/+page.svelte) (`SignalResultCard`, `RegimeCard`) |
 | Fungsi | Rata-rata return, excess return vs equal-weight, t-stat (Newey-West lag 5), max runup/drawdown per sinyal |
 | Sumber data | `analytics.signal_track` → `research.signal_log` (2024, 2034) + `research.latest_pit` untuk harga |
 | Rumus/Logika | Entry = close T+1; excess = return sinyal − return pasar equal-weight window sama; t-stat Newey-West lag 5 |
@@ -38,7 +38,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Field | Isi |
 |---|---|
 | Nama card | Kinerja per Regime IHSG |
-| Komponen | [jejak-sinyal/page.tsx:170](../../idx-web/app/jejak-sinyal/page.tsx) |
+| Komponen | [jejak-sinyal/page.svelte:170](../web/src/routes/jejak-sinyal/+page.svelte) |
 | Fungsi | Membandingkan kinerja sinyal saat trending / ranging / transisi |
 | Sumber data | `analytics.signal_track` → `research.signal_log` join `research.regime_daily` |
 | Rumus/Logika | Sinyal dikelompokkan berdasarkan `regime` pada tanggal sinyal |
@@ -50,7 +50,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Field | Isi |
 |---|---|
 | Nama card | Sinyal Terbaru |
-| Komponen | [jejak-sinyal/page.tsx:180](../../idx-web/app/jejak-sinyal/page.tsx) (tabel) |
+| Komponen | [jejak-sinyal/page.svelte:180](../web/src/routes/jejak-sinyal/+page.svelte) (tabel) |
 | Fungsi | Daftar sinyal terbaru + return realisasi 1 minggu / 2 minggu / 1 bulan |
 | Sumber data | `analytics.signal_track` → `research.signal_log` |
 | Rumus/Logika | Return terealisasi dari close entry; kosong bila horizon belum selesai |
@@ -62,7 +62,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 ```
 Pipeline sinyal (services.get_signals) → research.signal_log
   + research.latest_pit (harga) + research.regime_daily
-  → analytics.signal_track → GET /api/signals/track → SWR (600 s) → 4 kartu
+  → analytics.signal_track → GET /api/signals/track → auto-refresh (600 s) → 4 kartu
 ```
 
 ## 5. Cara Pengambilan / Update Data

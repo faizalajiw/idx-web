@@ -7,9 +7,9 @@ lagi dijalankan. Seluruh perhitungan ada di backend FastAPI
 
 Dokumen pendamping di `web/docs/`:
 
-- `TASKS.md` - status tiap fase migrasi
-- `PARITAS.md` - checklist paritas 19 rute dan audit sisa migrasi
-- `HASIL-UKUR.md` - angka byte Next vs SvelteKit
+- `PARITAS.md` - peta 19 rute ke berkas SvelteKit + catatan paritas & deviasi
+- `DEPLOY.md` - paket deploy statis (nginx/Caddy, cache, fallback SPA)
+- `TASKS.md`, `HASIL-UKUR.md`, `PANDUAN-PORT.md` - catatan migrasi (arsip)
 - `DEPLOY.md` - paket deploy (nginx atau `serve.mjs`)
 
 ---

@@ -4,11 +4,11 @@
 Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeline skor akumulasi. Pengguna: analis yang sudah memilih emiten dan ingin melihat jejak aliran. Tanpa kode, halaman menampilkan pemilih dan empty state.
 
 ## 2. Route & Berkas
-- URL indeks: `/flow` → [`app/flow/page.tsx`](../../idx-web/app/flow/page.tsx) (tanpa emiten)
-- URL detail: `/flow/[code]` → `app/flow/[code]/page.tsx` [BELUM TERVERIFIKASI nama berkas]
-- Workspace: [`app/flow/FlowWorkspace.tsx`](../../idx-web/app/flow/FlowWorkspace.tsx)
-- Komponen: `ForeignFlowCard`, `FlowTimelineCard` ([components/](../../idx-web/components/))
-- Hook: `useWatchlist()` (untuk saran cepat, [hooks.ts](../../idx-web/lib/hooks.ts)); `useStockForeignFlow(code, 30, 10)` ([hooks.ts:129](../../idx-web/lib/hooks.ts)); `useStockBrokerActivity(code, lookback)` ([hooks.ts:227](../../idx-web/lib/hooks.ts), 300 detik)
+- URL indeks: `/flow` → [`routes/flow/+page.svelte`](../web/src/routes/flow/+page.svelte) (tanpa emiten)
+- URL detail: `/flow/[code]` → [`routes/flow/[code]/+page.svelte`](../web/src/routes/flow/[code]/+page.svelte)
+- Workspace: [`components/FlowWorkspace.svelte`](../web/src/lib/components/FlowWorkspace.svelte)
+- Komponen: `ForeignFlowCard`, `FlowTimelineCard` ([components/](../web/src/lib/components/))
+- Hook: `useWatchlist()` (untuk saran cepat, [hooks.svelte.ts](../web/src/lib/hooks.svelte.ts)); `useStockForeignFlow(code, 30, 10)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts)); `useStockBrokerActivity(code, lookback)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 300 detik)
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -16,7 +16,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Field | Isi |
 |---|---|
 | Nama card | Pemilih emiten |
-| Komponen | [FlowWorkspace.tsx](../../idx-web/app/flow/FlowWorkspace.tsx) (`StockPicker`) |
+| Komponen | [FlowWorkspace.svelte](../web/src/lib/components/FlowWorkspace.svelte) (`StockPicker`) |
 | Fungsi | Input kode dan saran cepat (8 kode dari watchlist) |
 | Sumber data | `useWatchlist()` → `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Filter kode berdasarkan teks; emiten aktif selalu ditawarkan |
@@ -28,7 +28,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Field | Isi |
 |---|---|
 | Nama card | Arus Asing |
-| Komponen | [ForeignFlowCard.tsx](../../idx-web/components/ForeignFlowCard.tsx) (`code` prop) |
+| Komponen | [ForeignFlowCard.svelte](../web/src/lib/components/ForeignFlowCard.svelte) (`code` prop) |
 | Fungsi | Arah net asing harian, streak, flip terakhir, dan lama sejak flip |
 | Sumber data | `GET /api/stocks/{code}/foreign-flow?days=30&peer_days=10` ([app.py:397](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_foreign_flow` ([analytics.py:318](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `stock_foreign_flow:{code}:{days}:{peer_days}:{peer_limit}` |
 | Rumus/Logika | Arah = tanda net asing harian; streak = jumlah sesi berturut-turut searah; flip = pergantian tanda; peer = emiten sebanding |
@@ -40,7 +40,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Field | Isi |
 |---|---|
 | Nama card | Timeline Aliran Dana |
-| Komponen | [FlowTimelineCard.tsx](../../idx-web/components/FlowTimelineCard.tsx) |
+| Komponen | [FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte) |
 | Fungsi | Skor akumulasi per tanggal dan median pasar sebagai pembanding |
 | Sumber data | `GET /api/stocks/{code}/broker-activity?lookback=60` ([app.py:378](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_broker_activity` ([analytics.py:2578](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` ([analytics.py:2192](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
 | Rumus/Logika | Skor 0–100 dari faktor aliran yang lolos gate IC; median = median skor pasar pada tanggal itu |
@@ -54,13 +54,13 @@ Komposisi broker (asing/lokal/BUMN) tidak lagi ditampilkan di halaman ini karena
 ```
 Ingest EOD (foreign_flow, broker_activity) → Postgres
   → analytics.get_stock_foreign_flow / get_stock_broker_activity
-  → GET /api/stocks/{code}/... → SWR → ForeignFlowCard, FlowTimelineCard
+  → GET /api/stocks/{code}/... → auto-refresh → ForeignFlowCard, FlowTimelineCard
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand** dengan cache in-process (600–3600 detik). Data sumber diisi job EOD.
 - **Job**: pipeline EOD `refresh_s2` (16:10 WIB) — termasuk tahap broker summary/bandarmologi ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)).
-- **Refresh UI**: SWR 30 detik (foreign, broker flow), 300 detik (broker activity per emiten).
+- **Refresh UI**: auto-refresh 30 detik (foreign, broker flow), 300 detik (broker activity per emiten).
 - **Reset cache**: `POST /api/cache/clear`.
 - **Idempotensi**: upsert per (tanggal, emiten/broker) [BELUM TERVERIFIKASI detail upsert].
 - **Fallback**: pesan kosong; tidak ada sumber alternatif.

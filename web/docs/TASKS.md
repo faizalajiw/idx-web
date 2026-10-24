@@ -1,5 +1,7 @@
 # Tugas migrasi SvelteKit
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Branch kerja: `dev` (`main` dan `dev` bertemu di `2d94705`). App Next di akar tetap utuh sebagai rujukan; app baru di `web/`.
 Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && npm run preview`. Sajian cutover lokal: `node deploy/serve.mjs 3000 build`.
 

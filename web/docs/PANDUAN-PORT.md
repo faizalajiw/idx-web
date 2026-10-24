@@ -1,6 +1,9 @@
 # Panduan port halaman Next → SvelteKit
 
-Dokumen kerja untuk fase 4–6. Baca ini sebelum menulis satu baris pun.
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
+Dokumen kerja untuk fase 4–6 (selesai 25 Okt 2026). Disimpan sebagai catatan
+cara port kalau nanti ada halaman baru yang perlu disamakan dengan app Next.
 
 ## Sumber dan tujuan
 
@@ -45,7 +48,7 @@ Dokumen kerja untuk fase 4–6. Baca ini sebelum menulis satu baris pun.
      `stacked`, `normalize`, `maxBarSize`, `radius`, `refY`, `yDomain`, `yFmt`,
      `xFmt`, `legend`, `footer`, `xTickGap`.
 5. **Data.** Semua hook data sudah ada di `#lib/hooks.svelte.ts`, nama dan
-   kuncinya sama dengan `lib/hooks.ts` app Next. Hasilnya:
+   kuncinya sama dengan hook di app Next (arsip). Hasilnya:
    `{ data, error, isLoading, isValidating, mutate }`.
    - Parameter yang bisa berubah: kirim getter, mis. `useTechnical(() => code)`.
    - `error` bertipe `unknown`. Pola pesan:

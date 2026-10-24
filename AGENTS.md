@@ -5,7 +5,7 @@
 Frontend yang dipakai adalah **SvelteKit 3 + `adapter-static`** di `web/`; SSR
 mati, rute dinamis dilayani fallback SPA `index.html`. App Next di akar repo
 diarsipkan sebagai rujukan paritas: jangan menambah fitur di sana, dan jangan
-menjalankan `next dev`/`next build`. Blok aturan Next yang dulu ditulis ulang
+menjalankan dev/build app Next. Blok aturan Next yang dulu ditulis ulang
 otomatis oleh `next dev` sudah dihapus bersama app-nya.
 
 - Data hanya dari FastAPI (`PUBLIC_API_BASE_URL`, di-*inline* saat build). Nol
@@ -21,6 +21,9 @@ otomatis oleh `next dev` sudah dihapus bersama app-nya.
   `scripts/start-web.bat`.
 - Paritas adalah kriteria selesai: baca `web/docs/PARITAS.md` sebelum mengubah
   tampilan, dan catat deviasi yang disengaja di sana.
+- Dokumentasi dicek otomatis: `node scripts/check-docs.mjs` (dijalankan di `web/`)
+  menolak tautan mati dan rujukan stack lama. Berkas historis ditandai
+  `<!-- arsip -->` dan dilewati.
 
 <!-- END:web-agent-rules -->
 

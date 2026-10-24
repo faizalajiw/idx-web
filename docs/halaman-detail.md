@@ -4,9 +4,9 @@
 Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, arus asing, aliran dana, broker, event study, dan riwayat harga. Pengguna: analis yang sudah memilih emiten dari menu lain. Navigasi prev/next mengikuti urutan watchlist.
 
 ## 2. Route & Berkas
-- URL: `/stock/[code]` → [`app/stock/[code]/page.tsx`](../../idx-web/app/stock/[code]/page.tsx)
-- Komponen (diimpor di [page.tsx](../../idx-web/app/stock/[code]/page.tsx) baris 7–18): `TechnicalChart`, `HistoryTable`, `SignalsPanel`, `BrokerSummary`, `ForeignFlowCard`, `FlowTimelineCard`, `BrokerFlowCard`, `BrokerActivityCard`, `RegimeBanner`, `EventStudyCard`, `SmartMoneyBanner`, `OwnershipCard`
-- Hook: `useWatchlist()` (navigasi prev/next, [hooks.ts](../../idx-web/lib/hooks.ts))
+- URL: `/stock/[code]` → [`routes/stock/[code]/+page.svelte`](../web/src/routes/stock/[code]/+page.svelte)
+- Komponen (diimpor di [+page.svelte](../web/src/routes/stock/[code]/+page.svelte) baris 7–18): `TechnicalChart`, `HistoryTable`, `SignalsPanel`, `BrokerSummary`, `ForeignFlowCard`, `FlowTimelineCard`, `BrokerFlowCard`, `BrokerActivityCard`, `RegimeBanner`, `EventStudyCard`, `SmartMoneyBanner`, `OwnershipCard`
+- Hook: `useWatchlist()` (navigasi prev/next, [hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -14,7 +14,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Header kode + tombol prev/next |
-| Komponen | [stock/[code]/page.tsx](../../idx-web/app/stock/[code]/page.tsx) baris 30–80 |
+| Komponen | [routes/stock/[code]/+page.svelte](../web/src/routes/stock/[code]/+page.svelte) |
 | Fungsi | Menampilkan kode dan pindah ke emiten sebelum/sesudah dalam watchlist |
 | Sumber data | `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Urutan array watchlist; prev/next = indeks ± 1 |
@@ -26,7 +26,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Grafik Teknikal |
-| Komponen | `components/TechnicalChart.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/TechnicalChart.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Candlestick dengan indikator (SMA, MACD, RSI) |
 | Sumber data | `GET /api/stocks/{code}/technical` ([app.py:325](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); hook `useTechnical` refresh 30 detik |
 | Rumus/Logika | Indikator dihitung di backend dari OHLC |
@@ -38,7 +38,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Sinyal |
-| Komponen | `components/SignalsPanel.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/SignalsPanel.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Sinyal BUY/SELL untuk emiten ini |
 | Sumber data | `GET /api/signals?min_days=…` ([app.py:304](../../idx-scraper/src/idx_scraper/api/app.py)); hook `useSignals`, 30 detik |
 | Rumus/Logika | Lihat [Jejak Sinyal](jejak-sinyal.md) |
@@ -50,7 +50,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Kepemilikan |
-| Komponen | `components/OwnershipCard.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/OwnershipCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Komposisi pemegang saham |
 | Sumber data | `GET /api/stocks/{code}/ownership` ([app.py:439](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_ownership` ([analytics.py:1004](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache 600 detik; hook 3600 detik |
 | Rumus/Logika | Dari data kepemilikan tersimpan (tabel `research.ownership`) |
@@ -74,7 +74,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Ringkasan Broker |
-| Komponen | `components/BrokerSummary.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/BrokerSummary.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Broker teratas untuk emiten ini |
 | Sumber data | `GET /api/stocks/{code}/brokers` ([app.py:336](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
 | Rumus/Logika | Dari `broker_summary` per emiten |
@@ -86,7 +86,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Event Study |
-| Komponen | `components/EventStudyCard.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/EventStudyCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Reaksi harga di sekitar event (dividen, aksi korporasi, pengumuman) |
 | Sumber data | `GET /api/stocks/{code}/events` ([app.py:584](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_events` ([analytics.py:1809](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache 6 jam |
 | Rumus/Logika | Return abnormal sekitar tanggal event [BELUM TERVERIFIKASI window] |
@@ -98,7 +98,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Field | Isi |
 |---|---|
 | Nama card | Riwayat Harga |
-| Komponen | `components/HistoryTable.tsx` [BELUM TERVERIFIKASI baris] |
+| Komponen | `components/HistoryTable.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Tabel OHLCV harian |
 | Sumber data | `GET /api/stocks/{code}/history?limit=…` ([app.py:314](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
 | Rumus/Logika | Data mentah dari tabel harga |
@@ -110,7 +110,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 ```
 Postgres (stock_daily, stock_quotes, foreign_flow, broker_summary, research.*)
   → endpoint /api/stocks/{code}/* (app.py)
-  → SWR hook per kartu (lib/hooks.ts)
+  → auto-refresh hook per kartu (lib/hooks.svelte.ts)
   → komponen kartu di halaman stock/[code]
 ```
 

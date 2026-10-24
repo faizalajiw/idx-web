@@ -4,9 +4,9 @@
 Satu halaman ringkasan analisis per emiten, dengan export PDF. Setiap bagian menampilkan tanggal sesi datanya, dan ditandai bila lebih lama dari sesi terakhir pasar. Dossier tidak menghitung skor baru: semua isi berasal dari endpoint dan fungsi analitik yang sudah ada. Pengguna: pemakaian pribadi.
 
 ## 2. Route & Berkas
-- URL: `/dossier/[code]` → [`app/dossier/[code]/page.tsx`](../app/dossier/[code]/page.tsx)
-- Hook: `useStockDossier(code)` ([hooks.ts](../lib/hooks.ts)), refresh 300 detik
-- Tipe: `StockDossier`, `DossierSection` ([types.ts](../lib/types.ts))
+- URL: `/dossier/[code]` → [`routes/dossier/[code]/+page.svelte`](../web/src/routes/dossier/[code]/+page.svelte)
+- Hook: `useStockDossier(code)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts)), refresh 300 detik
+- Tipe: `StockDossier`, `DossierSection` ([types.ts](../web/src/lib/types.ts))
 - Tautan masuk: tombol **Dossier** di header `/stock/[code]` dan di baris Screener
 - Unduh PDF: `GET /api/stocks/{code}/dossier.pdf` (tombol "Unduh PDF")
 
@@ -33,7 +33,7 @@ Sumber: [`dossier.py`](../../idx-scraper/src/idx_scraper/api/dossier.py) `build_
 ## 5. Render Data per Bagian
 Data bagian dirender dengan aturan yang sama di web dan PDF: objek bersarang ditampilkan, bukan dibuang.
 
-- **Web** ([page.tsx](../app/dossier/[code]/page.tsx), `ScalarRows`): skalar → tabel dua kolom; objek bersarang → sub-grup berlabel; daftar teks (alasan, dll.) → butir penuh lebar; daftar objek → jumlah item.
+- **Web** ([+page.svelte](../web/src/routes/dossier/[code]/+page.svelte), `ScalarRows`): skalar → tabel dua kolom; objek bersarang → sub-grup berlabel; daftar teks (alasan, dll.) → butir penuh lebar; daftar objek → jumlah item.
 - **PDF** ([dossier_pdf.py](../../idx-scraper/src/idx_scraper/api/dossier_pdf.py), `_scalar_rows`): skalar → baris tabel; objek bersarang → diratakan dengan prefiks (mis. `regime adx`); daftar teks → digabung `"; "`; daftar objek → jumlah item.
 - Kartu Valuasi kosong dan tidak masuk daftar valuasi = pesan khusus, bukan keadaan galat.
 

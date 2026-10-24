@@ -4,8 +4,8 @@
 Simulasi strategi di atas data historis untuk menguji apakah sebuah aturan entry/exit layak dipakai. Menjawab: "kalau aturan ini dijalankan sejak tanggal X dengan biaya nyata, hasilnya bagaimana dibanding beli-dan-tahan?" Pengguna: analis dan PM yang menguji ide sebelum dipakai. Halaman ini **hanya menghitung on-demand**; tidak ada hasil yang disimpan.
 
 ## 2. Route & Berkas
-- URL: `/backtest` → [`app/backtest/page.tsx`](../../idx-web/app/backtest/page.tsx)
-- Hook: `useBacktestConfig()` ([hooks.ts:410](../../idx-web/lib/hooks.ts), refresh 300 detik) dan `runBacktest` ([api.ts:118](../../idx-web/lib/api.ts))
+- URL: `/backtest` → [`routes/backtest/+page.svelte`](../web/src/routes/backtest/+page.svelte)
+- Hook: `useBacktestConfig()` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik) dan `runBacktest` ([api.ts](../web/src/lib/api.ts))
 - Backend: [simulation.py](../../idx-scraper/src/idx_scraper/api/simulation.py), endpoint [app.py:693](../../idx-scraper/src/idx_scraper/api/app.py) (config) dan [app.py:699](../../idx-scraper/src/idx_scraper/api/app.py) (run, POST)
 
 ## 3. Layout Halaman
@@ -52,7 +52,7 @@ Postgres (prices/OHLCV, stock_daily, index_quotes)
   → api.ts runBacktest → state lokal halaman
   → Kartu verdict + tab (Ringkasan, Kurva Modal, Perbandingan, Biaya, Jejak Transaksi)
 ```
-Config: `GET /api/backtest/config` → `useBacktestConfig` (SWR 300 detik) → form.
+Config: `GET /api/backtest/config` → `useBacktestConfig` (auto-refresh 300 detik) → form.
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand**: setiap run menghitung ulang dari data harga tersimpan. Hasil tidak disimpan ke DB.

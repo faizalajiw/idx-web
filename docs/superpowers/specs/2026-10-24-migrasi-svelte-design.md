@@ -1,5 +1,7 @@
 # Migrasi idx-web ke SvelteKit: dokumen desain
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Tanggal: 2026-10-24
 Status: draft untuk disetujui pemilik
 Repo: `idx-web`. Kerja di subfolder `web/` di branch `svelte`; `main` tetap melayani :3000 sampai cutover.

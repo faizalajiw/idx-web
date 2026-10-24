@@ -4,9 +4,9 @@
 Membaca suasana pasar dari data yang sudah ada: arus asing, ketimpangan buku order intraday, dan breadth. Menghasilkan gauge pasar (suhu pasar) dan dua daftar emiten, akumulasi dan distribusi, yang tampil berdampingan. Pengguna: trader yang ingin tahu apakah pasar sedang optimis atau pesimis. Tidak ada sumber berita atau scraping baru.
 
 ## 2. Route & Berkas
-- URL: `/sentimen` → [`app/sentimen/page.tsx`](../app/sentimen/page.tsx)
-- Hook: `useSentiment(limit=15)` ([lib/hooks.ts](../lib/hooks.ts), refresh 300 detik, tanpa retry saat error)
-- Tipe: `SentimentResponse`, `SentimentItem`, `SentimentMarket` ([lib/types.ts](../lib/types.ts))
+- URL: `/sentimen` → [`routes/sentimen/+page.svelte`](../web/src/routes/sentimen/+page.svelte)
+- Hook: `useSentiment(limit=15)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik, tanpa retry saat error)
+- Tipe: `SentimentResponse`, `SentimentItem`, `SentimentMarket` ([lib/types.ts](../web/src/lib/types.ts))
 - Backend: `GET /api/sentiment?limit=15` ([app.py](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sentiment` ([analytics.py](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research/sentiment.compute` ([research/sentiment.py](../../idx-scraper/src/idx_scraper/research/sentiment.py))
 
 ## 3. Tata Letak Halaman
@@ -18,7 +18,7 @@ Urutan dari atas ke bawah:
    - Kiri: kartu **Suhu Pasar**. Berisi gauge skor 0–100 dan tiga bar komponen dari tengah (Lebar pasar, Gerak IHSG, Arus asing).
    - Kanan: empat kotak statistik (Dianalisis, Akumulasi, Distribusi, Netral), lalu kartu **Breadth & Aliran** berisi bar naik/stagnan/turun dan tiga angka (IHSG, Porsi asing, Asing/nilai).
      - Setiap kotak punya ikon Lucide dan warna sendiri lewat `--stat-c`: Dianalisis (`BarChart3`, biru aksen), Akumulasi (`TrendingUp`, hijau), Distribusi (`TrendingDown`, merah), Netral (`Minus`, abu-abu).
-     - Kotak memakai kelas `.stat-box` di [globals.css](../app/globals.css). Latar memakai tint 9% dari warna kotak, dan garis atas serta border saat hover memakai warna yang sama.
+     - Kotak memakai kelas `.stat-box` di [app.css](../web/src/app.css). Latar memakai tint 9% dari warna kotak, dan garis atas serta border saat hover memakai warna yang sama.
 3. **Baris 2, dua kolom (xl ke atas)**: kartu **Akumulasi** dan kartu **Distribusi**. Tidak ada tab; keduanya terlihat sekaligus. Klik emiten untuk membuka alasan sinyal.
 4. **Baris 3, dua kolom**: kartu **Bobot Skor Emiten** dan kartu **Catatan** (disclaimer dari backend, atau peringatan bila orderbook tidak tersedia).
 
@@ -77,7 +77,7 @@ latest_pit.foreign_net + research.orderbook (intraday, tertutup close T) + index
 ## 5. Cara Pengambilan / Update Data
 - **On-demand** dengan cache `sentiment:{limit}` 1 jam (`_RESEARCH_TTL`, analytics.py).
 - **Sumber orderbook**: diisi capture intraday (lihat [README](../../idx-scraper/README.md) bagian scheduler: `intraday`, interval 60 detik).
-- **Refresh UI**: SWR 300 detik; data tetap sampai cache 1 jam habis.
+- **Refresh UI**: auto-refresh 300 detik; data tetap sampai cache 1 jam habis.
 - **Reset cache**: `POST /api/cache/clear`.
 - **Idempotensi**: deterministik dari data tersimpan.
 - **Pemilihan hari**: hari EOD terakhir yang minimal 50% barisnya punya nilai transaksi. Hari parsial dilewati.

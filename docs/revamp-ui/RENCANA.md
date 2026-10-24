@@ -1,5 +1,7 @@
 # RENCANA & LEDGER REVAMP UI `idx-web`
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Revamp tampilan, bukan fungsi. Semua angka di bawah diukur di sesi 19 Okt 2026, bukan dikira.
 
 - **Ruang lingkup:** seluruh permukaan `idx-web` (desktop dan ponsel), mengikuti arah desain

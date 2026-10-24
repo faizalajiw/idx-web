@@ -4,9 +4,9 @@
 Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan skor keputusan dasar (lapisan verdict backend) sebagai dasar, lalu memperkaya dengan konteks yang **tidak mengubah verdict** (regime, sentimen aliran, jejak asing, base rate event, level pembatalan). Pengguna: trader/analis yang butuh ringkasan keputusan + alasan. Dipakai saat mau memutuskan hold/trim/exit satu emiten.
 
 ## 2. Route & Berkas
-- URL: `/keputusan` (pemilih emiten) → [`app/keputusan/page.tsx`](../../idx-web/app/keputusan/page.tsx); `/keputusan/[code]` → workspace
-- Komponen: [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (VerdictBadge, MiniBar, ContextStrip, ForeignMini, InvalidationLevels, StockPicker)
-- Hook: `useStockDecision(code)` ([hooks.ts](../../idx-web/lib/hooks.ts), refresh 120 detik)
+- URL: `/keputusan` (pemilih emiten) → [`routes/keputusan/+page.svelte`](../web/src/routes/keputusan/+page.svelte); `/keputusan/[code]` → workspace
+- Komponen: [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (VerdictBadge, MiniBar, ContextStrip, ForeignMini, InvalidationLevels, StockPicker)
+- Hook: `useStockDecision(code)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 120 detik)
 
 ## 3. Penjelasan Per-Card
 
@@ -14,7 +14,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Field | Isi |
 |---|---|
 | Nama card | Ruang Keputusan — `{code}` |
-| Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (`VerdictBadge`, `MiniBar`) |
+| Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`VerdictBadge`, `MiniBar`) |
 | Fungsi | Verdict gabungan teknikal + valuasi + lapisan IC/broker; skor N/100 + alasan |
 | Sumber data | `GET /api/stocks/{code}/decision` ([app.py:367](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_stock_decision` ([analytics.py:1143](../../idx-scraper/src/idx_scraper/api/analytics.py)); dasar dari `services.get_hold_check` (endpoint `/api/hold-check` tetap dipakai backend) ([services.py:772](../../idx-scraper/src/idx_scraper/api/services.py)) |
 | Rumus/Logika | Verdict = skor dasar backend; `score = base_score + factor_adj + broker_adj`; verdict merek: STRONG HOLD / HOLD / TRIM / EXIT |
@@ -26,7 +26,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Field | Isi |
 |---|---|
 | Nama card | Context strip (4 tile) |
-| Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (`ContextStrip`) |
+| Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`ContextStrip`) |
 | Fungsi | Regime IHSG (+ADX, as-of), Sentimen aliran (label + skor), Flip asing terakhir, Gauge pasar (N/100 + band) |
 | Sumber data | `get_stock_decision` membaca `get_market_regime` ([analytics.py:62](../../idx-scraper/src/idx_scraper/api/analytics.py)) + `get_sentiment` ([analytics.py:1984](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
 | Rumus/Logika | Konteks murni informatif — tidak mengubah verdict |
@@ -38,7 +38,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Field | Isi |
 |---|---|
 | Nama card | Jejak Asing 10 Sesi |
-| Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (`ForeignMini`) |
+| Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`ForeignMini`) |
 | Fungsi | Bar net asing per hari (rupiah), amber = hari flip |
 | Sumber data | `get_stock_decision` → net asing per sesi |
 | Rumus/Logika | Lebar bar ∝ `|net| / maxAbs`; warna flip (`#f59e0b`) vs up/down |
@@ -50,7 +50,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Field | Isi |
 |---|---|
 | Nama card | Level Pembatalan |
-| Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) (`InvalidationLevels`) |
+| Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`InvalidationLevels`) |
 | Fungsi | Level teknikal yang membatalkan tesis: Close, SMA50, Mean 60-hari, Bollinger bawah, RSI |
 | Sumber data | `get_stock_decision` → `invalidation` (dari frame OHLC `prices_adjusted`) |
 | Rumus/Logika | Level dihitung dari harga; RSI ≥ 65 mendekati overbought, ≤ 35 oversold |
@@ -62,7 +62,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Field | Isi |
 |---|---|
 | Nama card | Base Rate Event |
-| Komponen | [DecisionWorkspace.tsx](../../idx-web/app/keputusan/DecisionWorkspace.tsx) |
+| Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) |
 | Fungsi | Median forward & abnormal return setelah event serupa; kolom Emiten (n×, tanggal), Median fwd, Median abn., Pasar (count · hit rate) |
 | Sumber data | `get_stock_decision` → `events` (event study) |
 | Rumus/Logika | Event study: riwayat emiten vs baseline pasar; sampel kecil = baca sekilas |
@@ -75,13 +75,13 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 EOD ingest → Postgres (prices_pit / latest_pit, stock_summary_daily)
    → services.get_hold_check (skor) + analytics.get_sentiment + get_market_regime
    → analytics.get_stock_decision (gabung, cache 30m) → GET /api/stocks/{code}/decision
-   → SWR useStockDecision (120s) → DecisionWorkspace render
+   → auto-refresh useStockDecision (120s) → DecisionWorkspace render
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand**: dihitung saat request, **bukan** precomputed job.
 - **Cache**: 30 menit (`_research_cache`), kunci `stock_decision:{code}`.
-- **Refresh UI**: SWR 120 detik.
+- **Refresh UI**: auto-refresh 120 detik.
 - **Idempotensi**: verdict dari satu sumber (skor dasar backend); konteks dibaca ulang tiap request.
 - **Fallback**: mengikuti skor dasar backend.
 

@@ -1,10 +1,12 @@
 # Catatan Perubahan 12 Okt 2026
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Ringkasan semua perubahan pada sesi ini: halaman, dokumentasi, data, dan operasional. Diurutkan dari yang paling berdampak.
 
 ## 1. Halaman Sentimen Pasar (`/sentimen`)
 
-- **Berkas**: `app/sentimen/page.tsx` (ditulis ulang).
+- **Berkas**: `routes/sentimen/+page.svelte` (ditulis ulang).
 - **Tata letak baru**: header, Suhu Pasar + Breadth & Aliran, Akumulasi dan Distribusi berdampingan (tab dihapus), Bobot Skor Emiten + Catatan.
 - **Perbaikan kelas CSS**: kelas yang tidak ada di `globals.css` (`text-bull`, `bg-bull`, `bg-bear`, `bg-surface-2`, `text-foreground`, `stroke-bull`) diganti token yang ada (`text-up`, `bg-down`, `var(--bg-elev)`, `badge-buy`/`badge-sell`/`badge-hold`).
 - **Logo emiten**: `TickerLogo` ditambahkan di daftar emiten.

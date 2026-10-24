@@ -4,9 +4,9 @@
 Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari saya kalau ada apa-apa". Pengguna: trader/analis yang memantau emiten pilihan. Dipakai harian untuk kelola watchlist, pasang batas, dan terima alert Telegram.
 
 ## 2. Route & Berkas
-- URL: `/pantau` → [`app/pantau/page.tsx`](../../idx-web/app/pantau/page.tsx)
-- Komponen: [WatchlistTable](../../idx-web/components/WatchlistTable.tsx), [TechnicalChart](../../idx-web/components/TechnicalChart.tsx), [SmartMoneyWatchCard](../../idx-web/components/SmartMoneyWatchCard.tsx), [AlertRules](../../idx-web/components/AlertRules.tsx), [TelegramStatus](../../idx-web/components/TelegramStatus.tsx)
-- Hooks: `useWatchlist`, `useSignals`, `useTechnical`, `useSmartMoneyWatchlist`, `useAlerts`, `useAddToWatchlist`, `useRemoveFromWatchlist`, `useCreateAlert`, `useDeleteAlert` ([hooks.ts](../../idx-web/lib/hooks.ts))
+- URL: `/pantau` → [`routes/pantau/+page.svelte`](../web/src/routes/pantau/+page.svelte)
+- Komponen: [WatchlistTable](../web/src/lib/components/WatchlistTable.svelte), [TechnicalChart](../web/src/lib/components/TechnicalChart.svelte), [SmartMoneyWatchCard](../web/src/lib/components/SmartMoneyWatchCard.svelte), [AlertRules](../web/src/lib/components/AlertRules.svelte), [TelegramStatus](../web/src/lib/components/TelegramStatus.svelte)
+- Hooks: `useWatchlist`, `useSignals`, `useTechnical`, `useSmartMoneyWatchlist`, `useAlerts`, `useAddToWatchlist`, `useRemoveFromWatchlist`, `useCreateAlert`, `useDeleteAlert` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
 
 ## 3. Penjelasan Per-Card
 
@@ -14,11 +14,11 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Field | Isi |
 |---|---|
 | Nama card | Watchlist (tabel, klik baris → pilih emiten) |
-| Komponen | [WatchlistTable.tsx](../../idx-web/components/WatchlistTable.tsx) |
+| Komponen | [WatchlistTable.svelte](../web/src/lib/components/WatchlistTable.svelte) |
 | Fungsi | Daftar emiten pantauan + harga/perubahan; baris terpilih menggerakkan chart di bawah |
 | Sumber data | `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_watchlist` ([services.py:334](../../idx-scraper/src/idx_scraper/api/services.py)); tambah `POST /api/watchlist` (249), ubah `PUT /api/watchlist` (260), hapus `DELETE /api/watchlist` (274) |
 | Rumus/Logika | Gabungan snapshot harga (`stock_quotes`) per kode watchlist |
-| Periode/Window | Sesi terbaru; refresh SWR 30 detik |
+| Periode/Window | Sesi terbaru; refresh auto-refresh 30 detik |
 | Interaksi | Klik baris → `onSelect` → chart; tombol tambah/hapus emiten |
 | Empty/Loading/Error | Empty state bila watchlist kosong |
 
@@ -26,7 +26,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Field | Isi |
 |---|---|
 | Nama card | Grafik teknikal (mengikuti emiten terpilih) |
-| Komponen | [TechnicalChart.tsx](../../idx-web/components/TechnicalChart.tsx) |
+| Komponen | [TechnicalChart.svelte](../web/src/lib/components/TechnicalChart.svelte) |
 | Fungsi | Candlestick + overlay indikator (SMA/RSI/MACD per mode) |
 | Sumber data | `GET /api/stocks/{code}/technical` ([app.py:325](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); OHLC via `GET /api/stocks/{code}/history` (314) → `services.get_price_history` ([services.py:715](../../idx-scraper/src/idx_scraper/api/services.py)) |
 | Rumus/Logika | Indikator dihitung di `services` dari frame OHLC (`prices_adjusted`) |
@@ -38,7 +38,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Field | Isi |
 |---|---|
 | Nama card | Verdict Smart Money (verdicts board) |
-| Komponen | [SmartMoneyWatchCard.tsx](../../idx-web/components/SmartMoneyWatchCard.tsx) |
+| Komponen | [SmartMoneyWatchCard.svelte](../web/src/lib/components/SmartMoneyWatchCard.svelte) |
 | Fungsi | Ringkasan verdict akumulasi/distribusi untuk emiten yang dipantau |
 | Sumber data | `GET /api/smart-money/verdicts` ([app.py:478](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_smart_money_verdicts` ([analytics.py:924](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit` |
 | Rumus/Logika | Verdict dari net asing + pola aliran terbaru |
@@ -50,7 +50,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Field | Isi |
 |---|---|
 | Nama card | Aturan Notifikasi |
-| Komponen | [AlertRules.tsx](../../idx-web/components/AlertRules.tsx) |
+| Komponen | [AlertRules.svelte](../web/src/lib/components/AlertRules.svelte) |
 | Fungsi | Bangun/kelola aturan harga/RSI/volume; notifikasi sekali per persilangan |
 | Sumber data | `GET /api/alerts` ([app.py:650](../../idx-scraper/src/idx_scraper/api/app.py)); `POST /api/alerts` (656); `DELETE /api/alerts/{rule_id}` (666); `POST /api/alerts/test` (674) |
 | Rumus/Logika | Dievaluasi tiap kali data EOD baru masuk; state "tersimpan aman" mencegah spam |
@@ -62,7 +62,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Field | Isi |
 |---|---|
 | Nama card | Status Notifikasi Telegram |
-| Komponen | [TelegramStatus.tsx](../../idx-web/components/TelegramStatus.tsx) |
+| Komponen | [TelegramStatus.svelte](../web/src/lib/components/TelegramStatus.svelte) |
 | Fungsi | Kesiapan saluran notifikasi (configured/aktif) |
 | Sumber data | `GET /api/health` ([app.py:174](../../idx-scraper/src/idx_scraper/api/app.py)) / status alert |
 | Rumus/Logika | Cek konfigurasi bot Telegram (nama variabel env saja) |
@@ -74,14 +74,14 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 ```
 IDX (EOD / intraday) → cf_transport / ingest → Postgres (stock_quotes, prices_pit)
    → alert job (interval 300s, cli cmd_serve) evaluasi aturan → Telegram
-   → API /api/watchlist + /api/alerts → SWR (useWatchlist 30s, useAlerts 30s)
+   → API /api/watchlist + /api/alerts → auto-refresh (useWatchlist 30s, useAlerts 30s)
    → WatchlistTable / AlertRules / TelegramStatus
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **Watchlist & chart**: on-demand saat request; snapshot harga dari sesi terbaru.
 - **Alert**: job `alerts` interval 300 detik di `cmd_serve` ([cli.py:1037](../../idx-scraper/src/idx_scraper/cli.py)), hanya Telegram.
-- **Refresh UI**: SWR 30 detik (watchlist, signals, technical, alerts).
+- **Refresh UI**: auto-refresh 30 detik (watchlist, signals, technical, alerts).
 - **Idempotensi**: evaluasi aturan sekali per persilangan (state per aturan).
 - **Fallback**: bila sumber resmi gagal, ingest memakai fallback Yahoo Finance (lihat README indeks).
 

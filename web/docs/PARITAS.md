@@ -1,34 +1,34 @@
 # Checklist paritas 19 rute
 
-Sumber Next: kolom "Berkas Next" di akar repo. Isi checklist elemen per rute
-diisi saat rute itu diporting (fase 3–6), dibandingkan dengan halaman Next yang
-sama, lalu dicentang di fase 7.
+Migrasi tuntas 25 Okt 2026: 19 rute sudah dilayani SvelteKit dan app Next di
+akar repo hanya arsip. Tabel pertama adalah peta rute → berkas sumber; bagian
+audit di bawahnya adalah catatan pengukuran 24 Okt 2026 (angka saat itu, bukan
+kondisi yang dijanjikan hari ini).
 
-Cara mengisi satu baris checklist: buka halaman Next, catat teks judul, label
-kolom tabel, tombol, tautan, chip, badge, ikon bermakna, dan state kosong/error.
-Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
+Kalau mengubah tampilan: pakai tabel ini untuk menemukan berkasnya, lalu jaga
+daftar "Perbedaan yang disengaja" tetap benar.
 
-| Rute | Berkas Next | Komponen utama | Status |
+| Rute | Berkas SvelteKit | Komponen utama | Status |
 |---|---|---|---|
-| `/` | `app/page.tsx` | MarketOverview, NewsCards, TopLeadersPanel, TopBrokersPanel, SignalsPanel, MarketRegimeCard, DataHealthCard, TechnicalChart | selesai |
-| `/pantau` | `app/pantau/page.tsx` | WatchlistTable, AlertRules, TelegramStatus, SmartMoneyWatchCard, TechnicalChart | selesai |
-| `/screener` | `app/screener/page.tsx` | filter, tabel hasil, ScreenerFactorsModal | selesai |
-| `/rekomendasi` | `app/rekomendasi/page.tsx` | PortfolioStrip, ClaimRecord, papan kandidat, track record | selesai |
-| `/keputusan` | `app/keputusan/page.tsx` | DecisionWorkspace (tanpa kode) | selesai |
-| `/keputusan/[code]` | `app/keputusan/[code]/page.tsx` | DecisionWorkspace | selesai |
-| `/jejak-sinyal` | `app/jejak-sinyal/page.tsx` | tiga tab horizon, tabel sinyal terbaru | selesai |
-| `/backtest` | `app/backtest/page.tsx` | EquityCurveChart, RebalanceLedger, form parameter | selesai |
-| `/faktor` | `app/faktor/page.tsx` | tabel faktor, kalibrasi | selesai |
-| `/radar` | `app/radar/page.tsx` | SmartMoneyBanner, daftar emiten | selesai |
-| `/radar/[code]` | `app/radar/[code]/page.tsx` | SmartMoneyBanner, track record | selesai |
-| `/foreign` | `app/foreign/page.tsx` | ForeignFlowCard, chart arus harian, daftar mover | selesai |
-| `/flow` | `app/flow/page.tsx` | FlowWorkspace (tanpa kode) | selesai |
-| `/flow/[code]` | `app/flow/[code]/page.tsx` | FlowWorkspace | selesai |
-| `/sentimen` | `app/sentimen/page.tsx` | gauge suhu pasar, breadth, akumulasi/distribusi | selesai |
-| `/broker-activity` | `app/broker-activity/page.tsx` | BrokerActivityCard, BrokerFlowCard, FlowTimelineCard | selesai |
-| `/sectors` | `app/sectors/page.tsx` | SectorRotationTable, peta sektor, RegimeBanner | selesai |
-| `/stock/[code]` | `app/stock/[code]/page.tsx` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard, EventStudyCard | selesai |
-| `/dossier/[code]` | `app/dossier/[code]/page.tsx` | tujuh seksi dossier | selesai |
+| `/` | `routes/+page.svelte` | MarketOverview, NewsCards, TopLeadersPanel, TopBrokersPanel, SignalsPanel, MarketRegimeCard, DataHealthCard, TechnicalChart | selesai |
+| `/pantau` | `routes/pantau/+page.svelte` | WatchlistTable, AlertRules, TelegramStatus, SmartMoneyWatchCard, TechnicalChart | selesai |
+| `/screener` | `routes/screener/+page.svelte` | filter, tabel hasil, ScreenerFactorsModal | selesai |
+| `/rekomendasi` | `routes/rekomendasi/+page.svelte` | PortfolioStrip, ClaimRecord, papan kandidat, track record | selesai |
+| `/keputusan` | `routes/keputusan/+page.svelte` | DecisionWorkspace (tanpa kode) | selesai |
+| `/keputusan/[code]` | `routes/keputusan/[code]/+page.svelte` | DecisionWorkspace | selesai |
+| `/jejak-sinyal` | `routes/jejak-sinyal/+page.svelte` | tiga tab horizon, tabel sinyal terbaru | selesai |
+| `/backtest` | `routes/backtest/+page.svelte` | EquityCurveChart, RebalanceLedger, form parameter | selesai |
+| `/faktor` | `routes/faktor/+page.svelte` | tabel faktor, kalibrasi | selesai |
+| `/radar` | `routes/radar/+page.svelte` | SmartMoneyBanner, daftar emiten | selesai |
+| `/radar/[code]` | `routes/radar/[code]/+page.svelte` | SmartMoneyBanner, track record | selesai |
+| `/foreign` | `routes/foreign/+page.svelte` | ForeignFlowCard, chart arus harian, daftar mover | selesai |
+| `/flow` | `routes/flow/+page.svelte` | FlowWorkspace (tanpa kode) | selesai |
+| `/flow/[code]` | `routes/flow/[code]/+page.svelte` | FlowWorkspace | selesai |
+| `/sentimen` | `routes/sentimen/+page.svelte` | gauge suhu pasar, breadth, akumulasi/distribusi | selesai |
+| `/broker-activity` | `routes/broker-activity/+page.svelte` | BrokerActivityCard, BrokerFlowCard, FlowTimelineCard | selesai |
+| `/sectors` | `routes/sectors/+page.svelte` | SectorRotationTable, peta sektor, RegimeBanner | selesai |
+| `/stock/[code]` | `routes/stock/[code]/+page.svelte` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard, EventStudyCard | selesai |
+| `/dossier/[code]` | `routes/dossier/[code]/+page.svelte` | tujuh seksi dossier | selesai |
 
 ## `/sectors`
 
@@ -41,8 +41,8 @@ Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
 
 ## Audit paritas 2026-10-24
 
-Diukur langsung terhadap dua app yang hidup bersamaan (`next start -p 3000`
-dan dev SvelteKit :3100), viewport 1440. Yang dibandingkan: `h1`, daftar `h2`,
+Diukur langsung terhadap dua app yang saat itu hidup bersamaan (app Next di
+:3000 dan dev SvelteKit :3100), viewport 1440. Yang dibandingkan: `h1`, daftar `h2`,
 header tabel, jumlah baris `tbody`, jumlah `.card`, dan `scrollWidth`.
 
 | Rute | h1 | h2 | header tabel | baris | kartu | scrollW |
@@ -95,7 +95,7 @@ dicentang:
 
 | Yang dibandingkan | Hasil |
 |---|---|
-| 43 komponen `components/*.tsx` | semuanya punya padanan Svelte (`States` dipecah jadi `EmptyState`, `ErrorState`, `Skeleton`) |
+| 43 komponen Next `components/*.tsx` | semuanya punya padanan Svelte (`States` dipecah jadi `EmptyState`, `ErrorState`, `Skeleton`) |
 | 224 ekspor `lib/*.ts` Next | semua nama ada di `web/src/lib` |
 | 48 hook + `refreshInterval` per hook | 48 lawan 48, 0 beda interval |
 | Endpoint `/api/*` di `api.ts` | 7 lawan 7, sama |
@@ -111,9 +111,9 @@ dicentang:
 Temuan yang diperbaiki:
 
 - **Halaman galat tidak ada.** Rute tak dikenal menampilkan "404 Not Found"
-  polos SvelteKit, sedangkan Next punya `app/not-found.tsx` ("Halaman tidak
+  polos SvelteKit, sedangkan app Next punya halaman not-found ("Halaman tidak
   ditemukan", tombol "Kembali ke beranda"/"Kembali", ThemeToggle) dan
-  `app/error.tsx` ("Halaman ingin disajikan tapi kami mengalami masalah.",
+  halaman error ("Halaman ingin disajikan tapi kami mengalami masalah.",
   "Muat lagi"/"Kembali", aria-label "Muat ulang halaman"/"Kembali ke halaman
   sebelumnya"). Sekarang `src/routes/+error.svelte` bercabang pada
   `page.status === 404` dengan copy, tombol, dan atribut yang sama.
@@ -125,7 +125,7 @@ Temuan yang diperbaiki:
 
 Deviasi yang diterima:
 
-- `app/loading.tsx` ("Menyiapkan halaman...") tidak diport. SPA tidak punya
+- Halaman loading app Next ("Menyiapkan halaman...") tidak diport. SPA tidak punya
   suspense per rute: perpindahan halaman instan dan data dimuat dengan skeleton
   di dalam komponen. Halaman `+error.svelte` yang baru menambah 1,2 KB gzip
   pada muatan awal setiap rute karena node galat dimuat bersama shell.

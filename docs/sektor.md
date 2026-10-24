@@ -4,9 +4,9 @@
 Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain) untuk melihat sektor mana yang sedang kuat dan ke mana rotasi dana bergerak. Pengguna: analis dan trader sektor. Sering lebih berguna daripada memilih satu saham.
 
 ## 2. Route & Berkas
-- URL: `/sectors` → [`app/sectors/page.tsx`](../../idx-web/app/sectors/page.tsx)
-- Komponen: `RegimeBanner` ([components/RegimeBanner.tsx](../../idx-web/components/RegimeBanner.tsx)), `SectorRotationTable` ([components/SectorRotationTable.tsx](../../idx-web/components/SectorRotationTable.tsx)), `Card`, `LastUpdated`
-- Hook: `useSectors()` ([hooks.ts:191](../../idx-web/lib/hooks.ts), refresh 30 detik); `useSectorRotation(60, 3)` ([hooks.ts:366](../../idx-web/lib/hooks.ts), 300 detik) [BELUM TERVERIFIKASI baris hook]
+- URL: `/sectors` → [`routes/sectors/+page.svelte`](../web/src/routes/sectors/+page.svelte)
+- Komponen: `RegimeBanner` ([components/RegimeBanner.svelte](../web/src/lib/components/RegimeBanner.svelte)), `SectorRotationTable` ([components/SectorRotationTable.svelte](../web/src/lib/components/SectorRotationTable.svelte)), `Card`, `LastUpdated`
+- Hook: `useSectors()` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 30 detik); `useSectorRotation(60, 3)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 300 detik) [BELUM TERVERIFIKASI baris hook]
 - Backend: `GET /api/sectors` ([app.py:507](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_analysis` ([analytics.py:1266](../../idx-scraper/src/idx_scraper/api/analytics.py)); `GET /api/sectors/rotation?lookback=60&min_names=3` ([app.py:493](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_rotation` ([analytics.py:2478](../../idx-scraper/src/idx_scraper/api/analytics.py)); pemetaan sektor [api/sector_map.py](../../idx-scraper/src/idx_scraper/api/sector_map.py)
 
 ## 3. Penjelasan Per-Card / Per-Panel
@@ -15,7 +15,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Field | Isi |
 |---|---|
 | Nama card | Banner Regime |
-| Komponen | [RegimeBanner.tsx](../../idx-web/components/RegimeBanner.tsx) (baris 62 untuk volatilitas) |
+| Komponen | [RegimeBanner.svelte](../web/src/lib/components/RegimeBanner.svelte) (baris 62 untuk volatilitas) |
 | Fungsi | Konteks tren pasar sebelum membaca sektor |
 | Sumber data | `GET /api/market/regime` ([app.py:197](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_market_regime` ([analytics.py:62](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
 | Rumus/Logika | ADX(14) + DI pada IHSG; volatilitas = realized vol 20 hari, dianualisasi (~240 sesi) |
@@ -27,7 +27,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Field | Isi |
 |---|---|
 | Nama card | Rotasi Sektor |
-| Komponen | [SectorRotationTable.tsx](../../idx-web/components/SectorRotationTable.tsx) |
+| Komponen | [SectorRotationTable.svelte](../web/src/lib/components/SectorRotationTable.svelte) |
 | Fungsi | Perubahan performa sektor dan pergeseran urutan (rotasi) |
 | Sumber data | `GET /api/sectors/rotation` → `get_sector_rotation` ([analytics.py:2478](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `sector_rotation:{lookback}:{min_names}` |
 | Rumus/Logika | Return sektor periode `lookback` (60 sesi); sektor dengan minimal 3 emiten (`min_names`) |
@@ -39,7 +39,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Field | Isi |
 |---|---|
 | Nama card | Peta Sektor |
-| Komponen | [sectors/page.tsx](../../idx-web/app/sectors/page.tsx) baris 41 (subtitle "Diurutkan dari sektor terkuat") |
+| Komponen | [sectors/page.svelte](../web/src/routes/sectors/+page.svelte) baris 41 (subtitle "Diurutkan dari sektor terkuat") |
 | Fungsi | Tabel per sektor: Rata-rata %, Breadth, Value, Foreign Net, Top Stock; warna sel (`heatColor`) |
 | Sumber data | `GET /api/sectors` → `get_sector_analysis` ([analytics.py:1266](../../idx-scraper/src/idx_scraper/api/analytics.py)) via `useSectors` |
 | Rumus/Logika | Rata-rata % perubahan harga emiten per sektor; breadth = porsi emiten naik; value = total nilai transaksi; foreign net = jumlah net asing sektor; top stock = kontributor terbesar |
@@ -51,12 +51,12 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 ```
 Harga & volume EOD (stock_quotes/stock_daily, latest_pit) + foreign_net
   → sector_map (kode → sektor) → analytics.get_sector_analysis / get_sector_rotation
-  → GET /api/sectors, /api/sectors/rotation → SWR (30 s / 300 s) → RegimeBanner + tabel + kartu
+  → GET /api/sectors, /api/sectors/rotation → auto-refresh (30 s / 300 s) → RegimeBanner + tabel + kartu
 ```
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand** dengan cache in-process; data sumber dari pipeline EOD (`refresh_s2` 16:10 WIB).
-- **Refresh UI**: SWR 30 detik (peta) dan 300 detik (rotasi).
+- **Refresh UI**: auto-refresh 30 detik (peta) dan 300 detik (rotasi).
 - **Reset cache**: `POST /api/cache/clear`.
 - **Idempotensi**: deterministik dari data tersimpan.
 - **Fallback**: sektor dengan emiten di bawah `min_names` tidak ditampilkan di rotasi.

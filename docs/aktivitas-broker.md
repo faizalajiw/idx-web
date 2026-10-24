@@ -4,9 +4,9 @@
 Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang lolos uji IC), disertai struktur konsentrasi broker pasar dan uji statistik faktor. Menjawab: "faktor aliran mana yang terbukti, dan emiten mana yang skornya tertinggi hari ini?" Pengguna: analis dan PM. Skor hanya tampil bila tervalidasi.
 
 ## 2. Route & Berkas
-- URL: `/broker-activity` → [`app/broker-activity/page.tsx`](../../idx-web/app/broker-activity/page.tsx)
-- Komponen: `FlowTimelineCard` ([components/FlowTimelineCard.tsx](../../idx-web/components/FlowTimelineCard.tsx)), `BrokerFlowCard` ([components/BrokerFlowCard.tsx](../../idx-web/components/BrokerFlowCard.tsx)), `Card`
-- Hook: `useBrokerActivity(25)` ([hooks.ts:151](../../idx-web/lib/hooks.ts), refresh 300 detik); `useBrokerFlow` ([hooks.ts:117](../../idx-web/lib/hooks.ts))
+- URL: `/broker-activity` → [`routes/broker-activity/+page.svelte`](../web/src/routes/broker-activity/+page.svelte)
+- Komponen: `FlowTimelineCard` ([components/FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte)), `BrokerFlowCard` ([components/BrokerFlowCard.svelte](../web/src/lib/components/BrokerFlowCard.svelte)), `Card`
+- Hook: `useBrokerActivity(25)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik); `useBrokerFlow` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
 - Backend: `GET /api/broker-activity?limit=25` ([app.py:234](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `broker_activity_snapshot` ([analytics.py:2192](../../idx-scraper/src/idx_scraper/api/analytics.py))
 
 ## 3. Penjelasan Per-Card / Per-Panel
@@ -15,7 +15,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Field | Isi |
 |---|---|
 | Nama card | Peringkat Skor Akumulasi |
-| Komponen | [broker-activity/page.tsx](../../idx-web/app/broker-activity/page.tsx) ~baris 355–363 |
+| Komponen | [broker-activity/page.svelte](../web/src/routes/broker-activity/+page.svelte) ~baris 355–363 |
 | Fungsi | Daftar emiten urut skor 0–100 dari faktor aliran yang tervalidasi |
 | Sumber data | `GET /api/broker-activity` → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` (satu sumber bersama Screener dan Ruang Keputusan) |
 | Rumus/Logika | Composite faktor yang lolos gate: \|mean IC\| ≥ 0,05 dan \|ICIR\| ≥ 0,5; arah mengikuti tanda IC. Skor relatif terhadap pasar hari itu. Pilih emiten untuk timeline (klik baris) |
@@ -27,7 +27,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Field | Isi |
 |---|---|
 | Nama card | Uji Statistik Faktor (IC) |
-| Komponen | [broker-activity/page.tsx](../../idx-web/app/broker-activity/page.tsx) ~baris 364–373 |
+| Komponen | [broker-activity/page.svelte](../web/src/routes/broker-activity/+page.svelte) ~baris 364–373 |
 | Fungsi | Faktor mana yang layak dipakai; faktor gagal tetap ditampilkan tapi tanpa bobot |
 | Sumber data | `broker_activity_snapshot.factors` ← `research.factor_ic_history` (run terbaru) |
 | Rumus/Logika | `ba.select_factors` (research/broker_activity.py) menerapkan gate IC |
@@ -39,7 +39,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Field | Isi |
 |---|---|
 | Nama card | Struktur Broker Pasar |
-| Komponen | [broker-activity/page.tsx](../../idx-web/app/broker-activity/page.tsx) ~baris 374–380 |
+| Komponen | [broker-activity/page.svelte](../web/src/routes/broker-activity/+page.svelte) ~baris 374–380 |
 | Fungsi | Konsentrasi transaksi per firma broker, seluruh pasar |
 | Sumber data | `GET /api/broker-activity` → field `market` ← `broker_store`/`research.broker_daily` (data broker EOD asli IDX) |
 | Rumus/Logika | Porsi transaksi per firma; bukan proksi |
@@ -51,7 +51,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Field | Isi |
 |---|---|
 | Nama card | Komposisi Broker; Timeline Aliran Dana |
-| Komponen | `BrokerFlowCard` ([BrokerFlowCard.tsx](../../idx-web/components/BrokerFlowCard.tsx)); `FlowTimelineCard` ([FlowTimelineCard.tsx](../../idx-web/components/FlowTimelineCard.tsx)) |
+| Komponen | `BrokerFlowCard` ([BrokerFlowCard.svelte](../web/src/lib/components/BrokerFlowCard.svelte)); `FlowTimelineCard` ([FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte)) |
 | Fungsi | Komposisi kategori broker; timeline skor satu emiten |
 | Sumber data | `GET /api/broker-flow` ([app.py:221](../../idx-scraper/src/idx_scraper/api/app.py)); `GET /api/stocks/{code}/broker-activity` ([app.py:378](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Lihat [Aliran Dana Emiten](aliran-dana-emiten.md) |
@@ -73,7 +73,7 @@ Snapshot yang sama juga dipakai [Screener](screener.md) (`min_broker_score`) dan
 - **Precomputed sebagian**: data broker EOD diisi tahap broker summary di dalam pipeline `refresh_s2` (16:10 WIB) ([cli.py](../../idx-scraper/src/idx_scraper/cli.py)). IC diisi job `daily_ic` (Senin-Jumat 16:50 WIB).
 - **On-demand**: snapshot dihitung saat request pertama setelah cache kosong.
 - **Reset cache**: `POST /api/cache/clear`, dipanggil setiap pipeline refresh.
-- **Refresh UI**: SWR 300 detik.
+- **Refresh UI**: auto-refresh 300 detik.
 - **Idempotensi**: deterministik dari data tersimpan.
 - **Fallback**: tidak tervalidasi → tidak ada skor palsu; UI menampilkan status.
 

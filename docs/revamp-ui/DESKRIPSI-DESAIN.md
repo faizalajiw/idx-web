@@ -1,5 +1,7 @@
 # Deskripsi Desain: Revamp UI idx-web
 
+<!-- arsip: catatan historis; path dan perintah di dalamnya merujuk kondisi saat ditulis -->
+
 Acuan kode untuk revamp tampilan. Batasan yang mengikat seluruh pekerjaan:
 
 1. **Murni sisi tampilan.** Tidak ada endpoint, hook, tipe data, alur data, atau perilaku backend yang berubah.

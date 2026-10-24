@@ -1,6 +1,6 @@
 ﻿# Market Labs — Dokumentasi Menu
 
-Dokumentasi teknis-fungsional per menu untuk aplikasi **Market Labs** (platform data pasar saham IDX). Sumber kebenaran daftar menu adalah [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (GROUPS, baris 33–70).
+Dokumentasi teknis-fungsional per menu untuk aplikasi **Market Labs** (platform data pasar saham IDX). Sumber kebenaran daftar menu adalah [`lib/nav.ts`](../web/src/lib/nav.ts) (`NAV_GROUPS`, baris 22–58) yang dirender [`components/Sidebar.svelte`](../web/src/lib/components/Sidebar.svelte).
 
 Dokumen ini dipakai oleh tiga audiens:
 
@@ -10,9 +10,9 @@ Dokumen ini dipakai oleh tiga audiens:
 
 ## Arsitektur Ringkas
 
-- **`idx-web`** — Frontend Next.js (App Router) + Recharts + Tailwind. **Presentation-only**: nol kalkulasi bisnis. Semua data di-fetch sebagai JSON lewat SWR ([`lib/hooks.ts`](../../idx-web/lib/hooks.ts), interval default 30 detik). Tipe mirror di [`lib/types.ts`](../../idx-web/lib/types.ts), fetch client di [`lib/api.ts`](../../idx-web/lib/api.ts).
+- **`idx-web`** — Frontend SvelteKit 3 + `adapter-static` + Tailwind 4 (SSR mati, fallback SPA `index.html`). **Presentation-only**: nol kalkulasi bisnis. Semua data di-fetch sebagai JSON lewat auto-refresh ([`hooks.svelte.ts`](../web/src/lib/hooks.svelte.ts), interval default 30 detik). Tipe mirror di [`lib/types.ts`](../web/src/lib/types.ts), fetch client di [`lib/api.ts`](../web/src/lib/api.ts).
 - **`idx-scraper`** — Backend Python/FastAPI + PostgreSQL + APScheduler (timezone WIB). Sumber kalkulasi & penyimpanan. API di [`src/idx_scraper/api/`](../../idx-scraper/src/idx_scraper/api/), scheduler di [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py).
-- Base URL backend: `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`).
+- Base URL backend: `PUBLIC_API_BASE_URL` (di-inline saat `npm run build`; default `http://localhost:8000`).
 - **Chrome global** (dipasang di semua halaman): sidebar bisa diciutkan menjadi rail, tema terang/gelap, badge kesegaran data, dan command palette (Ctrl/Cmd+K). Rincian di bagian [Chrome Global](#chrome-global).
 
 ```mermaid
@@ -30,35 +30,34 @@ flowchart LR
       PG[("PostgreSQL<br/>schema + research")]
     end
     subgraph web["idx-web"]
-      SWR["SWR hooks.ts"]
-      UI["React pages + components"]
+      auto-refresh["auto-refresh hooks.svelte.ts"]
+      UI["SvelteKit routes + components"]
     end
     IDX --> CF --> LIVE --> PG
     YF -.fallback.-> PG
     SCH --> LIVE
     PG --> ANA --> API
-    API --> SWR --> UI
+    API --> auto-refresh --> UI
 ```
 
 ## Indeks Menu
 
 | Group | Route | Menu | Fungsi (1 baris) | Card | Sumber data utama | Update |
 |---|---|---|---|---|---|---|
-| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 9 | `index_quotes`, `index_summary_daily`, `research.latest_pit`, `research.raw_eod` | on-demand + SWR 30s (kesehatan data & kesegaran 60s) |
-| Utama | `/pantau` | Pantau | Watchlist + alert + chart | 5 | `watchlist`, `stock_quotes` | on-demand + SWR 30s |
-| Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + SWR 30s |
+| Utama | `/` | Dashboard | Ringkasan pasar: IHSG, regime, berita terbaru, leaderboard, sinyal | 9 | `index_quotes`, `index_summary_daily`, `research.latest_pit`, `research.raw_eod` | on-demand + auto-refresh 30s (kesehatan data & kesegaran 60s) |
+| Utama | `/pantau` | Pantau | Watchlist + alert + chart | 5 | `watchlist`, `stock_quotes` | on-demand + auto-refresh 30s |
+| Screening | `/screener` | Screener | Filter saham multi-kriteria | 3 | `research.latest_pit` | on-demand + auto-refresh 30s |
 | Analisis | `/rekomendasi` | Rekomendasi Beli | Papan kandidat + badge kesegaran + track record | 3 | `research.recommendation_log` | job harian `idx recommend` |
-| Analisis | `/keputusan` | Ruang Keputusan | Verdict per emiten + event study | 5 | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
-| Analisis | `/ruang-keputusan` | Ruang Keputusan | Skor keputusan + konteks | 2 | `research.latest_pit` + `orderbook` | on-demand + SWR 300s |
+| Analisis | `/keputusan` | Ruang Keputusan | Daftar emiten + verdict, masuk ke workspace per emiten | 5 | `research.latest_pit`, `signal_log` | on-demand (cache 1h) |
 | Analisis | `/jejak-sinyal` | Jejak Sinyal | Track record sinyal vs pasar | 4 | `research.signal_log` | job `idx signal-log` |
 | Analisis | `/backtest` | Backtest | Simulasi point-in-time | 8 | `research.prices_pit` | on-demand (POST, tanpa tulis DB) |
 | Analisis | `/faktor` | Faktor & Kalibrasi | Bobot IC, regime, registry faktor | 6 | `research.factor_ic_history`, `regime_daily` | job `idx ic` (harian 16:50) |
-| Flow | `/radar` | Radar Smart Money | Akumulasi/distribusi asing | 6 | `research.latest_pit` | on-demand + SWR 300s |
-| Flow | `/foreign` | Foreign Flow | Arus asing harian + top | 2 | `research.latest_pit` | on-demand + SWR 30s |
-| Flow | `/flow` | Aliran Dana Emiten | Timeline aliran per emiten | 4 | `research.broker_daily` | on-demand + SWR 300s |
+| Flow | `/radar` | Radar Smart Money | Akumulasi/distribusi asing | 6 | `research.latest_pit` | on-demand + auto-refresh 300s |
+| Flow | `/foreign` | Foreign Flow | Arus asing harian + top | 2 | `research.latest_pit` | on-demand + auto-refresh 30s |
+| Flow | `/flow` | Aliran Dana Emiten | Timeline aliran per emiten | 4 | `research.broker_daily` | on-demand + auto-refresh 300s |
 | Flow | `/sentimen` | Sentimen | Skor posisi dari jejak transaksi | 3 | `research.latest_pit` + `orderbook` | on-demand (cache 1h) |
-| Flow | `/broker-activity` | Aktivitas Broker | Skor aliran + uji IC + struktur broker | 4 | `research.broker_daily`, `factor_ic_history` | on-demand + SWR 300s |
-| Sektor | `/sectors` | Sektor | Rotasi sektor + peta kekuatan | 3 | `research.latest_pit` | on-demand + SWR 30s |
+| Flow | `/broker-activity` | Aktivitas Broker | Skor aliran + uji IC + struktur broker | 4 | `research.broker_daily`, `factor_ic_history` | on-demand + auto-refresh 300s |
+| Sektor | `/sectors` | Sektor | Rotasi sektor + peta kekuatan | 3 | `research.latest_pit` | on-demand + auto-refresh 30s |
 
 ### Halaman Detail & Tambahan
 
@@ -69,29 +68,28 @@ flowchart LR
 | `/flow/[code]` | Dinamis | Workspace aliran dana per emiten (ForeignFlowCard, FlowTimelineCard) |
 | `/radar/[code]` | Dinamis | SmartMoneyBanner + track record + back-link |
 | `/dossier/[code]` | Dinamis | Dossier analisis per emiten: 7 bagian dengan tanggal sesi + export PDF ([dossier.md](./dossier.md)) |
-| (semua) `error` | Status | [`app/error.tsx`](../../idx-web/app/error.tsx): tampilan galat dengan tombol coba lagi dan `ThemeToggle` |
-| (semua) `loading` | Status | [`app/loading.tsx`](../../idx-web/app/loading.tsx): skeleton saat route dimuat |
-| (semua) `not-found` | Status | [`app/not-found.tsx`](../../idx-web/app/not-found.tsx): halaman 404 dengan tautan kembali |
+| (semua) `error` | Status | [`routes/+error.svelte`](../web/src/routes/+error.svelte): satu komponen untuk galat dan 404 (`page.status === 404`), dengan tombol kembali dan `ThemeToggle` |
+| (semua) `loading` | Status | Tidak ada berkas rute: setiap kartu merender [`components/Skeleton.svelte`](../web/src/lib/components/Skeleton.svelte) selama query-nya belum selesai |
 
-> Route `/watchlist` tidak terdaftar di `Sidebar.tsx` — watchlist diakses via menu **Pantau**.
+> Route `/watchlist` tidak terdaftar di `lib/nav.ts` — watchlist diakses via menu **Pantau**. Tidak ada rute `/ruang-keputusan`; Ruang Keputusan adalah `/keputusan` (daftar) dan `/keputusan/[code]` (workspace).
 
 ### Chrome Global
 
-Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas. Perilaku di bawah ini sudah dikonfirmasi terhadap UI yang berjalan di http://localhost:3000 (2026-10-11).
+Komponen yang tampil di semua halaman, tidak termasuk dalam tabel menu di atas. Perilaku di bawah ini dikonfirmasi pada UI yang saat itu berjalan di :3000 (2026-10-11); port sekarang: :3100 untuk dev, :3000 untuk sajian statis.
 
 | Fitur | Implementasi | Perilaku | Penyimpanan lokal |
 |---|---|---|---|
-| Sidebar rail | [`components/Sidebar.tsx`](../../idx-web/components/Sidebar.tsx) (`SIDEBAR_KEY`, baris 73) | Sidebar bisa diciutkan menjadi rail ikon. Grup: Utama, Screening, Analisis, Flow, Sektor | `ml-sidebar-collapsed` (`1` = ciut) |
-| Tema terang/gelap | [`components/ThemeToggle.tsx`](../../idx-web/components/ThemeToggle.tsx) (`KEY`, baris 8) | Default gelap. Skrip inline di [`app/layout.tsx`](../../idx-web/app/layout.tsx) (`THEME_SCRIPT`) menerapkan kelas sebelum render agar tidak ada kilatan (anti-FOUC) | `ml-theme` (`dark` / `light`) |
-| Badge kesegaran data | [`components/GlobalLastUpdated.tsx`](../../idx-web/components/GlobalLastUpdated.tsx), dirender di Topbar lewat `Sidebar.tsx` (baris 172) | Menampilkan waktu data terakhir dari `useMarketOverview()` ([`lib/hooks.ts`](../../idx-web/lib/hooks.ts), baris 59) memakai komponen `LastUpdated`. Teks awal: "Memuat data..." | — |
-| Command palette | [`components/CommandPalette.tsx`](../../idx-web/components/CommandPalette.tsx), dipasang di [`app/layout.tsx`](../../idx-web/app/layout.tsx) | Buka dengan Ctrl/Cmd+K, tutup dengan Esc. Berisi daftar menu (dengan kata kunci) dan pencarian emiten lewat `searchStocks()` → `GET /api/search` | — |
+| Sidebar rail | [`components/Sidebar.svelte`](../web/src/lib/components/Sidebar.svelte) (`SIDEBAR_KEY`, baris 6) | Sidebar bisa diciutkan menjadi rail ikon. Grup: Utama, Screening, Analisis, Flow, Sektor | `ml-sidebar-collapsed` (`1` = ciut) |
+| Tema terang/gelap | [`components/ThemeToggle.svelte`](../web/src/lib/components/ThemeToggle.svelte) (`KEY`, baris 7) | Default gelap. Skrip inline di [`src/app.html`](../web/src/app.html) (baris 12) menerapkan kelas sebelum render agar tidak ada kilatan (anti-FOUC) | `ml-theme` (`dark` / `light`) |
+| Badge kesegaran data | [`components/GlobalLastUpdated.svelte`](../web/src/lib/components/GlobalLastUpdated.svelte), dirender di [`components/Topbar.svelte`](../web/src/lib/components/Topbar.svelte) baris 15 (bukan di Sidebar) | Menampilkan waktu data terakhir dari `useMarketOverview()` ([`hooks.svelte.ts`](../web/src/lib/hooks.svelte.ts), baris 91) memakai komponen `LastUpdated`. Teks awal: "Memuat data." | — |
+| Command palette | [`components/CommandPalette.svelte`](../web/src/lib/components/CommandPalette.svelte), dipasang di [`routes/+layout.svelte`](../web/src/routes/+layout.svelte) baris 28 | Buka dengan Ctrl/Cmd+K, tutup dengan Esc. Berisi daftar menu (dengan kata kunci) dan pencarian emiten lewat `searchStocks()` → `GET /api/search` | — |
 
-Sinkronisasi filter Screener: filter di [`app/screener/page.tsx`](../../idx-web/app/screener/page.tsx) ditulis ke query string URL (`useSearchParams` + `useRouter`), sehingga tautan hasil filter bisa dibagikan dan dibuka ulang.
+Sinkronisasi filter Screener: filter di [`routes/screener/+page.svelte`](../web/src/routes/screener/+page.svelte) dibaca dari `page.url.searchParams` (baris 276) dan ditulis lewat `goto()` (baris 317), sehingga tautan hasil filter bisa dibagikan dan dibuka ulang.
 
-Logo emiten dan broker: [`components/TickerLogo.tsx`](../../idx-web/components/TickerLogo.tsx) membaca `manifest.json` dari folder yang ditunjuk prop `basePath`, lalu memakai file lokal di folder tersebut. Bila file tidak ada, ditampilkan monogram kode.
+Logo emiten dan broker: [`components/TickerLogo.svelte`](../web/src/lib/components/TickerLogo.svelte) membaca `manifest.json` dari folder yang ditunjuk prop `basePath`, lalu memakai file lokal di folder tersebut. Bila file tidak ada, ditampilkan monogram kode.
 
-- Emiten: `basePath="/logos"` (default), file `public/logos/{CODE}.png`, manifest [`public/logos/manifest.json`](../../idx-web/public/logos/manifest.json). Dataset: 912 logo, 51 monogram (dari 963 kode). Sumber TradingView. Dipakai di Top Leaders, Market Overview, Watchlist, Radar, Screener, Foreign Flow, Smart Money (Watchlist `/pantau` dan Pola Terkuat `/radar`), Trading Signal, Jejak Sinyal (Sinyal Terbaru), Backtest (trades dan holdings), Sentimen (Akumulasi/Distribusi), Broker Activity (Peringkat Skor Akumulasi), dan Foreign Flow peer list (`/flow/PACK`).
-- Broker: `basePath="/logos/brokers"`, file `public/logos/brokers/{CODE}.jpg`, manifest [`public/logos/brokers/manifest.json`](../../idx-web/public/logos/brokers/manifest.json). Dataset: 88 logo (dari 88 kode di `research.broker_daily`), tanpa fallback. Sumber `idx.co.id/StaticData/Brokers/Logo/{CODE}.jpg`, diambil lewat `scripts/fetch_broker_logos.py` (butuh Chrome; lihat README idx-scraper). Dipakai di panel Top Broker ([`components/TopBrokersPanel.tsx`](../../idx-web/components/TopBrokersPanel.tsx)).
+- Emiten: `basePath="/logos"` (default), file `static/logos/{CODE}.png`, manifest [`static/logos/manifest.json`](../web/static/logos/manifest.json). Dataset: 912 logo, 51 monogram (dari 963 kode). Sumber TradingView. Dipakai di Top Leaders, Market Overview, Watchlist, Radar, Screener, Foreign Flow, Smart Money (Watchlist `/pantau` dan Pola Terkuat `/radar`), Trading Signal, Jejak Sinyal (Sinyal Terbaru), Backtest (trades dan holdings), Sentimen (Akumulasi/Distribusi), Broker Activity (Peringkat Skor Akumulasi), dan Foreign Flow peer list (`/flow/PACK`).
+- Broker: `basePath="/logos/brokers"`, file `static/logos/brokers/{CODE}.jpg`, manifest [`static/logos/brokers/manifest.json`](../web/static/logos/brokers/manifest.json). Dataset: 88 logo (dari 88 kode di `research.broker_daily`), tanpa fallback. Sumber `idx.co.id/StaticData/Brokers/Logo/{CODE}.jpg`, diambil lewat `scripts/fetch_broker_logos.py` (butuh Chrome; lihat README idx-scraper). Dipakai di panel Top Broker ([`components/TopBrokersPanel.svelte`](../web/src/lib/components/TopBrokersPanel.svelte)).
 
 Status hak cipta logo (emiten maupun broker) tetap `[BELUM TERVERIFIKASI]`. Kode broker `PC` disimpan sebagai `.bmp` (sumber mengembalikan BMP di balik URL `.jpg`) dan tetap tampil normal karena UI memakai field `file` dari manifest.
 
@@ -105,17 +103,17 @@ sequenceDiagram
     participant PG as PostgreSQL
     participant ANA as analytics.py
     participant API as FastAPI
-    participant SWR as SWR (30s)
-    participant UI as Dashboard page.tsx
+    participant auto-refresh as auto-refresh (30s)
+    participant UI as routes/+page.svelte
     IDX->>CF: scrape index + movers
     CF->>PG: upsert index_quotes/index_summary_daily
-    SWR->>API: GET /api/market/overview
+    auto-refresh->>API: GET /api/market/overview
     API->>ANA: get_market_overview()
     ANA->>PG: SELECT index_quotes WHERE code='COMPOSITE'
     PG-->>ANA: row
     ANA-->>API: {index, totals}
-    API-->>SWR: JSON
-    SWR-->>UI: render HeroIndex
+    API-->>auto-refresh: JSON
+    auto-refresh-->>UI: render HeroIndex
 ```
 
 ### Radar Smart Money
@@ -124,7 +122,7 @@ flowchart LR
     A["research.latest_pit<br/>(60 sesi, foreign_net)"] --> B["get_smart_money_radar()"]
     B --> C["rank akumulasi/distribusi"]
     C --> D["/api/smart-money/radar"]
-    D --> E["useSmartMoneyRadar (300s) → radar/page.tsx"]
+    D --> E["useSmartMoneyRadar (300s) → routes/radar/+page.svelte"]
 ```
 
 ### Backtest
@@ -133,7 +131,7 @@ flowchart LR
     A["research.prices_pit<br/>(bitemporal, as-of)"] --> B["simulation.run_backtest()"]
     C["POST /api/backtest/run<br/>(strategy, costs, rebalance)"] --> B
     B --> D["equity curve + metrics<br/>(TIDAK menulis DB)"]
-    D --> E["backtest/page.tsx"]
+    D --> E["routes/backtest/+page.svelte"]
 ```
 
 ### Aktivitas Broker
@@ -176,7 +174,7 @@ sequenceDiagram
 | Dashboard | `/api/market/overview` | `services.get_market_overview` | `index_quotes` | interval `idx` 60s |
 | Dashboard | `/api/market/trade-summary` | `services.get_market_trade_summary` | `research.market_segment_daily` | EOD refresh |
 | Dashboard | `/api/market/regime` | `analytics.get_market_regime` | `index_summary_daily`, `research.latest_pit` | on-demand |
-| Dashboard | `/api/data-health` | `services.get_data_health` → `idx_scraper.health` | `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` | SWR 60s |
+| Dashboard | `/api/data-health` | `services.get_data_health` → `idx_scraper.health` | `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` | auto-refresh 60s |
 | Dashboard | `/api/market/leaders` | `services.get_market_leaders` | `stock_summary_daily`/`stock_quotes` | interval `wl` 60s |
 | Dashboard | `/api/market/top-brokers` | `services.get_top_brokers` | `research.broker_daily` | EOD refresh |
 | Dashboard | `/api/signals` | `services.get_signals` | `research.latest_pit` | on-demand |
@@ -223,20 +221,24 @@ Sumber: [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py) `cmd_serve`. Semua 
 | `idx` | interval, `IDX_INDEX_INTERVAL` (default 60s) | refresh index |
 | `wl` | interval, `IDX_WATCHLIST_INTERVAL` (default 60s) | refresh watchlist |
 | `alerts` | interval, `IDX_ALERT_INTERVAL` (default 300s) | evaluasi aturan alert (bila Telegram aktif) |
+| `news_refresh` | interval, `NEWS_INTERVAL` (default 900s) | tarik berita Snips 24/7 (tanpa gate jam bursa) |
 | `refresh_preopen` | Mon-Fri 08:50 | pra-buka (`do_eod=False`) |
 | `refresh_s1` | Mon–Thu 12:00 | sesi 1 (EOD) |
 | `refresh_s1_fri` | Fri 11:30 | sesi 1 Jumat (EOD) |
 | `refresh_s2` | Mon–Fri 16:10 | sesi 2 / EOD (termasuk broker summary) |
 | `eod_fallback` | Mon–Fri 16:30, lalu tiap jam s/d 20:30 | jaring kedua EOD: keluar cepat kalau EOD hari ini sudah lengkap, kalau belum jalankan pipeline penuh |
-| `health_eod` | Mon–Fri 16:45 | empat penjaga data (kesegaran, cakupan kolom, sesi separuh, lubang sesi) → log + Telegram; setelah `eod_fallback`. Pemeriksa baris melewati sesi hari ini; `misfire_grace_time` 2 jam |
+| `health_eod` | Mon–Fri 17:45 | empat penjaga data (kesegaran, cakupan kolom, sesi separuh, lubang sesi) → log + Telegram; sengaja setelah `eod_fallback` dan setelah tenggat 17:30. Pemeriksa baris melewati sesi hari ini; `misfire_grace_time` 2 jam |
 | `refresh_weekend_am` | Sat–Sun 08:45 | refresh akhir pekan |
 | `refresh_weekend_pm` | Sat–Sun 16:00 | refresh akhir pekan |
 | `daily_ic` | Mon–Fri 16:50 | hitung IC faktor → `factor_ic_history` |
+| `journal_claims` | Mon–Fri 17:55–21:55 tiap jam | tulis klaim buku klaim (P6); idempoten per kode+tanggal+aturan |
+| `journal_outcomes` | Mon–Fri 18:10 | isi hasil klaim yang horizonnya sudah berjalan |
+| `journal_reminder` | Mon–Fri 19:20 | pengingat level tersentuh; alarm kalau sesi bisu |
 | `ownership_weekly` | interval 1 minggu, mulai Sen 17:00 | snapshot ownership |
 
 > **Startup catchup**: saat serve mulai, backend mengecek `prices_pit` dan `index_quotes`; bila kosong/stale ia memicu refresh lewat `_eod_catchup()` — fungsi yang sama dipakai job `eod_fallback` (lihat [`cli.py`](../../idx-scraper/src/idx_scraper/cli.py)).
 >
-> **Lubang hari bursa lampau**: `_eod_catchup()` punya dua fase — hari ini, lalu hari bursa lampau yang bolong (`_backfill_hari_lampau`, default 5 hari bursa, atur lewat `IDX_BACKFILL_DAYS`). Jadi mesin yang tidur/off melewati jendela sore tetap ditambal, tanpa menunggu `serve` di-restart (tick sore berikutnya yang melihat ke belakang). Hanya **saham** yang bisa ditarik ulang; close resmi indeks untuk tanggal lampau tidak punya sumber non-live.
+> **Lubang hari bursa lampau**: `_eod_catchup()` punya dua fase — hari ini, lalu hari bursa lampau yang bolong (`_backfill_hari_lampau`, default **21** hari bursa, atur lewat `IDX_BACKFILL_DAYS`). Jadi mesin yang tidur/off melewati jendela sore tetap ditambal, tanpa menunggu `serve` di-restart (tick sore berikutnya yang melihat ke belakang). Hanya **saham** yang bisa ditarik ulang; close resmi indeks untuk tanggal lampau tidak punya sumber non-live.
 
 ## Cara Menjalankan Backend (agar semua data update)
 
@@ -258,8 +260,8 @@ Jangan dibuat ulang tanpa keputusan baru. Backend terkait tetap dipakai oleh fit
 
 | Path / konsep | Dihapus pada | Alasan | Backend yang tetap | Syarat buat ulang |
 |---|---|---|---|---|
-| `app/valuation/`, `docs/valuasi.md`, `useValuation` | 2026-10-11 (commit `7a08ca3`) | Fitur UI Valuasi dihapus | `GET /api/valuation` tetap (dipakai screener & Hold Check) | Keputusan baru + ADR |
-| `app/hold-check/`, `components/HoldCheckPanel.tsx`, `docs/hold-check.md` | 2026-10-11 (commit `4ae0dcc`) | Fitur UI Hold Check dihapus | `GET /api/hold-check` tetap (dipakai Ruang Keputusan) | Keputusan baru + ADR |
+| `app/valuation/` (app Next, diarsipkan), `docs/valuasi.md`, `useValuation` | 2026-10-11 (commit `7a08ca3`) | Fitur UI Valuasi dihapus; SvelteKit tidak punya rute ini | `GET /api/valuation` tetap (dipakai screener & Hold Check) | Keputusan baru + ADR |
+| `app/hold-check/` (app Next, diarsipkan), `components/HoldCheckPanel.svelte`, `docs/hold-check.md` | 2026-10-11 (commit `4ae0dcc`) | Fitur UI Hold Check dihapus; SvelteKit tidak punya rute ini | `GET /api/hold-check` tetap (dipakai Ruang Keputusan) | Keputusan baru + ADR |
 
 ## Konvensi
 

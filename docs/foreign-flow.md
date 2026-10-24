@@ -4,8 +4,8 @@
 Peringkat emiten dengan arus beli dan jual bersih asing dalam 20 sesi terakhir. Menjawab: "asing sedang masuk atau keluar di saham mana?" Pengguna: trader dan analis yang memantau posisi asing. Data EOD.
 
 ## 2. Route & Berkas
-- URL: `/foreign` → [`app/foreign/page.tsx`](../../idx-web/app/foreign/page.tsx)
-- Hook: `useForeignFlow(days=20)` ([hooks.ts:195](../../idx-web/lib/hooks.ts), refresh 30 detik)
+- URL: `/foreign` → [`routes/foreign/+page.svelte`](../web/src/routes/foreign/+page.svelte)
+- Hook: `useForeignFlow(days=20)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 30 detik)
 - Backend: `GET /api/foreign-flow?days=20` ([app.py:392](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_foreign_flow` ([analytics.py:250](../../idx-scraper/src/idx_scraper/api/analytics.py))
 
 ## 3. Penjelasan Per-Card / Per-Panel
@@ -14,7 +14,7 @@ Peringkat emiten dengan arus beli dan jual bersih asing dalam 20 sesi terakhir. 
 | Field | Isi |
 |---|---|
 | Nama card | Top Net Buy |
-| Komponen | [foreign/page.tsx](../../idx-web/app/foreign/page.tsx) ~baris 100–140 |
+| Komponen | [foreign/page.svelte](../web/src/routes/foreign/+page.svelte) ~baris 100–140 |
 | Fungsi | Emiten dengan akumulasi asing terbesar |
 | Sumber data | `GET /api/foreign-flow` → `get_foreign_flow` ([analytics.py:250](../../idx-scraper/src/idx_scraper/api/analytics.py)); tabel `foreign_flow` / `latest_pit.foreign_net` |
 | Rumus/Logika | Jumlah net asing per emiten selama 20 sesi, diurutkan menurun. Tiap baris menampilkan kode, persen, dan net (format ringkas) |
@@ -26,7 +26,7 @@ Peringkat emiten dengan arus beli dan jual bersih asing dalam 20 sesi terakhir. 
 | Field | Isi |
 |---|---|
 | Nama card | Top Net Sell |
-| Komponen | [foreign/page.tsx](../../idx-web/app/foreign/page.tsx) ~baris 100–140 |
+| Komponen | [foreign/page.svelte](../web/src/routes/foreign/+page.svelte) ~baris 100–140 |
 | Fungsi | Emiten dengan distribusi asing terbesar |
 | Sumber data | Sama dengan Top Net Buy |
 | Rumus/Logika | Urutkan net asing menaik (paling negatif) |
@@ -43,7 +43,7 @@ Ingest EOD asing (Postgres: foreign_flow, latest_pit.foreign_net)
 
 ## 5. Cara Pengambilan / Update Data
 - **On-demand** dengan cache in-process; data dasar diisi job pipeline `refresh_s2` (16:10 WIB).
-- **Refresh UI**: SWR 30 detik; data tetap EOD sehingga tidak berubah intraday.
+- **Refresh UI**: auto-refresh 30 detik; data tetap EOD sehingga tidak berubah intraday.
 - **Reset cache**: `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)).
 - **Idempotensi**: net dihitung ulang dari data tersimpan; deterministik.
 - **Fallback**: tidak ada sumber alternatif; kosong bila data asing belum diisi.

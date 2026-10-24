@@ -1,7 +1,8 @@
 # idx-web (SvelteKit)
 
-Pengganti app Next.js di akar repo. Masa paralel: app Next tetap melayani :3000,
-app ini di :3100 sampai cutover (fase 9).
+App produksi. Menggantikan app Next di akar repo (kini arsip, tidak dijalankan).
+Production: `npm run build` menghasilkan `build/` statis yang disajikan nginx
+(lihat `docs/DEPLOY.md`) atau `node deploy/serve.mjs 3000 build`.
 
 ## Perintah
 
