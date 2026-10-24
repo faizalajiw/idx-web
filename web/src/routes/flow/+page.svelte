@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { ArrowLeftRight } from '@lucide/svelte';
-	import StubPage from '#lib/components/StubPage.svelte';
+	import { page } from "$app/state";
+	import FlowWorkspace from "#lib/components/FlowWorkspace.svelte";
+
+	// `/flow` tanpa kode = pemilih + empty state; `/flow?code=BBRI` = workspace emiten.
+	const code = $derived((page.url.searchParams.get("code") ?? "").trim().toUpperCase() || null);
 </script>
 
-<StubPage title="Aliran Dana" accent="Emiten" icon={ArrowLeftRight} />
+<FlowWorkspace {code} />
