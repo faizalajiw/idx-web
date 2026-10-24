@@ -30,6 +30,7 @@ set "NPM_CMD=npm"
 where npm >nul 2>nul
 if errorlevel 1 set "NPM_CMD=C:\Users\faiza\AppData\Local\Author Software\nvm\.nodejs\npm.exe"
 echo [%date% %time%] npm: %NPM_CMD% >> D:\Project\market-labs\idx-web\logs\_launcher.log
+for /f "delims=" %%v in ('node --version 2^>nul') do echo [%date% %time%] node: %%v >> D:\Project\market-labs\idx-web\logs\_launcher.log
 if not exist "%NPM_CMD%" if /i not "%NPM_CMD%"=="npm" (
   echo [%date% %time%] npm tidak ditemukan - %NPM_CMD% - web TIDAK dinyalakan >> D:\Project\market-labs\idx-web\logs\_launcher.log
   exit /b 1
