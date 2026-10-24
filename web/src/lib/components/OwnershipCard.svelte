@@ -1,36 +1,36 @@
 <script lang="ts">
-	import { Crown, Landmark, Users } from "@lucide/svelte";
-	import { useStockOwnership } from "#lib/hooks.svelte.ts";
-	import { fmtDateStr, fmtNum, fmtPct } from "#lib/format.ts";
-	import type { OwnershipChange } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { Crown, Landmark, Users } from '@lucide/svelte';
+	import { useStockOwnership } from '#lib/hooks.svelte.ts';
+	import { fmtDateStr, fmtNum, fmtPct } from '#lib/format.ts';
+	import type { OwnershipChange } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	// Label ramah untuk kategori pemegang saham IDX.
 	const CATEGORY_LABEL: Record<string, string> = {
-		publik: "masyarakat",
-		besar: ">5%",
-		manajemen: "manajemen",
-		treasury: "treasury",
-		lain: "lain"
+		publik: 'masyarakat',
+		besar: '>5%',
+		manajemen: 'manajemen',
+		treasury: 'treasury',
+		lain: 'lain'
 	};
 
 	const CHANGE_WORD: Record<string, string> = {
-		tambah: "menambah",
-		kurang: "mengurangi",
-		baru: "masuk (baru)",
-		keluar: "keluar"
+		tambah: 'menambah',
+		kurang: 'mengurangi',
+		baru: 'masuk (baru)',
+		keluar: 'keluar'
 	};
 
 	function categoryOf(cat: string | null): string {
-		const c = (cat ?? "").trim();
-		if (c === "Masyarakat Warkat" || c === "Masyarakat Non Warkat") return "publik";
-		if (c === "Saham Treasury") return "treasury";
-		if (c === "Direksi" || c === "Komisaris") return "manajemen";
-		if (c.startsWith("Lebih dari") || c.includes("5%")) return "besar";
-		return "lain";
+		const c = (cat ?? '').trim();
+		if (c === 'Masyarakat Warkat' || c === 'Masyarakat Non Warkat') return 'publik';
+		if (c === 'Saham Treasury') return 'treasury';
+		if (c === 'Direksi' || c === 'Komisaris') return 'manajemen';
+		if (c.startsWith('Lebih dari') || c.includes('5%')) return 'besar';
+		return 'lain';
 	}
 
 	let { code }: { code: string } = $props();
@@ -41,7 +41,7 @@
 	const isLoading = $derived(ownership.isLoading);
 
 	const controller = $derived(
-		data && data.controller.length > 0 ? data.controller.join(", ") : null
+		data && data.controller.length > 0 ? data.controller.join(', ') : null
 	);
 	const holders = $derived((data?.holders ?? []).filter((h) => h.pct !== null).slice(0, 10));
 	const freeFloat = $derived(data?.free_float_pct ?? null);
@@ -64,8 +64,8 @@
 {/snippet}
 
 {#snippet changeRow(c: OwnershipChange)}
-	{@const up = c.action === "tambah" || c.action === "baru"}
-	{@const cls = up ? "text-up" : "text-down"}
+	{@const up = c.action === 'tambah' || c.action === 'baru'}
+	{@const cls = up ? 'text-up' : 'text-down'}
 	<li class="flex items-center gap-2 text-xs">
 		<span class="min-w-0 flex-1 truncate">{c.holder_name}</span>
 		<span class="shrink-0 font-medium {cls}">{CHANGE_WORD[c.action] ?? c.action}</span>
@@ -74,7 +74,7 @@
 				? fmtPct(c.delta_pct)
 				: c.curr_pct !== null
 					? `${fmtNum(c.curr_pct, 2)}%`
-					: "—"}
+					: '—'}
 		</span>
 	</li>
 {/snippet}

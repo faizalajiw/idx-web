@@ -6,14 +6,14 @@
 	 * diporting. Yang dijaga paritasnya: sumbu dengan label, kisi horizontal,
 	 * legenda, garis referensi, dan tooltip saat kursor melintas.
 	 */
-	import { fmtNum } from "#lib/format.ts";
+	import { fmtNum } from '#lib/format.ts';
 
 	type Series = {
 		name: string;
 		values: (number | null)[];
 		color: string;
 		/** `line` (bawaan) atau `area` yang diisi sampai dasar grafik. */
-		kind?: "line" | "area";
+		kind?: 'line' | 'area';
 		width?: number;
 		dashed?: boolean;
 		fill?: string;
@@ -27,19 +27,19 @@
 		labels,
 		series,
 		height = 240,
-		yDomain = "auto",
+		yDomain = 'auto',
 		yTicks = [],
 		yFmt = (v: number) => fmtNum(v),
 		xFmt = (s: string) => s,
 		refs = [],
 		legend = true,
 		xTickGap = 28,
-		emptyLabel = "Tidak ada data."
+		emptyLabel = 'Tidak ada data.'
 	}: {
 		labels: string[];
 		series: Series[];
 		height?: number;
-		yDomain?: "auto" | [number, number];
+		yDomain?: 'auto' | [number, number];
 		yTicks?: number[];
 		yFmt?: (v: number) => string;
 		xFmt?: (s: string) => string;
@@ -50,8 +50,8 @@
 	} = $props();
 
 	const PAD = { right: 12, top: 8, bottom: 22 };
-	const AXIS = "var(--chart-axis)";
-	const GRID = "var(--chart-grid)";
+	const AXIS = 'var(--chart-axis)';
+	const GRID = 'var(--chart-grid)';
 
 	let box = $state<HTMLDivElement | null>(null);
 	let width = $state(0);
@@ -62,7 +62,8 @@
 	const domain = $derived.by<[number, number]>(() => {
 		if (Array.isArray(yDomain)) return yDomain;
 		const all: number[] = [];
-		for (const s of series) for (const v of s.values) if (v !== null && Number.isFinite(v)) all.push(v);
+		for (const s of series)
+			for (const v of s.values) if (v !== null && Number.isFinite(v)) all.push(v);
 		for (const r of refs) all.push(r.y);
 		if (all.length === 0) return [0, 1];
 		let min = Math.min(...all);
@@ -89,8 +90,10 @@
 	});
 	const plotW = $derived(Math.max(0, width - padL - PAD.right));
 
-	const x = (i: number) => padL + (labels.length <= 1 ? plotW / 2 : (i / (labels.length - 1)) * plotW);
-	const y = (v: number) => PAD.top + plotH - ((v - domain[0]) / (domain[1] - domain[0] || 1)) * plotH;
+	const x = (i: number) =>
+		padL + (labels.length <= 1 ? plotW / 2 : (i / (labels.length - 1)) * plotW);
+	const y = (v: number) =>
+		PAD.top + plotH - ((v - domain[0]) / (domain[1] - domain[0] || 1)) * plotH;
 
 	const xTickIdx = $derived.by<number[]>(() => {
 		if (labels.length === 0) return [];
@@ -104,7 +107,8 @@
 		for (let i = 0; i < labels.length; i += step) idx.push(i);
 		const last = labels.length - 1;
 		if (idx[idx.length - 1] !== last) {
-			const gapPx = labels.length <= 1 ? plotW : (plotW / (labels.length - 1)) * (last - idx[idx.length - 1]);
+			const gapPx =
+				labels.length <= 1 ? plotW : (plotW / (labels.length - 1)) * (last - idx[idx.length - 1]);
 			if (gapPx < minGap) idx.pop();
 			idx.push(last);
 		}
@@ -118,14 +122,14 @@
 		values.forEach((v, i) => {
 			if (v === null || !Number.isFinite(v)) {
 				if (current.length > 0) {
-					out.push(current.join(" "));
+					out.push(current.join(' '));
 					current = [];
 				}
 				return;
 			}
-			current.push(`${current.length === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+			current.push(`${current.length === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`);
 		});
-		if (current.length > 0) out.push(current.join(" "));
+		if (current.length > 0) out.push(current.join(' '));
 		return out;
 	}
 
@@ -144,7 +148,9 @@
 		if (run.length > 0) groups.push(run);
 		const base = PAD.top + plotH;
 		return groups.map((g) => {
-			const body = g.map((p, k) => `${k === 0 ? "M" : "L"}${x(p.i).toFixed(1)},${y(p.v).toFixed(1)}`).join(" ");
+			const body = g
+				.map((p, k) => `${k === 0 ? 'M' : 'L'}${x(p.i).toFixed(1)},${y(p.v).toFixed(1)}`)
+				.join(' ');
 			const first = g[0].i;
 			const last = g[g.length - 1].i;
 			return `${body} L${x(last).toFixed(1)},${base.toFixed(1)} L${x(first).toFixed(1)},${base.toFixed(1)} Z`;
@@ -159,7 +165,9 @@
 		hover = Math.max(0, Math.min(labels.length - 1, idx));
 	}
 
-	const tooltipX = $derived(hover === null ? 0 : Math.min(Math.max(x(hover), 90), Math.max(width - 90, 90)));
+	const tooltipX = $derived(
+		hover === null ? 0 : Math.min(Math.max(x(hover), 90), Math.max(width - 90, 90))
+	);
 </script>
 
 {#if labels.length === 0}
@@ -168,7 +176,7 @@
 	<div class="relative" bind:this={box} bind:clientWidth={width}>
 		<svg
 			width="100%"
-			height={height}
+			{height}
 			viewBox="0 0 {width || 1} {height}"
 			role="img"
 			aria-label="Grafik {series.map((s) => s.name).join(', ')}"
@@ -176,14 +184,7 @@
 			onmouseleave={() => (hover = null)}
 		>
 			{#each ticks as t (t)}
-				<line
-					x1={padL}
-					x2={padL + plotW}
-					y1={y(t)}
-					y2={y(t)}
-					stroke={GRID}
-					stroke-width="1"
-				/>
+				<line x1={padL} x2={padL + plotW} y1={y(t)} y2={y(t)} stroke={GRID} stroke-width="1" />
 				<text
 					x={padL - 8}
 					y={y(t) + 3.5}
@@ -198,7 +199,7 @@
 				<text
 					x={i === 0 ? padL : i === labels.length - 1 ? padL + plotW : x(i)}
 					y={height - 6}
-					text-anchor={i === 0 ? "start" : i === labels.length - 1 ? "end" : "middle"}
+					text-anchor={i === 0 ? 'start' : i === labels.length - 1 ? 'end' : 'middle'}
 					font-size="11"
 					fill={AXIS}>{xFmt(labels[i])}</text
 				>
@@ -210,28 +211,28 @@
 					x2={padL + plotW}
 					y1={y(r.y)}
 					y2={y(r.y)}
-					stroke={r.color ?? "var(--chart-ref-soft)"}
-					stroke-dasharray={r.dashed ? "4 4" : undefined}
+					stroke={r.color ?? 'var(--chart-ref-soft)'}
+					stroke-dasharray={r.dashed ? '4 4' : undefined}
 				/>
 				{#if r.label}
 					<text x={padL + 4} y={y(r.y) - 4} font-size="10" fill={AXIS}>{r.label}</text>
 				{/if}
 			{/each}
 
-			{#each series.filter((s) => (s.kind ?? "line") === "area") as s (s.name)}
+			{#each series.filter((s) => (s.kind ?? 'line') === 'area') as s (s.name)}
 				{#each areaPaths(s.values) as d, i (i)}
-					<path d={d} fill={s.fill ?? "var(--chart-area-fill)"} stroke="none" />
+					<path {d} fill={s.fill ?? 'var(--chart-area-fill)'} stroke="none" />
 				{/each}
 			{/each}
 
 			{#each series as s (s.name)}
 				{#each segments(s.values) as d, i (i)}
 					<path
-						d={d}
+						{d}
 						fill="none"
 						stroke={s.color}
 						stroke-width={s.width ?? 1.75}
-						stroke-dasharray={s.dashed ? "5 4" : undefined}
+						stroke-dasharray={s.dashed ? '5 4' : undefined}
 						stroke-linejoin="round"
 						stroke-linecap="round"
 					/>
@@ -265,7 +266,9 @@
 				{#each series as s (s.name)}
 					{@const v = s.values[hover]}
 					<p class="tabular-nums" style="color: {s.color}">
-						{s.name}: {v === null || v === undefined ? "-" : (s.fmt ?? ((n: number) => fmtNum(n, 2)))(v)}
+						{s.name}: {v === null || v === undefined
+							? '-'
+							: (s.fmt ?? ((n: number) => fmtNum(n, 2)))(v)}
 					</p>
 				{/each}
 			</div>
@@ -273,7 +276,9 @@
 	</div>
 
 	{#if legend}
-		<div class="text-muted mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]">
+		<div
+			class="text-muted mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]"
+		>
 			{#each series as s (s.name)}
 				<span class="inline-flex items-center gap-1.5">
 					<span

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import FlowWorkspace from "#lib/components/FlowWorkspace.svelte";
+	import { page } from '$app/state';
+	import FlowWorkspace from '#lib/components/FlowWorkspace.svelte';
 
 	// `/flow/[code]` deep-link emiten, mis. /flow/BBRI.
-	const code = $derived((page.params.code ?? "").toUpperCase());
+	const code = $derived((page.params.code ?? '').toUpperCase());
 </script>
 
 <svelte:head>

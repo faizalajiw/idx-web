@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
 /**
  * Galat jaringan bukan cacat halaman.
@@ -8,31 +8,31 @@ import { expect, test } from "@playwright/test";
  * suite jadi merah hanya karena layanan mati atau pasar tutup.
  */
 const POLA_JARINGAN = [
-	"Failed to fetch",
-	"Load failed",
-	"net::ERR_",
-	"ERR_CONNECTION_",
-	"WebSocket connection to",
-	"favicon"
+	'Failed to fetch',
+	'Load failed',
+	'net::ERR_',
+	'ERR_CONNECTION_',
+	'WebSocket connection to',
+	'favicon'
 ];
 
-const HALAMAN = ["/", "/rekomendasi", "/pantau"] as const;
+const HALAMAN = ['/', '/rekomendasi', '/pantau'] as const;
 
 for (const halaman of HALAMAN) {
 	test(`${halaman} tanpa galat konsol`, async ({ page }) => {
 		const galat: string[] = [];
 
-		page.on("console", (pesan) => {
-			if (pesan.type() !== "error") return;
+		page.on('console', (pesan) => {
+			if (pesan.type() !== 'error') return;
 			const teks = pesan.text();
 			if (POLA_JARINGAN.some((pola) => teks.includes(pola))) return;
 			galat.push(teks);
 		});
-		page.on("pageerror", (e) => galat.push(`pageerror: ${e.message}`));
+		page.on('pageerror', (e) => galat.push(`pageerror: ${e.message}`));
 
 		await page.goto(halaman);
 		await page.waitForTimeout(1500);
 
-		expect(galat, galat.join("\n---\n")).toEqual([]);
+		expect(galat, galat.join('\n---\n')).toEqual([]);
 	});
 }

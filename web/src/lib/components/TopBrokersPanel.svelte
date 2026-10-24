@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { useTopBrokers } from "#lib/hooks.svelte.ts";
-	import { fmtNum, fmtCompact } from "#lib/format.ts";
-	import type { BrokerFlowCategory, BrokerLeaderRow } from "#lib/types.ts";
-	import { getBrokerType, BROKER_TYPE_META } from "#lib/brokerType.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { useTopBrokers } from '#lib/hooks.svelte.ts';
+	import { fmtNum, fmtCompact } from '#lib/format.ts';
+	import type { BrokerFlowCategory, BrokerLeaderRow } from '#lib/types.ts';
+	import { getBrokerType, BROKER_TYPE_META } from '#lib/brokerType.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
-	const BROKER_TYPES = ["asing", "lokal", "bumn"] as const;
+	const BROKER_TYPES = ['asing', 'lokal', 'bumn'] as const;
 
 	/**
 	 * Kategori prioritas dari backend (map kurasi kode broker). Fallback ke
 	 * classifier nama lama kalau respons berasal dari backend versi sebelum ada
 	 * field `category`.
 	 */
-	function rowCategory(r: Pick<BrokerLeaderRow, "category" | "broker_name">): BrokerFlowCategory {
-		if (r.category === "asing" || r.category === "lokal" || r.category === "bumn") {
+	function rowCategory(r: Pick<BrokerLeaderRow, 'category' | 'broker_name'>): BrokerFlowCategory {
+		if (r.category === 'asing' || r.category === 'lokal' || r.category === 'bumn') {
 			return r.category;
 		}
 		return getBrokerType(r.broker_name);
@@ -68,7 +68,7 @@
 	title="Top Broker"
 	subtitle="Broker teraktif per nilai transaksi"
 	info="Broker dengan nilai transaksi terbesar pada sesi bursa terakhir (data akhir sesi)."
-	right={right}
+	{right}
 >
 	{#if error}
 		<ErrorState message={pesanError} />
@@ -111,9 +111,9 @@
 					</button>
 					{#if open[r.broker_code]}
 						<div class="grid grid-cols-3 gap-2 border-t border-[var(--border)] px-3 py-2">
-							{@render detail("Volume", fmtCompact(r.volume))}
-							{@render detail("Value", `Rp ${fmtCompact(r.value)}`)}
-							{@render detail("Freq", r.frequency !== null ? `${fmtNum(r.frequency)}x` : "-")}
+							{@render detail('Volume', fmtCompact(r.volume))}
+							{@render detail('Value', `Rp ${fmtCompact(r.value)}`)}
+							{@render detail('Freq', r.frequency !== null ? `${fmtNum(r.frequency)}x` : '-')}
 						</div>
 					{/if}
 				</div>

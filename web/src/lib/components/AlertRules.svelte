@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { useAlerts, useCreateAlert, useDeleteAlert, useWatchlist } from "#lib/hooks.svelte.ts";
-	import { fmtNum, fmtPct } from "#lib/format.ts";
-	import type { AlertRuleStatus, AlertRuleType, WatchlistRow } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { useAlerts, useCreateAlert, useDeleteAlert, useWatchlist } from '#lib/hooks.svelte.ts';
+	import { fmtNum, fmtPct } from '#lib/format.ts';
+	import type { AlertRuleStatus, AlertRuleType, WatchlistRow } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	function fmtMetric(value: number | null, unit: string): string {
-		if (value === null || value === undefined) return "-";
-		if (unit === "IDR") return fmtNum(value);
-		if (unit === "RSI") return value.toFixed(1);
+		if (value === null || value === undefined) return '-';
+		if (unit === 'IDR') return fmtNum(value);
+		if (unit === 'RSI') return value.toFixed(1);
 		return `${value.toFixed(2)}×`;
 	}
 
 	function signalBadge(signal: string | null): string {
-		if (signal === "BUY") return "badge badge-buy";
-		if (signal === "SELL") return "badge badge-sell";
-		return "badge badge-hold";
+		if (signal === 'BUY') return 'badge badge-buy';
+		if (signal === 'SELL') return 'badge badge-sell';
+		return 'badge badge-hold';
 	}
 
 	function defaultThreshold(
@@ -27,7 +27,7 @@
 	): number {
 		if (!spec) return 0;
 		// Price levels are far more useful pre-filled with the current price.
-		if (spec.unit === "IDR" && code) {
+		if (spec.unit === 'IDR' && code) {
 			const row = rows?.find((r) => r.code === code);
 			if (row?.close) return Math.round(row.close);
 		}
@@ -47,21 +47,19 @@
 	let code = $state<string | null>(null);
 	let typeId = $state<string | null>(null);
 	let threshold = $state<number | null>(null);
-	let note = $state("");
+	let note = $state('');
 	let busy = $state(false);
 	let mutateError = $state<string | null>(null);
 
 	const ruleTypes = $derived(data?.rule_types ?? []);
-	const activeCode = $derived(code ?? watchlist?.[0]?.code ?? "");
-	const activeType = $derived(typeId ?? ruleTypes[0]?.id ?? "");
+	const activeCode = $derived(code ?? watchlist?.[0]?.code ?? '');
+	const activeType = $derived(typeId ?? ruleTypes[0]?.id ?? '');
 	const spec = $derived(ruleTypes.find((t) => t.id === activeType));
 	const effectiveThreshold = $derived(threshold ?? defaultThreshold(spec, watchlist, activeCode));
 
 	const sortedRules = $derived.by(() => {
 		const rules = data?.rules ?? [];
-		return [...rules].sort(
-			(a, b) => a.code.localeCompare(b.code) || a.type.localeCompare(b.type)
-		);
+		return [...rules].sort((a, b) => a.code.localeCompare(b.code) || a.type.localeCompare(b.type));
 	});
 
 	async function handleAdd() {
@@ -75,10 +73,10 @@
 				threshold: effectiveThreshold,
 				note: note.trim() || null
 			});
-			note = "";
+			note = '';
 			threshold = null;
 		} catch (e) {
-			mutateError = e instanceof Error ? e.message : "Gagal menambah aturan";
+			mutateError = e instanceof Error ? e.message : 'Gagal menambah aturan';
 		} finally {
 			busy = false;
 		}
@@ -91,7 +89,7 @@
 		try {
 			await removeAlert(id);
 		} catch (e) {
-			mutateError = e instanceof Error ? e.message : "Gagal menghapus aturan";
+			mutateError = e instanceof Error ? e.message : 'Gagal menghapus aturan';
 		} finally {
 			busy = false;
 		}
@@ -104,7 +102,7 @@
 			<span class="font-semibold">{rule.code}</span>
 			<span class="text-muted ml-2 text-xs tabular-nums">
 				{fmtNum(rule.close)}
-				{rule.percent !== null ? ` (${fmtPct(rule.percent)})` : ""}
+				{rule.percent !== null ? ` (${fmtPct(rule.percent)})` : ''}
 			</span>
 		</td>
 		<td>
@@ -114,8 +112,8 @@
 		<td class="text-right tabular-nums">{fmtMetric(rule.threshold, rule.unit)}</td>
 		<td class="text-right tabular-nums">{fmtMetric(rule.current, rule.unit)}</td>
 		<td class="text-center">
-			<span class={rule.triggered ? "badge badge-warn" : "badge badge-hold"}>
-				{rule.triggered ? "TERPICU" : "menunggu"}
+			<span class={rule.triggered ? 'badge badge-warn' : 'badge badge-hold'}>
+				{rule.triggered ? 'TERPICU' : 'menunggu'}
 			</span>
 		</td>
 		<td class="py-2 text-right">
@@ -140,23 +138,23 @@
 >
 	{#snippet right()}
 		{#if data}
-			<span class={data.triggered_count > 0 ? "badge badge-warn" : "badge badge-hold"}>
+			<span class={data.triggered_count > 0 ? 'badge badge-warn' : 'badge badge-hold'}>
 				{data.triggered_count} terpicu
 			</span>
 		{/if}
 	{/snippet}
 
 	{#if error}
-		<ErrorState message="Gagal memuat aturan: {error instanceof Error ? error.message : String(error)}" />
+		<ErrorState
+			message="Gagal memuat aturan: {error instanceof Error ? error.message : String(error)}"
+		/>
 	{:else if isLoading || !data}
 		<Skeleton class="h-56" />
 	{:else}
 		<div class="space-y-4">
 			<!-- ------------------------------------------------------- builder -->
 			{#if !watchlist?.length}
-				<EmptyState
-					message="Tambahkan emiten ke watchlist dulu, lalu pasang aturannya di sini."
-				/>
+				<EmptyState message="Tambahkan emiten ke watchlist dulu, lalu pasang aturannya di sini." />
 			{:else}
 				<div class="space-y-3">
 					<div class="grid grid-cols-2 gap-3">
@@ -199,7 +197,7 @@
 					<div class="grid grid-cols-2 gap-3">
 						<label class="block">
 							<span class="text-muted text-xs">
-								Ambang ({spec?.unit === "IDR" ? "Rp" : (spec?.unit ?? "-")})
+								Ambang ({spec?.unit === 'IDR' ? 'Rp' : (spec?.unit ?? '-')})
 							</span>
 							<input
 								type="number"
@@ -211,7 +209,7 @@
 								oninput={(e) => {
 									const raw = e.currentTarget.value;
 									const parsed = Number(raw);
-									threshold = raw.trim() === "" || Number.isNaN(parsed) ? null : parsed;
+									threshold = raw.trim() === '' || Number.isNaN(parsed) ? null : parsed;
 								}}
 							/>
 						</label>
@@ -233,7 +231,7 @@
 						onclick={() => void handleAdd()}
 						disabled={busy || !activeCode || !activeType}
 					>
-						{busy ? "Menyimpan…" : "+ Tambah aturan"}
+						{busy ? 'Menyimpan…' : '+ Tambah aturan'}
 					</button>
 					{#if mutateError}<ErrorState message={mutateError} />{/if}
 				</div>

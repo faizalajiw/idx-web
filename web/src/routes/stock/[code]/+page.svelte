@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import { useWatchlist } from "#lib/hooks.svelte.ts";
-	import TechnicalChart from "#lib/components/TechnicalChart.svelte";
-	import HistoryTable from "#lib/components/HistoryTable.svelte";
-	import SignalsPanel from "#lib/components/SignalsPanel.svelte";
-	import BrokerSummary from "#lib/components/BrokerSummary.svelte";
-	import ForeignFlowCard from "#lib/components/ForeignFlowCard.svelte";
-	import FlowTimelineCard from "#lib/components/FlowTimelineCard.svelte";
-	import BrokerFlowCard from "#lib/components/BrokerFlowCard.svelte";
-	import BrokerActivityCard from "#lib/components/BrokerActivityCard.svelte";
-	import RegimeBanner from "#lib/components/RegimeBanner.svelte";
-	import EventStudyCard from "#lib/components/EventStudyCard.svelte";
-	import SmartMoneyBanner from "#lib/components/SmartMoneyBanner.svelte";
-	import OwnershipCard from "#lib/components/OwnershipCard.svelte";
+	import { page } from '$app/state';
+	import { useWatchlist } from '#lib/hooks.svelte.ts';
+	import TechnicalChart from '#lib/components/TechnicalChart.svelte';
+	import HistoryTable from '#lib/components/HistoryTable.svelte';
+	import SignalsPanel from '#lib/components/SignalsPanel.svelte';
+	import BrokerSummary from '#lib/components/BrokerSummary.svelte';
+	import ForeignFlowCard from '#lib/components/ForeignFlowCard.svelte';
+	import FlowTimelineCard from '#lib/components/FlowTimelineCard.svelte';
+	import BrokerFlowCard from '#lib/components/BrokerFlowCard.svelte';
+	import BrokerActivityCard from '#lib/components/BrokerActivityCard.svelte';
+	import RegimeBanner from '#lib/components/RegimeBanner.svelte';
+	import EventStudyCard from '#lib/components/EventStudyCard.svelte';
+	import SmartMoneyBanner from '#lib/components/SmartMoneyBanner.svelte';
+	import OwnershipCard from '#lib/components/OwnershipCard.svelte';
 
 	const NAV_BTN =
-		"card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm transition-colors hover:bg-white/[0.03]";
+		'card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm transition-colors hover:bg-white/[0.03]';
 	const NAV_DISABLED =
-		"card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm text-muted opacity-50";
+		'card inline-flex min-w-[96px] items-center justify-center px-3 py-2 text-sm text-muted opacity-50';
 
-	const code = $derived((page.params.code ?? "").toUpperCase());
+	const code = $derived((page.params.code ?? '').toUpperCase());
 
 	// Prev/next mengikuti watchlist backend (alfabetis, melingkar), jadi saham
 	// yang dibuka dari dashboard bisa ditelusuri tanpa kembali dulu.

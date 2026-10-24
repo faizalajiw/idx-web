@@ -1,16 +1,16 @@
 <script module lang="ts">
 	// Palet warna monogram (nyambung ke tema flat terminal).
 	const PALETTE = [
-		"#2962ff",
-		"#26a69a",
-		"#f5a623",
-		"#ef5350",
-		"#9c27b0",
-		"#00897b",
-		"#5c6bc0",
-		"#ec407a",
-		"#7cb342",
-		"#fb8c00"
+		'#2962ff',
+		'#26a69a',
+		'#f5a623',
+		'#ef5350',
+		'#9c27b0',
+		'#00897b',
+		'#5c6bc0',
+		'#ec407a',
+		'#7cb342',
+		'#fb8c00'
 	];
 
 	function hashColor(code: string): string {
@@ -27,12 +27,12 @@
 	function loadLogoMap(basePath: string): Promise<Map<string, string>> {
 		let promise = logoMapPromises.get(basePath);
 		if (!promise) {
-			promise = fetch(`${basePath}/manifest.json`, { cache: "no-store" })
+			promise = fetch(`${basePath}/manifest.json`, { cache: 'no-store' })
 				.then((r) => (r.ok ? r.json() : { entries: [] }))
 				.then((data: { entries?: ManifestEntry[] }) => {
 					const map = new Map<string, string>();
 					for (const e of data.entries ?? []) {
-						if (e.status === "ok" && e.file) map.set(e.code, `${basePath}/${e.file}`);
+						if (e.status === 'ok' && e.file) map.set(e.code, `${basePath}/${e.file}`);
 					}
 					return map;
 				})
@@ -51,8 +51,8 @@
 	let {
 		code,
 		size = 24,
-		class: className = "",
-		basePath = "/logos"
+		class: className = '',
+		basePath = '/logos'
 	}: {
 		code: string;
 		size?: number;
@@ -90,7 +90,8 @@
 	<span
 		aria-hidden="true"
 		class="inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white {className}"
-		style="width: {size}px; height: {size}px; background: {hashColor(upper)}; font-size: {size * 0.4}px; line-height: 1"
+		style="width: {size}px; height: {size}px; background: {hashColor(upper)}; font-size: {size *
+			0.4}px; line-height: 1"
 	>
 		{upper.slice(0, 2)}
 	</span>

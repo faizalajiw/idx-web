@@ -6,18 +6,18 @@
  * sesi, dan tes ini harus lulus walau API mati atau pasar tutup.
  */
 export const RUTE = [
-	"/",
-	"/backtest",
-	"/broker-activity",
-	"/faktor",
-	"/flow",
-	"/foreign",
-	"/jejak-sinyal",
-	"/keputusan",
-	"/pantau",
-	"/radar",
-	"/rekomendasi",
-	"/screener",
-	"/sectors",
-	"/sentimen"
+	'/',
+	'/backtest',
+	'/broker-activity',
+	'/faktor',
+	'/flow',
+	'/foreign',
+	'/jejak-sinyal',
+	'/keputusan',
+	'/pantau',
+	'/radar',
+	'/rekomendasi',
+	'/screener',
+	'/sectors',
+	'/sentimen'
 ] as const;

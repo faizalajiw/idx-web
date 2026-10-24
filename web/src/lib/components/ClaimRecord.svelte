@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { ShieldAlert, ShieldCheck } from "@lucide/svelte";
+	import { ShieldAlert, ShieldCheck } from '@lucide/svelte';
 	import {
 		useJournalClaims,
 		useJournalHalt,
 		useJournalResume,
 		useJournalState,
 		useJournalSummary
-	} from "#lib/hooks.svelte.ts";
-	import { fmtNum } from "#lib/format.ts";
-	import type { JournalClaim, JournalSummary } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	} from '#lib/hooks.svelte.ts';
+	import { fmtNum } from '#lib/format.ts';
+	import type { JournalClaim, JournalSummary } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	/**
 	 * Blok rekaman klaim mesin (lapis 4) di atas papan kandidat.
@@ -26,33 +26,33 @@
 	 */
 
 	const VERDICT_META: Record<string, { label: string; badge: string }> = {
-		terbukti: { label: "Terbukti", badge: "badge badge-buy" },
-		"tidak terbukti": { label: "Tidak terbukti", badge: "badge badge-sell" },
-		"belum cukup": { label: "Belum cukup bukti", badge: "badge badge-hold" }
+		terbukti: { label: 'Terbukti', badge: 'badge badge-buy' },
+		'tidak terbukti': { label: 'Tidak terbukti', badge: 'badge badge-sell' },
+		'belum cukup': { label: 'Belum cukup bukti', badge: 'badge badge-hold' }
 	};
 
 	const STATUS_BADGE: Record<string, string> = {
-		terbuka: "badge badge-hold",
-		kena_target: "badge badge-buy",
-		kena_stop: "badge badge-sell",
-		kedaluwarsa: "badge badge-warn"
+		terbuka: 'badge badge-hold',
+		kena_target: 'badge badge-buy',
+		kena_stop: 'badge badge-sell',
+		kedaluwarsa: 'badge badge-warn'
 	};
 
 	const STATUS_LABEL: Record<string, string> = {
-		terbuka: "terbuka",
-		kena_target: "kena target",
-		kena_stop: "kena stop",
-		kedaluwarsa: "kedaluwarsa"
+		terbuka: 'terbuka',
+		kena_target: 'kena target',
+		kena_stop: 'kena stop',
+		kedaluwarsa: 'kedaluwarsa'
 	};
 
 	const rp = (v: number | null | undefined) =>
-		v === null || v === undefined ? "-" : `Rp ${fmtNum(v)}`;
+		v === null || v === undefined ? '-' : `Rp ${fmtNum(v)}`;
 
 	/** Abnormal dalam fraksi (0.014 = +1,4%); "belum terukur" berarti belum ada, bukan nol. */
 	const abn = (v: number | null | undefined) =>
 		v === null || v === undefined || Number.isNaN(v)
-			? "belum terukur"
-			: `${v > 0 ? "+" : ""}${(v * 100).toFixed(2)}%`;
+			? 'belum terukur'
+			: `${v > 0 ? '+' : ''}${(v * 100).toFixed(2)}%`;
 
 	/** Tanggal sesi terbaru di buku (ISO, urut leksikografis = urut waktu). */
 	function sesiTerakhir(summary: JournalSummary): string | null {
@@ -81,7 +81,7 @@
 
 	// Kontrol gerbang: satu instance per blok, jadi keadaannya hidup di sini.
 	let terbuka = $state(false);
-	let alasan = $state("");
+	let alasan = $state('');
 	let sibuk = $state(false);
 	let galat = $state<string | null>(null);
 	let inputRef = $state<HTMLInputElement | undefined>(undefined);
@@ -100,22 +100,22 @@
 		if (!terbuka) return;
 		inputRef?.focus();
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") tutup();
+			if (e.key === 'Escape') tutup();
 		};
-		window.addEventListener("keydown", onKey);
-		return () => window.removeEventListener("keydown", onKey);
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
 	});
 
 	async function kirim() {
-		if (sibuk || alasan.trim() === "") return;
+		if (sibuk || alasan.trim() === '') return;
 		sibuk = true;
 		galat = null;
 		try {
 			await halt(alasan.trim());
-			alasan = "";
+			alasan = '';
 			terbuka = false;
 		} catch (e) {
-			galat = e instanceof Error ? e.message : "Gagal menghentikan klaim";
+			galat = e instanceof Error ? e.message : 'Gagal menghentikan klaim';
 		} finally {
 			sibuk = false;
 		}
@@ -128,14 +128,14 @@
 		try {
 			await resume();
 		} catch (e) {
-			galat = e instanceof Error ? e.message : "Gagal membuka lagi klaim";
+			galat = e instanceof Error ? e.message : 'Gagal membuka lagi klaim';
 		} finally {
 			sibuk = false;
 		}
 	}
 </script>
 
-{#snippet stat(label: string, value: string, tone = "")}
+{#snippet stat(label: string, value: string, tone = '')}
 	<div>
 		<p class="text-muted text-[11px]">{label}</p>
 		<p class="mt-0.5 text-sm font-semibold tabular-nums {tone}">{value}</p>
@@ -147,14 +147,14 @@
 		class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--border)] py-1.5 last:border-b-0"
 	>
 		<span class="font-semibold tabular-nums">{row.code}</span>
-		<span class={STATUS_BADGE[row.status] ?? "badge badge-hold"}>
+		<span class={STATUS_BADGE[row.status] ?? 'badge badge-hold'}>
 			{STATUS_LABEL[row.status] ?? row.status}
 		</span>
 		<span class="text-muted tabular-nums">
 			stop {rp(row.stop_raw)} · target {rp(row.target_raw)}
 		</span>
 		<span class="text-muted ml-auto tabular-nums">
-			{row.outcome_abn === null ? "hasil belum terukur" : abn(row.outcome_abn)}
+			{row.outcome_abn === null ? 'hasil belum terukur' : abn(row.outcome_abn)}
 		</span>
 	</li>
 {/snippet}
@@ -163,10 +163,10 @@
 	{#if g.halt.halted}
 		<div class="space-y-2">
 			<p class="text-warn text-xs leading-relaxed tabular-nums" role="status">
-				Dihentikan manual oleh {g.halt.by ?? "pemilik"}:
-				{g.halt.reason ?? "tanpa sebab tertulis"}{g.halt.at
-					? ` (${g.halt.at.slice(0, 16).replace("T", " ")} WIB)`
-					: ""}. Mesin berhenti menulis klaim baru, bukan menghapus klaim yang sudah ada.
+				Dihentikan manual oleh {g.halt.by ?? 'pemilik'}:
+				{g.halt.reason ?? 'tanpa sebab tertulis'}{g.halt.at
+					? ` (${g.halt.at.slice(0, 16).replace('T', ' ')} WIB)`
+					: ''}. Mesin berhenti menulis klaim baru, bukan menghapus klaim yang sudah ada.
 			</p>
 			<button
 				type="button"
@@ -174,7 +174,7 @@
 				onclick={() => void bukaLagi()}
 				disabled={sibuk}
 			>
-				{sibuk ? "Membuka…" : "Buka lagi penulisan klaim"}
+				{sibuk ? 'Membuka…' : 'Buka lagi penulisan klaim'}
 			</button>
 			{#if galat}<ErrorState message={galat} />{/if}
 		</div>
@@ -219,9 +219,9 @@
 							type="button"
 							class="btn btn-primary min-h-11"
 							onclick={() => void kirim()}
-							disabled={sibuk || alasan.trim() === ""}
+							disabled={sibuk || alasan.trim() === ''}
 						>
-							{sibuk ? "Menghentikan…" : "Ya, hentikan"}
+							{sibuk ? 'Menghentikan…' : 'Ya, hentikan'}
 						</button>
 						<button type="button" class="btn btn-ghost min-h-11" onclick={tutup} disabled={sibuk}>
 							Batal
@@ -263,43 +263,43 @@
 
 			{#if buku.claims === 0 && !buku.note}
 				<p class="text-muted text-xs leading-relaxed">
-					Buku ini masih kosong: belum ada klaim yang tertulis. Klaim pertama ditulis job
-					terjadwal sesudah sesi bursa tutup, lalu hasilnya diperiksa setelah horizonnya
-					berjalan (21 hari bursa).
+					Buku ini masih kosong: belum ada klaim yang tertulis. Klaim pertama ditulis job terjadwal
+					sesudah sesi bursa tutup, lalu hasilnya diperiksa setelah horizonnya berjalan (21 hari
+					bursa).
 				</p>
 			{/if}
 
 			{#if buku.claims > 0}
 				<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-					{@render stat("Klaim tertulis", fmtNum(buku.claims))}
-					{@render stat("Sudah terukur", fmtNum(buku.measured_claims))}
-					{@render stat("Kena target", fmtNum(buku.hit_target), "text-up")}
-					{@render stat("Kena stop", fmtNum(buku.hit_stop), "text-down")}
+					{@render stat('Klaim tertulis', fmtNum(buku.claims))}
+					{@render stat('Sudah terukur', fmtNum(buku.measured_claims))}
+					{@render stat('Kena target', fmtNum(buku.hit_target), 'text-up')}
+					{@render stat('Kena stop', fmtNum(buku.hit_stop), 'text-down')}
 					{@render stat(
-						"Rata-rata vs pasar",
+						'Rata-rata vs pasar',
 						abn(buku.mean_abnormal),
 						buku.mean_abnormal === null
-							? "text-muted"
+							? 'text-muted'
 							: buku.mean_abnormal > 0
-								? "text-up"
-								: "text-down"
+								? 'text-up'
+								: 'text-down'
 					)}
-					{@render stat("Sesi terukur", fmtNum(buku.sessions))}
+					{@render stat('Sesi terukur', fmtNum(buku.sessions))}
 				</div>
 
 				<p class="text-muted text-xs tabular-nums">
 					{fmtNum(buku.open)} masih terbuka · {fmtNum(buku.expired)} kedaluwarsa{buku.horizon_mismatch >
 					0
 						? ` · ${fmtNum(buku.horizon_mismatch)} horizonnya tidak cocok`
-						: ""}
-					{" · "}
+						: ''}
+					{' · '}
 					{fmtNum(buku.claim_sessions)} sesi menulis klaim, {fmtNum(buku.sessions)}
 					sesi sudah terukur. Rata-rata dihitung per sesi dulu, baru antar sesi.
 				</p>
 
 				<details>
 					<summary class="text-muted cursor-pointer text-xs">
-						Rincian per sesi{sesi ? ` (terbaru ${sesi})` : ""}
+						Rincian per sesi{sesi ? ` (terbaru ${sesi})` : ''}
 					</summary>
 					<ul class="mt-2 space-y-0.5 text-xs tabular-nums">
 						{#each perSesi.slice(0, 5) as s (s.trade_date)}
@@ -329,12 +329,7 @@
 					{#if gerbang.allowed}
 						<ShieldCheck size={14} class="shrink-0 text-up" aria-hidden />
 					{:else}
-						<ShieldAlert
-							size={14}
-							class="mt-0.5 shrink-0"
-							style="color: var(--warn)"
-							aria-hidden
-						/>
+						<ShieldAlert size={14} class="mt-0.5 shrink-0" style="color: var(--warn)" aria-hidden />
 					{/if}
 					Gerbang klaim
 				</p>
@@ -343,7 +338,7 @@
 					role="status"
 				>
 					{gerbang.allowed
-						? "Terbuka: sesudah sesi tutup, mesin menulis klaim baru seperti biasa."
+						? 'Terbuka: sesudah sesi tutup, mesin menulis klaim baru seperti biasa.'
 						: gerbang.message}
 				</p>
 				{#if gerbang.note}
@@ -357,12 +352,12 @@
 
 		{#if celah.length > 0}
 			<p class="text-muted text-xs leading-relaxed tabular-nums">
-				{fmtNum(celah.length)} sesi terakhir tanpa klaim dan tanpa penolakan, jadi job-nya tidak
-				menulis apa pun untuk sesi itu:
+				{fmtNum(celah.length)} sesi terakhir tanpa klaim dan tanpa penolakan, jadi job-nya tidak menulis
+				apa pun untuk sesi itu:
 				{celah
 					.slice(0, 5)
 					.map((g) => g.trade_date)
-					.join(" · ")}{celah.length > 5 ? ` dan ${fmtNum(celah.length - 5)} sesi lain` : ""}.
+					.join(' · ')}{celah.length > 5 ? ` dan ${fmtNum(celah.length - 5)} sesi lain` : ''}.
 			</p>
 		{/if}
 	</div>

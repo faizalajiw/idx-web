@@ -6,7 +6,9 @@
 <nav class="flex flex-col gap-5" aria-label="Navigasi utama">
 	{#each NAV_GROUPS as group (group.title)}
 		<div>
-			<p class="nav-group-title text-muted mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em]">
+			<p
+				class="nav-group-title text-muted mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em]"
+			>
 				{group.title}
 			</p>
 			<ul class="space-y-0.5">

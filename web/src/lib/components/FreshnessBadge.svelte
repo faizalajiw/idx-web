@@ -1,8 +1,14 @@
 <script lang="ts">
-	import { CircleCheck, Clock, CircleQuestionMark, TriangleAlert, type LucideIcon } from "@lucide/svelte";
-	import { useFreshness } from "#lib/hooks.svelte.ts";
-	import { fmtDateStr } from "#lib/format.ts";
-	import type { Freshness, FreshnessStatus } from "#lib/types.ts";
+	import {
+		CircleCheck,
+		Clock,
+		CircleQuestionMark,
+		TriangleAlert,
+		type LucideIcon
+	} from '@lucide/svelte';
+	import { useFreshness } from '#lib/hooks.svelte.ts';
+	import { fmtDateStr } from '#lib/format.ts';
+	import type { Freshness, FreshnessStatus } from '#lib/types.ts';
 
 	/**
 	 * Badge kesegaran data (spec D1): tiga status, satu pertanyaan — "angka di
@@ -14,46 +20,50 @@
 	 * dengan sebabnya di `title`, bukan menggantung di "memuat…" selamanya.
 	 */
 	const META: Record<FreshnessStatus, { badge: string; label: string; icon: LucideIcon }> = {
-		segar: { badge: "badge badge-buy", label: "Segar", icon: CircleCheck },
-		basi: { badge: "badge badge-warn", label: "Basi", icon: TriangleAlert },
-		"tak diketahui": { badge: "badge badge-hold", label: "Tak diketahui", icon: CircleQuestionMark }
+		segar: { badge: 'badge badge-buy', label: 'Segar', icon: CircleCheck },
+		basi: { badge: 'badge badge-warn', label: 'Basi', icon: TriangleAlert },
+		'tak diketahui': { badge: 'badge badge-hold', label: 'Tak diketahui', icon: CircleQuestionMark }
 	};
 
 	const BASIS_LABEL: Record<string, string> = {
-		panel: "panel saham",
-		indeks: "indeks"
+		panel: 'panel saham',
+		indeks: 'indeks'
 	};
 
-	const tgl = (s: string | null | undefined): string => fmtDateStr(s) ?? "—";
+	const tgl = (s: string | null | undefined): string => fmtDateStr(s) ?? '—';
 
 	let {
-		basis = "panel",
+		basis = 'panel',
 		freshness
 	}: {
-		basis?: "panel" | "indeks";
+		basis?: 'panel' | 'indeks';
 		freshness?: Freshness | null;
 	} = $props();
 
 	const query = useFreshness();
 	const f = $derived(freshness ?? query.data ?? null);
-	const meta = $derived(f ? (META[basis === "indeks" ? f.index_status : f.status] ?? META["tak diketahui"]) : null);
+	const meta = $derived(
+		f ? (META[basis === 'indeks' ? f.index_status : f.status] ?? META['tak diketahui']) : null
+	);
 
 	const judul = $derived.by(() => {
-		if (!f) return "";
-		const sesi = basis === "indeks" ? f.index_latest : f.panel_latest;
+		if (!f) return '';
+		const sesi = basis === 'indeks' ? f.index_latest : f.panel_latest;
 		return [
 			f.reason,
-			sesi ? `Sesi terakhir ${tgl(sesi)}${f.expected ? ` · diharapkan ${tgl(f.expected)}` : ""}` : null,
+			sesi
+				? `Sesi terakhir ${tgl(sesi)}${f.expected ? ` · diharapkan ${tgl(f.expected)}` : ''}`
+				: null,
 			`Diperiksa ${tgl(f.checked_at.slice(0, 10))}`
 		]
 			.filter(Boolean)
-			.join(" · ");
+			.join(' · ');
 	});
 </script>
 
 {#if !f}
 	{#if query.error}
-		{@const masuk = META["tak diketahui"]}
+		{@const masuk = META['tak diketahui']}
 		{@const IkonMasuk = masuk.icon}
 		<span
 			class="{masuk.badge} gap-1"

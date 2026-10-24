@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { fmtCompact, fmtNum } from "#lib/format.ts";
-	import type { RebalanceEvent } from "#lib/types.ts";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { fmtCompact, fmtNum } from '#lib/format.ts';
+	import type { RebalanceEvent } from '#lib/types.ts';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
 	/**
 	 * Jejak transaksi: pilih satu sesi rebalance di kiri, periksa fill yang
@@ -24,8 +24,8 @@
 </script>
 
 {#snippet sideBadge(side: string)}
-	<span class={side === "buy" ? "badge badge-buy" : "badge badge-sell"}>
-		{side === "buy" ? "BELI" : "JUAL"}
+	<span class={side === 'buy' ? 'badge badge-buy' : 'badge badge-sell'}>
+		{side === 'buy' ? 'BELI' : 'JUAL'}
 	</span>
 {/snippet}
 
@@ -39,7 +39,8 @@
 		{#if truncated}
 			<p class="text-muted text-xs leading-relaxed">
 				Menampilkan <span class="font-medium text-[var(--fg)]">{events.length}</span> rebalance
-				terbaru dari total {total}. Angka agregat (turnover &amp; biaya) di kartu lain tetap lengkap.
+				terbaru dari total {total}. Angka agregat (turnover &amp; biaya) di kartu lain tetap
+				lengkap.
 			</p>
 		{/if}
 
@@ -51,7 +52,7 @@
 					<button
 						type="button"
 						onclick={() => (selected = i)}
-						aria-current={isActive ? "true" : undefined}
+						aria-current={isActive ? 'true' : undefined}
 						class="w-full rounded-xl border px-3 py-2 text-left text-xs transition-colors {isActive
 							? 'border-[var(--accent)] bg-white/[0.04]'
 							: 'border-[var(--border)] hover:border-[var(--border-strong)]'}"

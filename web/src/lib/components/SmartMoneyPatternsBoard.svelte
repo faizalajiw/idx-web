@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { Activity, TrendingDown, TrendingUp } from "@lucide/svelte";
-	import { useSmartMoneyPatternsBoard } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtDateStr, fmtNum } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { Activity, TrendingDown, TrendingUp } from '@lucide/svelte';
+	import { useSmartMoneyPatternsBoard } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtDateStr, fmtNum } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
 	const CONFIDENCE_CLS: Record<string, string> = {
-		tinggi: "bg-white/10 text-[var(--fg)]",
-		sedang: "bg-white/5 text-muted",
-		lemah: "bg-white/5 text-muted"
+		tinggi: 'bg-white/10 text-[var(--fg)]',
+		sedang: 'bg-white/5 text-muted',
+		lemah: 'bg-white/5 text-muted'
 	};
 
 	/**
@@ -28,7 +27,7 @@
 	 * Gunanya: pola dengan catatan terkuat (mis. inisiasi volume) hanya menyala
 	 * sesekali, jadi tanpa papan ini ia nyaris tak pernah terlihat.
 	 */
-	let { class: className = "" }: { class?: string } = $props();
+	let { class: className = '' }: { class?: string } = $props();
 
 	const board = useSmartMoneyPatternsBoard();
 	const data = $derived(board.data);
@@ -67,7 +66,7 @@
 		{:else}
 			<div class="space-y-3">
 				{#each data.groups as g (g.pattern)}
-					{@const buy = g.direction === "buy-side"}
+					{@const buy = g.direction === 'buy-side'}
 					{@const rate = g.aligned_hit_rate}
 					{@const hidden = g.fired - g.count}
 					<div class="rounded-lg border border-[var(--border)] bg-white/[0.02] p-2.5">
@@ -86,9 +85,7 @@
 								{g.label}
 							</span>
 							{#if g.horizon_days}
-								<span
-									class="text-muted rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-medium"
-								>
+								<span class="text-muted rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-medium">
 									cerita {g.horizon_days} hari
 								</span>
 							{/if}
@@ -103,8 +100,9 @@
 							{/if}
 							{#if g.confidence}
 								<span
-									class="rounded px-1.5 py-0.5 text-[10px] font-medium {CONFIDENCE_CLS[g.confidence] ??
-										'bg-white/5 text-muted'}"
+									class="rounded px-1.5 py-0.5 text-[10px] font-medium {CONFIDENCE_CLS[
+										g.confidence
+									] ?? 'bg-white/5 text-muted'}"
 									title="|t| terbaik lintas horizon — seberapa yakin catatan ini bukan kebetulan{g.edge_pct !==
 									null
 										? `; besar efek ${g.edge_pct.toFixed(2)}%`
@@ -115,7 +113,7 @@
 							{/if}
 							<span class="text-muted ml-auto text-[10px] tabular-nums">
 								{g.count} emiten
-								{hidden > 0 ? ` (dari ${g.fired} yang menyala)` : ""}
+								{hidden > 0 ? ` (dari ${g.fired} yang menyala)` : ''}
 							</span>
 						</div>
 

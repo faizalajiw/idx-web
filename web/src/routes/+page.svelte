@@ -10,20 +10,20 @@
 		TrendingUp,
 		Wallet,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useMarketOverview, useMarketTradeSummary } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtDateStr, fmtNum, fmtPct } from "#lib/format.ts";
-	import DataHealthCard from "#lib/components/DataHealthCard.svelte";
-	import FreshnessBadge from "#lib/components/FreshnessBadge.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import LatestNewsCard from "#lib/components/NewsCards.svelte";
-	import MarketOverview from "#lib/components/MarketOverview.svelte";
-	import MarketRegimeCard from "#lib/components/MarketRegimeCard.svelte";
-	import SignalsPanel from "#lib/components/SignalsPanel.svelte";
-	import TechnicalChart from "#lib/components/TechnicalChart.svelte";
-	import TopBrokersPanel from "#lib/components/TopBrokersPanel.svelte";
-	import TopLeadersPanel from "#lib/components/TopLeadersPanel.svelte";
+	} from '@lucide/svelte';
+	import { useMarketOverview, useMarketTradeSummary } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtDateStr, fmtNum, fmtPct } from '#lib/format.ts';
+	import DataHealthCard from '#lib/components/DataHealthCard.svelte';
+	import FreshnessBadge from '#lib/components/FreshnessBadge.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import LatestNewsCard from '#lib/components/NewsCards.svelte';
+	import MarketOverview from '#lib/components/MarketOverview.svelte';
+	import MarketRegimeCard from '#lib/components/MarketRegimeCard.svelte';
+	import SignalsPanel from '#lib/components/SignalsPanel.svelte';
+	import TechnicalChart from '#lib/components/TechnicalChart.svelte';
+	import TopBrokersPanel from '#lib/components/TopBrokersPanel.svelte';
+	import TopLeadersPanel from '#lib/components/TopLeadersPanel.svelte';
 
 	type Tile = {
 		label: string;
@@ -52,7 +52,7 @@
 	const pct = $derived(idx?.percent ?? 0);
 	const up = $derived(chg > 0);
 	const down = $derived(chg < 0);
-	const badgeTone = $derived(up ? "badge-buy" : down ? "badge-sell" : "badge-hold");
+	const badgeTone = $derived(up ? 'badge-buy' : down ? 'badge-sell' : 'badge-hold');
 	const DirIcon = $derived(up ? TrendingUp : down ? TrendingDown : Minus);
 
 	const indexValue = $derived(idx?.current ?? idx?.close ?? null);
@@ -65,38 +65,40 @@
 
 	const tiles = $derived<Tile[]>([
 		{
-			label: "Volume",
-			value: volLot != null ? `${fmtCompact(volLot)} lot` : "-",
+			label: 'Volume',
+			value: volLot != null ? `${fmtCompact(volLot)} lot` : '-',
 			icon: Activity,
-			color: "#38bdf8"
+			color: '#38bdf8'
 		},
 		{
-			label: "Nilai Transaksi",
-			value: totalValue != null ? `Rp ${fmtCompact(totalValue)}` : "-",
+			label: 'Nilai Transaksi',
+			value: totalValue != null ? `Rp ${fmtCompact(totalValue)}` : '-',
 			icon: Wallet,
-			color: "#4ade80"
+			color: '#4ade80'
 		},
-		{ label: "Emiten Aktif", value: fmtNum(stocks), icon: BuildingComplex, color: "#c4b5fd" }
+		{ label: 'Emiten Aktif', value: fmtNum(stocks), icon: BuildingComplex, color: '#c4b5fd' }
 	]);
 
 	const segments = $derived<Tile[]>([
 		{
-			label: "Pasar Reguler",
+			label: 'Pasar Reguler',
 			warn: false,
 			icon: Landmark,
-			color: "#fbbf24",
-			title: "1 lot = 100 lembar",
-			value: trade?.regular?.value != null ? `Rp ${fmtCompact(trade.regular.value)}` : "-",
+			color: '#fbbf24',
+			title: '1 lot = 100 lembar',
+			value: trade?.regular?.value != null ? `Rp ${fmtCompact(trade.regular.value)}` : '-',
 			sub:
-				trade?.regular?.volume_lot != null ? `${fmtCompact(trade.regular.volume_lot)} lot` : undefined
+				trade?.regular?.volume_lot != null
+					? `${fmtCompact(trade.regular.volume_lot)} lot`
+					: undefined
 		},
 		{
-			label: "Pasar Non-Reguler",
+			label: 'Pasar Non-Reguler',
 			warn: true,
 			icon: Handshake,
-			color: "#fb923c",
-			title: "1 lot = 100 lembar",
-			value: trade?.non_regular?.value != null ? `Rp ${fmtCompact(trade.non_regular.value)}` : "-",
+			color: '#fb923c',
+			title: '1 lot = 100 lembar',
+			value: trade?.non_regular?.value != null ? `Rp ${fmtCompact(trade.non_regular.value)}` : '-',
 			sub:
 				trade?.non_regular?.volume_lot != null
 					? `${fmtCompact(trade.non_regular.volume_lot)} lot`
@@ -111,7 +113,7 @@
 	$effect(() => {
 		const value = indexValue;
 		if (value == null) return;
-		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const from = fromRef ?? value;
 		fromRef = value;
 		if (reduce || from === value) {
@@ -184,14 +186,13 @@
 				</span>
 			</div>
 			{#key indexValue}
-				<p class="index-value text-4xl leading-none font-bold tracking-tight tabular-nums sm:text-5xl">
+				<p
+					class="index-value text-4xl leading-none font-bold tracking-tight tabular-nums sm:text-5xl"
+				>
 					{fmtNum(display, 2)}
 				</p>
 			{/key}
-			<LastUpdated
-				sessionDate={data?.index?.captured_at}
-				updatedAt={data?.index?.captured_at}
-			/>
+			<LastUpdated sessionDate={data?.index?.captured_at} updatedAt={data?.index?.captured_at} />
 		</div>
 
 		<div class="flex min-w-0 flex-1 flex-col gap-3">

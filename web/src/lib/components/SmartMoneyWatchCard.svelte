@@ -7,38 +7,37 @@
 		TrendingDown,
 		TrendingUp,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useSmartMoneyWatchlist } from "#lib/hooks.svelte.ts";
-	import { fmtNum } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import type { SmartMoneyWatchRow } from "#lib/types.ts";
+	} from '@lucide/svelte';
+	import { useSmartMoneyWatchlist } from '#lib/hooks.svelte.ts';
+	import { fmtNum } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import type { SmartMoneyWatchRow } from '#lib/types.ts';
 
-	type FilterKey = "aktif" | "akumulasi" | "distribusi" | "semua";
+	type FilterKey = 'aktif' | 'akumulasi' | 'distribusi' | 'semua';
 
 	const FILTERS: { key: FilterKey; label: string; icon: LucideIcon }[] = [
-		{ key: "aktif", label: "Ada aliran", icon: Activity },
-		{ key: "akumulasi", label: "Ditimbun", icon: TrendingUp },
-		{ key: "distribusi", label: "Dibuang", icon: TrendingDown },
-		{ key: "semua", label: "Semua", icon: Layers }
+		{ key: 'aktif', label: 'Ada aliran', icon: Activity },
+		{ key: 'akumulasi', label: 'Ditimbun', icon: TrendingUp },
+		{ key: 'distribusi', label: 'Dibuang', icon: TrendingDown },
+		{ key: 'semua', label: 'Semua', icon: Layers }
 	];
 
 	function sideStyle(side: string | null, insufficient: boolean) {
-		if (insufficient || side === "netral" || !side)
-			return { Icon: Minus, cls: "text-muted", chip: "bg-white/5 text-muted" };
-		if (side === "akumulasi")
-			return { Icon: TrendingUp, cls: "text-up", chip: "bg-up/15 text-up" };
-		return { Icon: TrendingDown, cls: "text-down", chip: "bg-down/15 text-down" };
+		if (insufficient || side === 'netral' || !side)
+			return { Icon: Minus, cls: 'text-muted', chip: 'bg-white/5 text-muted' };
+		if (side === 'akumulasi') return { Icon: TrendingUp, cls: 'text-up', chip: 'bg-up/15 text-up' };
+		return { Icon: TrendingDown, cls: 'text-down', chip: 'bg-down/15 text-down' };
 	}
 
 	const SIDE_WORD: Record<string, string> = {
-		akumulasi: "ditimbun",
-		distribusi: "dibuang",
-		netral: "seimbang"
+		akumulasi: 'ditimbun',
+		distribusi: 'dibuang',
+		netral: 'seimbang'
 	};
 
 	/**
@@ -53,29 +52,28 @@
 	const data = $derived(watch.data);
 	const error = $derived(watch.error);
 	const isLoading = $derived(watch.isLoading);
-	let filter = $state<FilterKey>("aktif");
+	let filter = $state<FilterKey>('aktif');
 
 	const rows = $derived(data?.rows ?? []);
 	const counts = $derived.by(() => {
 		let acc = 0,
-			dist = 0,
-			neu = 0;
+			dist = 0;
 		for (const r of rows) {
-			if (r.insufficient || r.side === "netral" || !r.side) neu += 1;
-			else if (r.side === "akumulasi") acc += 1;
+			if (r.insufficient || r.side === 'netral' || !r.side) continue;
+			if (r.side === 'akumulasi') acc += 1;
 			else dist += 1;
 		}
 		return { aktif: acc + dist, akumulasi: acc, distribusi: dist, semua: rows.length };
 	});
 
 	const shown = $derived.by(() => {
-		if (filter === "semua") return rows;
-		if (filter === "akumulasi")
-			return rows.filter((r) => !r.insufficient && r.side === "akumulasi");
-		if (filter === "distribusi")
-			return rows.filter((r) => !r.insufficient && r.side === "distribusi");
+		if (filter === 'semua') return rows;
+		if (filter === 'akumulasi')
+			return rows.filter((r) => !r.insufficient && r.side === 'akumulasi');
+		if (filter === 'distribusi')
+			return rows.filter((r) => !r.insufficient && r.side === 'distribusi');
 		return rows.filter(
-			(r) => !r.insufficient && (r.side === "akumulasi" || r.side === "distribusi")
+			(r) => !r.insufficient && (r.side === 'akumulasi' || r.side === 'distribusi')
 		);
 	});
 </script>
@@ -106,10 +104,10 @@
 				</span>
 			{/if}
 			<span class="text-xs font-semibold tabular-nums {style.cls}">
-				{row.insufficient || !row.side ? "—" : `${fmtNum(row.netval_pct, 1)}%`}
+				{row.insufficient || !row.side ? '—' : `${fmtNum(row.netval_pct, 1)}%`}
 			</span>
 			<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {style.chip}">
-				{row.insufficient ? "belum cukup" : (SIDE_WORD[row.side ?? ""] ?? "—")}
+				{row.insufficient ? 'belum cukup' : (SIDE_WORD[row.side ?? ''] ?? '—')}
 			</span>
 		</span>
 	</a>
@@ -122,11 +120,7 @@
 			: String(error)}"
 	/>
 {:else}
-	<Card
-		subtitle={data
-			? `Terpantau ${data.n} emiten · alert saat verdict berubah`
-			: "Memuat…"}
-	>
+	<Card subtitle={data ? `Terpantau ${data.n} emiten · alert saat verdict berubah` : 'Memuat…'}>
 		{#snippet title()}
 			<Bell size={16} aria-hidden /> Jejak Smart Money — Watchlist
 			<InfoHint
@@ -141,11 +135,11 @@
 						? 'bg-up/15 text-up'
 						: 'bg-white/10 text-muted'}"
 					title={data.telegram_enabled
-						? "Telegram tersambung — alert akan dikirim"
-						: "Telegram belum diatur — alert hanya bisa dilihat di dashboard"}
+						? 'Telegram tersambung — alert akan dikirim'
+						: 'Telegram belum diatur — alert hanya bisa dilihat di dashboard'}
 				>
 					<Bell size={11} aria-hidden />
-					{data.telegram_enabled ? "Telegram aktif" : "Telegram belum diatur"}
+					{data.telegram_enabled ? 'Telegram aktif' : 'Telegram belum diatur'}
 				</span>
 			{/if}
 		{/snippet}
@@ -177,9 +171,7 @@
 							<FilterIcon
 								size={15}
 								aria-hidden
-								class={active
-									? "text-[var(--accent-text)]"
-									: "opacity-70 group-hover:opacity-100"}
+								class={active ? 'text-[var(--accent-text)]' : 'opacity-70 group-hover:opacity-100'}
 							/>
 							{f.label}
 							<span

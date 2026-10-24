@@ -1,49 +1,51 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import { useStockDossier } from "#lib/hooks.svelte.ts";
-	import { API_BASE } from "#lib/api.ts";
-	import type { DossierSection, StockDossier } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { page } from '$app/state';
+	import { useStockDossier } from '#lib/hooks.svelte.ts';
+	import { API_BASE } from '#lib/api.ts';
+	import type { DossierSection, StockDossier } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
-	const SECTION_ORDER: { key: keyof StockDossier["sections"]; title: string }[] = [
-		{ key: "profil", title: "Profil" },
-		{ key: "valuasi", title: "Valuasi" },
-		{ key: "faktor", title: "Faktor & Verdict" },
-		{ key: "arus_asing", title: "Arus Asing" },
-		{ key: "aktivitas_broker", title: "Aktivitas Broker" },
-		{ key: "sentimen", title: "Sentimen" },
-		{ key: "catatan_risiko", title: "Catatan Risiko" }
+	const SECTION_ORDER: { key: keyof StockDossier['sections']; title: string }[] = [
+		{ key: 'profil', title: 'Profil' },
+		{ key: 'valuasi', title: 'Valuasi' },
+		{ key: 'faktor', title: 'Faktor & Verdict' },
+		{ key: 'arus_asing', title: 'Arus Asing' },
+		{ key: 'aktivitas_broker', title: 'Aktivitas Broker' },
+		{ key: 'sentimen', title: 'Sentimen' },
+		{ key: 'catatan_risiko', title: 'Catatan Risiko' }
 	];
 
 	type Obj = Record<string, unknown>;
 
 	function fmtValue(v: unknown): string {
-		if (v === null || v === undefined) return "—";
-		if (typeof v === "boolean") return v ? "Ya" : "Tidak";
-		if (typeof v === "number") return v.toLocaleString("id-ID", { maximumFractionDigits: 2 });
+		if (v === null || v === undefined) return '—';
+		if (typeof v === 'boolean') return v ? 'Ya' : 'Tidak';
+		if (typeof v === 'number') return v.toLocaleString('id-ID', { maximumFractionDigits: 2 });
 		if (Array.isArray(v)) {
-			if (v.length === 0) return "—";
-			return v.every((x) => typeof x === "string") ? (v as string[]).join("; ") : `${v.length} item`;
+			if (v.length === 0) return '—';
+			return v.every((x) => typeof x === 'string')
+				? (v as string[]).join('; ')
+				: `${v.length} item`;
 		}
-		if (typeof v === "object") return "Lihat detail";
+		if (typeof v === 'object') return 'Lihat detail';
 		return String(v);
 	}
 
 	function fmtTimestamp(iso: string): string {
 		const d = new Date(iso);
 		if (Number.isNaN(d.getTime())) return iso;
-		return d.toLocaleString("id-ID", {
-			dateStyle: "medium",
-			timeStyle: "short",
-			timeZone: "Asia/Jakarta"
+		return d.toLocaleString('id-ID', {
+			dateStyle: 'medium',
+			timeStyle: 'short',
+			timeZone: 'Asia/Jakarta'
 		});
 	}
 
 	function isPlainObject(v: unknown): v is Obj {
-		return v !== null && typeof v === "object" && !Array.isArray(v);
+		return v !== null && typeof v === 'object' && !Array.isArray(v);
 	}
 
 	function partitionRows(data: Obj) {
@@ -57,7 +59,7 @@
 			if (isPlainObject(v)) nested.push([k, v]);
 			else if (Array.isArray(v)) {
 				if (v.length === 0) continue;
-				if (v.every((x) => typeof x === "string")) textLists.push([k, v as string[]]);
+				if (v.every((x) => typeof x === 'string')) textLists.push([k, v as string[]]);
 				else objectLists.push([k, v.length]);
 			} else scalars.push([k, v]);
 		}
@@ -70,7 +72,7 @@
 		return rows.map(([k, n]) => [k, `${n} item`]);
 	}
 
-	const code = $derived((page.params.code ?? "").toUpperCase());
+	const code = $derived((page.params.code ?? '').toUpperCase());
 	const dossier = useStockDossier(() => code || null);
 	const data = $derived(dossier.data);
 	const error = $derived(dossier.error);
@@ -85,7 +87,7 @@
 	<dl class="grid grid-cols-1 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-2">
 		{#each rows as [k, v] (k)}
 			<div class="flex justify-between gap-3 border-b border-[var(--border)] py-1 last:border-0">
-				<dt class="text-muted capitalize">{k.replace(/_/g, " ")}</dt>
+				<dt class="text-muted capitalize">{k.replace(/_/g, ' ')}</dt>
 				<dd class="max-w-[60%] text-right font-medium tabular-nums break-words">{fmtValue(v)}</dd>
 			</div>
 		{/each}
@@ -113,7 +115,7 @@
 				{#if subRows.length > 0}
 					<div>
 						<p class="text-muted mb-1 text-xs font-semibold tracking-wide uppercase">
-							{k.replace(/_/g, " ")}
+							{k.replace(/_/g, ' ')}
 						</p>
 						{@render scalarDl(subRows)}
 					</div>
@@ -121,7 +123,7 @@
 			{/each}
 			{#each rows.textLists as [k, items] (k)}
 				<div>
-					<p class="text-muted mb-1 text-xs capitalize">{k.replace(/_/g, " ")}</p>
+					<p class="text-muted mb-1 text-xs capitalize">{k.replace(/_/g, ' ')}</p>
 					<ul class="list-disc space-y-1 pl-5 text-sm leading-snug">
 						{#each items as it, i (i)}
 							<li>{it}</li>
@@ -136,7 +138,7 @@
 {#snippet sectionCard(title: string, section: DossierSection)}
 	<Card
 		{title}
-		subtitle={section.session_date ? `Data sesi ${section.session_date}` : "Tanpa tanggal sesi"}
+		subtitle={section.session_date ? `Data sesi ${section.session_date}` : 'Tanpa tanggal sesi'}
 	>
 		{#snippet right()}
 			{#if section.stale}
@@ -175,7 +177,7 @@
 				<h1 class="mt-1 text-2xl font-bold tracking-tight">Dossier {code}</h1>
 				{#if data}
 					<p class="text-muted mt-1 text-xs">
-						Sesi terakhir pasar: {data.latest_session ?? "—"} · Dibuat {fmtTimestamp(
+						Sesi terakhir pasar: {data.latest_session ?? '—'} · Dibuat {fmtTimestamp(
 							data.generated_at
 						)} WIB
 					</p>
@@ -203,7 +205,7 @@
 			{#if data.stale_sections.length > 0}
 				<p class="badge-warn mb-4 rounded-lg px-3 py-2 text-xs">
 					Ada {data.stale_sections.length} bagian yang datanya lebih lama dari sesi terakhir: {data.stale_sections.join(
-						", "
+						', '
 					)}.
 				</p>
 			{/if}

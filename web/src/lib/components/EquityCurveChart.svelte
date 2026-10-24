@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { fmtCompact } from "#lib/format.ts";
-	import type { EquityPoint } from "#lib/types.ts";
-	import LineArea from "#lib/components/LineArea.svelte";
+	import { fmtCompact } from '#lib/format.ts';
+	import type { EquityPoint } from '#lib/types.ts';
+	import LineArea from '#lib/components/LineArea.svelte';
 
 	/**
 	 * Kurva modal strategi vs patokan beli-tahan dengan bobot sama.
@@ -17,16 +17,16 @@
 
 	const series = $derived([
 		{
-			name: "Strategi",
+			name: 'Strategi',
 			values: points.map((p) => p.equity),
-			color: "var(--chart-strategy)",
+			color: 'var(--chart-strategy)',
 			width: 2,
 			fmt: rupiah
 		},
 		{
-			name: "Buy & Hold",
+			name: 'Buy & Hold',
 			values: points.map((p) => p.benchmark),
-			color: "var(--chart-benchmark)",
+			color: 'var(--chart-benchmark)',
 			width: 1.5,
 			dashed: true,
 			fmt: rupiah
@@ -34,7 +34,7 @@
 	]);
 
 	const refs = $derived([
-		{ y: initialCash, color: "var(--chart-ref)", dashed: true, label: "modal awal" }
+		{ y: initialCash, color: 'var(--chart-ref)', dashed: true, label: 'modal awal' }
 	]);
 </script>
 

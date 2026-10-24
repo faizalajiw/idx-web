@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { useHistory } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtNum, trendClass } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { useHistory } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtNum, trendClass } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	let { code }: { code: string } = $props();
 

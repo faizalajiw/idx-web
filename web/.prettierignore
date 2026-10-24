@@ -1,0 +1,8 @@
+node_modules
+.svelte-kit
+build
+test-results
+playwright-report
+static/logos
+docs
+*.md

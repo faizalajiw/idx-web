@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { LayoutGrid } from "@lucide/svelte";
-	import { useSectors } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtPct } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import SectorRotationTable from "#lib/components/SectorRotationTable.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import RegimeBanner from "#lib/components/RegimeBanner.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
+	import { LayoutGrid } from '@lucide/svelte';
+	import { useSectors } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtPct } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import SectorRotationTable from '#lib/components/SectorRotationTable.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import RegimeBanner from '#lib/components/RegimeBanner.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
 
 	function heatColor(pct: number | null): string {
-		if (pct === null) return "var(--bg-elev)";
+		if (pct === null) return 'var(--bg-elev)';
 		const clamped = Math.max(-3, Math.min(3, pct));
 		const share = (10 + (Math.abs(clamped) / 3) * 40).toFixed(0);
-		const base = clamped >= 0 ? "var(--chart-net-up)" : "var(--chart-net-down)";
+		const base = clamped >= 0 ? 'var(--chart-net-up)' : 'var(--chart-net-down)';
 		return `color-mix(in srgb, ${base} ${share}%, transparent)`;
 	}
 
@@ -34,7 +34,7 @@
 		</h1>
 		<p class="text-muted mt-0.5 flex items-center gap-2 text-sm">
 			Rata-rata pergerakan, nilai transaksi, dan arus asing per sektor ·&nbsp;
-			{sectors.data?.date ?? "-"}
+			{sectors.data?.date ?? '-'}
 			<LastUpdated sessionDate={sectors.data?.date} />
 		</p>
 	</div>
@@ -75,7 +75,10 @@
 						{#each rows as s (s.sector)}
 							<tr>
 								<td>
-									<div class="-mx-2 rounded-lg px-2 py-1.5" style="background: {heatColor(s.avg_percent)}">
+									<div
+										class="-mx-2 rounded-lg px-2 py-1.5"
+										style="background: {heatColor(s.avg_percent)}"
+									>
 										<span class="font-semibold">{s.sector}</span>
 										<span class="text-muted ml-2 text-xs">{s.stock_count} saham</span>
 									</div>
@@ -121,7 +124,7 @@
 	</Card>
 
 	<p class="text-muted text-xs leading-relaxed">
-		Catatan: klasifikasi sektor memakai mapping kurasi internal (gaya IDX-IC) untuk emiten
-		likuid; emiten di luar mapping masuk kategori “Lainnya”.
+		Catatan: klasifikasi sektor memakai mapping kurasi internal (gaya IDX-IC) untuk emiten likuid;
+		emiten di luar mapping masuk kategori “Lainnya”.
 	</p>
 </main>

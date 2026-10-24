@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { useTechnical } from "#lib/hooks.svelte.ts";
-	import type { IndicatorBar } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LineArea from "#lib/components/LineArea.svelte";
+	import { useTechnical } from '#lib/hooks.svelte.ts';
+	import type { IndicatorBar } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LineArea from '#lib/components/LineArea.svelte';
 
 	let { code }: { code: string | null } = $props();
 
 	function badgeClass(sig: string): string {
-		if (sig === "BUY") return "badge badge-buy";
-		if (sig === "SELL") return "badge badge-sell";
-		return "badge badge-hold";
+		if (sig === 'BUY') return 'badge badge-buy';
+		if (sig === 'SELL') return 'badge badge-sell';
+		return 'badge badge-hold';
 	}
 
 	/** Tanggal `YYYY-MM-DD` → `MM-DD`, seperti tickFormatter Recharts di app Next. */
@@ -58,32 +58,37 @@
 						labels={bars.map((b) => b.date)}
 						series={[
 							{
-								name: "BB Upper",
+								name: 'BB Upper',
 								values: bars.map((b) => b.bb_upper),
-								color: "var(--chart-area-stroke)",
-								kind: "area",
-								fill: "var(--chart-area-fill)",
+								color: 'var(--chart-area-stroke)',
+								kind: 'area',
+								fill: 'var(--chart-area-fill)',
 								width: 1
 							},
 							{
-								name: "BB Lower",
+								name: 'BB Lower',
 								values: bars.map((b) => b.bb_lower),
-								color: "var(--chart-area-stroke)",
-								kind: "area",
-								fill: "var(--chart-area-fill)",
+								color: 'var(--chart-area-stroke)',
+								kind: 'area',
+								fill: 'var(--chart-area-fill)',
 								width: 1
 							},
-							{ name: "Close", values: bars.map((b) => b.close), color: "var(--chart-close)", width: 2 },
 							{
-								name: "MA20",
+								name: 'Close',
+								values: bars.map((b) => b.close),
+								color: 'var(--chart-close)',
+								width: 2
+							},
+							{
+								name: 'MA20',
 								values: bars.map((b) => b.ma_short),
-								color: "var(--chart-ma-fast)",
+								color: 'var(--chart-ma-fast)',
 								width: 1.5
 							},
 							{
-								name: "MA50",
+								name: 'MA50',
 								values: bars.map((b) => b.ma_long),
-								color: "var(--chart-ma-slow)",
+								color: 'var(--chart-ma-slow)',
 								width: 1.5
 							}
 						]}
@@ -97,14 +102,16 @@
 					<p class="text-muted mb-1 text-xs">RSI (14)</p>
 					<LineArea
 						labels={bars.map((b) => b.date)}
-						series={[{ name: "RSI", values: bars.map((b) => b.rsi), color: "var(--chart-rsi)", width: 1.5 }]}
+						series={[
+							{ name: 'RSI', values: bars.map((b) => b.rsi), color: 'var(--chart-rsi)', width: 1.5 }
+						]}
 						height={110}
 						yDomain={[0, 100]}
 						yTicks={[30, 50, 70]}
 						yFmt={(v) => String(Math.round(v))}
 						refs={[
-							{ y: 70, color: "var(--chart-ref-soft)", dashed: true },
-							{ y: 30, color: "var(--chart-ref-soft)", dashed: true }
+							{ y: 70, color: 'var(--chart-ref-soft)', dashed: true },
+							{ y: 30, color: 'var(--chart-ref-soft)', dashed: true }
 						]}
 						xFmt={shortDate}
 						xTickGap={30}
@@ -117,11 +124,16 @@
 					<LineArea
 						labels={bars.map((b) => b.date)}
 						series={[
-							{ name: "MACD", values: bars.map((b) => b.macd), color: "var(--chart-macd)", width: 1.5 },
 							{
-								name: "Signal",
+								name: 'MACD',
+								values: bars.map((b) => b.macd),
+								color: 'var(--chart-macd)',
+								width: 1.5
+							},
+							{
+								name: 'Signal',
 								values: bars.map((b) => b.macd_signal),
-								color: "var(--chart-signal)",
+								color: 'var(--chart-signal)',
 								width: 1.5
 							}
 						]}

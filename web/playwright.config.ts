@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Tes regresi papan untuk app SvelteKit.
@@ -9,39 +9,39 @@ import { defineConfig, devices } from "@playwright/test";
  * `baseURL` memakai `localhost`, bukan `127.0.0.1`: CORS API hanya mengizinkan
  * `http://localhost:3000` dan `http://localhost:3100`.
  */
-const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:3100';
 
 export default defineConfig({
-	testDir: "./e2e",
+	testDir: './e2e',
 	fullyParallel: true,
 	forbidOnly: Boolean(process.env.CI),
 	retries: 0,
 	workers: 2,
 	timeout: 45_000,
 	expect: { timeout: 10_000 },
-	reporter: [["list"]],
-	outputDir: "test-results",
+	reporter: [['list']],
+	outputDir: 'test-results',
 	use: {
 		baseURL: BASE_URL,
-		trace: "retain-on-failure",
-		screenshot: "only-on-failure"
+		trace: 'retain-on-failure',
+		screenshot: 'only-on-failure'
 	},
 	projects: [
 		{
-			name: "desktop",
-			use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+			name: 'desktop',
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
 			testIgnore: /layout-mobile\.spec\.ts/
 		},
 		{
-			name: "mobile-390",
-			use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } },
+			name: 'mobile-390',
+			use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
 			testMatch: /(routes|layout-mobile)\.spec\.ts/
 		}
 	],
 	// Lokal: dev server (paling cepat, dan biasanya sudah hidup). CI: `preview`,
 	// supaya yang diuji artefak build produksi, bukan kode hasil compile ulang.
 	webServer: {
-		command: process.env.E2E_SERVER_CMD ?? "npm run dev",
+		command: process.env.E2E_SERVER_CMD ?? 'npm run dev',
 		url: BASE_URL,
 		reuseExistingServer: true,
 		timeout: 120_000

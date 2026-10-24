@@ -25,64 +25,64 @@
 		Wallet,
 		Zap,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useSectorRotation } from "#lib/hooks.svelte.ts";
-	import type { SectorRotationRow } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
+	} from '@lucide/svelte';
+	import { useSectorRotation } from '#lib/hooks.svelte.ts';
+	import type { SectorRotationRow } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
 
 	const PHASE_STYLE: Record<string, { badge: string; label: string }> = {
-		AKUMULASI: { badge: "badge badge-buy", label: "Akumulasi" },
-		MEMBAIK: { badge: "badge badge-hold", label: "Membaik" },
-		MEMUDAR: { badge: "badge badge-warn", label: "Memudar" },
-		TERPURUK: { badge: "badge badge-sell", label: "Terpuruk" },
-		STABIL: { badge: "badge badge-hold opacity-60", label: "Stabil" }
+		AKUMULASI: { badge: 'badge badge-buy', label: 'Akumulasi' },
+		MEMBAIK: { badge: 'badge badge-hold', label: 'Membaik' },
+		MEMUDAR: { badge: 'badge badge-warn', label: 'Memudar' },
+		TERPURUK: { badge: 'badge badge-sell', label: 'Terpuruk' },
+		STABIL: { badge: 'badge badge-hold opacity-60', label: 'Stabil' }
 	};
 
 	/** Ikon + warna per sektor (vocabulary dari BUCKETS di sector_map.py). */
 	const SECTOR_ICON: Record<string, { icon: LucideIcon; color: string }> = {
-		Perbankan: { icon: Landmark, color: "#38bdf8" },
-		"Keuangan Non-Bank": { icon: Wallet, color: "#22d3ee" },
-		Asuransi: { icon: ShieldCheck, color: "#2dd4bf" },
-		Energi: { icon: Flame, color: "#fb923c" },
-		Batubara: { icon: Mountain, color: "#a3a3a3" },
-		"Logam & Mineral": { icon: Gem, color: "#c084fc" },
-		Properti: { icon: BuildingComplex, color: "#f472b6" },
-		"Telkom & Internet": { icon: Signal, color: "#60a5fa" },
-		Infrastruktur: { icon: TowerControl, color: "#818cf8" },
-		Konstruksi: { icon: HardHat, color: "#facc15" },
-		"Transportasi & Logistik": { icon: Truck, color: "#34d399" },
-		"Konsumer Primer": { icon: ShoppingBasket, color: "#4ade80" },
-		"Konsumer Sekunder": { icon: ShoppingBag, color: "#a3e635" },
-		Agriculture: { icon: Sprout, color: "#65a30d" },
-		Kesehatan: { icon: HeartPulse, color: "#f87171" },
-		"Media & Hiburan": { icon: Clapperboard, color: "#e879f9" },
-		Otomotif: { icon: Car, color: "#fbbf24" },
-		"Industri Dasar & Kimia": { icon: FlaskConical, color: "#fcd34d" },
-		Utilitas: { icon: Zap, color: "#fde047" },
-		Teknologi: { icon: Cpu, color: "#22d3ee" },
-		Retail: { icon: Store, color: "#fb7185" },
-		"Jasa & Industri": { icon: Briefcase, color: "#94a3b8" },
-		Konglomerat: { icon: Network, color: "#c4b5fd" }
+		Perbankan: { icon: Landmark, color: '#38bdf8' },
+		'Keuangan Non-Bank': { icon: Wallet, color: '#22d3ee' },
+		Asuransi: { icon: ShieldCheck, color: '#2dd4bf' },
+		Energi: { icon: Flame, color: '#fb923c' },
+		Batubara: { icon: Mountain, color: '#a3a3a3' },
+		'Logam & Mineral': { icon: Gem, color: '#c084fc' },
+		Properti: { icon: BuildingComplex, color: '#f472b6' },
+		'Telkom & Internet': { icon: Signal, color: '#60a5fa' },
+		Infrastruktur: { icon: TowerControl, color: '#818cf8' },
+		Konstruksi: { icon: HardHat, color: '#facc15' },
+		'Transportasi & Logistik': { icon: Truck, color: '#34d399' },
+		'Konsumer Primer': { icon: ShoppingBasket, color: '#4ade80' },
+		'Konsumer Sekunder': { icon: ShoppingBag, color: '#a3e635' },
+		Agriculture: { icon: Sprout, color: '#65a30d' },
+		Kesehatan: { icon: HeartPulse, color: '#f87171' },
+		'Media & Hiburan': { icon: Clapperboard, color: '#e879f9' },
+		Otomotif: { icon: Car, color: '#fbbf24' },
+		'Industri Dasar & Kimia': { icon: FlaskConical, color: '#fcd34d' },
+		Utilitas: { icon: Zap, color: '#fde047' },
+		Teknologi: { icon: Cpu, color: '#22d3ee' },
+		Retail: { icon: Store, color: '#fb7185' },
+		'Jasa & Industri': { icon: Briefcase, color: '#94a3b8' },
+		Konglomerat: { icon: Network, color: '#c4b5fd' }
 	};
 
 	function sectorVisual(sector: string): { icon: LucideIcon; color: string } {
-		return SECTOR_ICON[sector] ?? { icon: Layers, color: "var(--fg-muted)" };
+		return SECTOR_ICON[sector] ?? { icon: Layers, color: 'var(--fg-muted)' };
 	}
 
 	const p0 = (v: number) => `${(v * 100).toFixed(0)}%`;
 
 	function deltaCell(v: number | null): string {
-		if (v === null) return "-";
-		return `${v > 0 ? "+" : ""}${v.toFixed(1)}`;
+		if (v === null) return '-';
+		return `${v > 0 ? '+' : ''}${v.toFixed(1)}`;
 	}
 
 	function deltaClass(v: number | null): string {
-		if (v === null || v === 0) return "text-muted";
-		return v > 0 ? "text-up" : "text-down";
+		if (v === null || v === 0) return 'text-muted';
+		return v > 0 ? 'text-up' : 'text-down';
 	}
 
 	const rotation = useSectorRotation(60, 3);
@@ -99,7 +99,7 @@
 		{@const span = max - min || 1}
 		{@const x = (i: number) => (i / (values.length - 1)) * w}
 		{@const y = (v: number) => h - ((v - min) / span) * h}
-		{@const points = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}
+		{@const points = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}
 		{@const last = values[values.length - 1]}
 		<svg
 			width="100%"
@@ -109,11 +109,18 @@
 			aria-hidden="true"
 			class="overflow-visible"
 		>
-			<line x1={0} x2={w} y1={y(50)} y2={y(50)} stroke="var(--chart-ref-soft)" stroke-dasharray="2 2" />
+			<line
+				x1={0}
+				x2={w}
+				y1={y(50)}
+				y2={y(50)}
+				stroke="var(--chart-ref-soft)"
+				stroke-dasharray="2 2"
+			/>
 			<polyline
-				points={points}
+				{points}
 				fill="none"
-				stroke={last >= 50 ? "var(--chart-up)" : "var(--chart-down)"}
+				stroke={last >= 50 ? 'var(--chart-up)' : 'var(--chart-down)'}
 				stroke-width="1.75"
 				stroke-linejoin="round"
 				stroke-linecap="round"
@@ -180,15 +187,17 @@
 
 {#snippet rotationGrid()}
 	{#if rotation.error}
-		<ErrorState message="Gagal memuat rotasi sektor: {rotation.error instanceof Error
-			? rotation.error.message
-			: String(rotation.error)}" />
+		<ErrorState
+			message="Gagal memuat rotasi sektor: {rotation.error instanceof Error
+				? rotation.error.message
+				: String(rotation.error)}"
+		/>
 	{:else if rotation.isLoading || !data}
 		<Skeleton class="h-72 w-full" />
 	{:else if !data.validated}
 		<div class="space-y-2">
 			<p class="text-muted text-sm">
-				{data.reason ?? "Rotasi sektor belum bisa dihitung."}
+				{data.reason ?? 'Rotasi sektor belum bisa dihitung.'}
 			</p>
 			<p class="text-muted text-[11px] leading-snug">
 				Rotasi ini diturunkan dari skor aktivitas broker, dan skor itu hanya memakai faktor aliran
@@ -209,10 +218,10 @@
 			<p class="text-muted text-[11px] leading-snug">
 				Urut dari sektor yang paling sedang menguat (Δ 5 sesi). Median dipakai agar satu emiten
 				ekstrem tidak mewakili seluruh sektor. Breadth = porsi emiten sektor itu yang skornya ≥ 60
-				(benar-benar diakumulasi). Sektor dengan kurang dari {data.min_names} emiten berskor tidak
-				ditampilkan{data.unmapped_names > 0
+				(benar-benar diakumulasi). Sektor dengan kurang dari {data.min_names} emiten berskor tidak ditampilkan{data.unmapped_names >
+				0
 					? `; ${data.unmapped_names} emiten berskor belum punya sektor sebenarnya dan tidak diikutkan`
-					: ""}. Δ = perubahan median, bukan levelnya — sektor kuat yang mulai turun berbeda artinya
+					: ''}. Δ = perubahan median, bukan levelnya — sektor kuat yang mulai turun berbeda artinya
 				dari yang sedang naik.
 			</p>
 		</div>

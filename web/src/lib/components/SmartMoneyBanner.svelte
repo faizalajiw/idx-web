@@ -7,30 +7,30 @@
 		TrendingDown,
 		TrendingUp,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useStockSmartMoney } from "#lib/hooks.svelte.ts";
-	import { fmtDateStr, fmtNum, fmtPct } from "#lib/format.ts";
-	import type { SmartMoneyPattern } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	} from '@lucide/svelte';
+	import { useStockSmartMoney } from '#lib/hooks.svelte.ts';
+	import { fmtDateStr, fmtNum, fmtPct } from '#lib/format.ts';
+	import type { SmartMoneyPattern } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
 	/** Tone warna berdasarkan arah verdict. */
 	function sideTone(side: string): { text: string; chip: string; icon: LucideIcon } {
-		if (side === "akumulasi")
-			return { text: "text-up", chip: "bg-up/15 text-up", icon: TrendingUp };
-		if (side === "distribusi")
-			return { text: "text-down", chip: "bg-down/15 text-down", icon: TrendingDown };
-		return { text: "text-muted", chip: "bg-white/10 text-muted", icon: Minus };
+		if (side === 'akumulasi')
+			return { text: 'text-up', chip: 'bg-up/15 text-up', icon: TrendingUp };
+		if (side === 'distribusi')
+			return { text: 'text-down', chip: 'bg-down/15 text-down', icon: TrendingDown };
+		return { text: 'text-muted', chip: 'bg-white/10 text-muted', icon: Minus };
 	}
 
 	const SIDE_LABEL: Record<string, string> = {
-		akumulasi: "SEDANG DITIMBUN",
-		distribusi: "SEDANG DIBUANG",
-		netral: "ARUS SEIMBANG"
+		akumulasi: 'SEDANG DITIMBUN',
+		distribusi: 'SEDANG DIBUANG',
+		netral: 'ARUS SEIMBANG'
 	};
 
 	/**
@@ -66,7 +66,7 @@
 	ditampilkan apa adanya — pola itu lebih sering meleset.
 -->
 {#snippet patternRow(pattern: SmartMoneyPattern)}
-	{@const buy = pattern.direction === "buy-side"}
+	{@const buy = pattern.direction === 'buy-side'}
 	{@const h = pattern.history}
 	{@const rate = h?.aligned_hit_rate ?? null}
 	{@const hasEdge = rate !== null && rate >= 0.5}
@@ -93,11 +93,11 @@
 			<span class="font-medium tabular-nums {hasEdge ? 'text-[var(--fg)]' : 'text-muted'}">
 				{Math.round(rate * 100)}% sesuai arah
 				<span class="text-muted">
-					{" "}· n={h?.n_resolved_horizon ?? 0}{h && !h.reliable
-						? " (sampel kecil)"
+					{' '}· n={h?.n_resolved_horizon ?? 0}{h && !h.reliable
+						? ' (sampel kecil)'
 						: h?.confidence
 							? ` · keyakinan ${h.confidence}`
-							: ""}
+							: ''}
 				</span>
 			</span>
 		{/if}
@@ -117,7 +117,7 @@
 {:else}
 	{@const tone = sideTone(v.side)}
 	{@const strength =
-		v.strength === "besar" ? "aliran besar" : v.strength === "menengah" ? "aliran bermakna" : null}
+		v.strength === 'besar' ? 'aliran besar' : v.strength === 'menengah' ? 'aliran bermakna' : null}
 	{@const ToneIcon = tone.icon}
 	<Card
 		title={cardTitle}
@@ -156,7 +156,7 @@
 					<p class="text-muted text-[10px]">
 						{v.streak_start_date
 							? `sejak ${fmtDateStr(v.streak_start_date) ?? v.streak_start_date}`
-							: "sesi searah"}
+							: 'sesi searah'}
 					</p>
 				</div>
 			{/if}
@@ -202,15 +202,16 @@
 			>
 				<ShieldAlert size={14} class="shrink-0" aria-hidden />
 				<span>
-					Rentang {range.lookback} sesi:{" "}
+					Rentang {range.lookback} sesi:{' '}
 					<strong class="text-[var(--fg)] tabular-nums">{fmtNum(range.low)}</strong>–<strong
 						class="text-[var(--fg)] tabular-nums">{fmtNum(range.high)}</strong
 					>
 					<span class="text-muted"> (lebar {fmtPct(range.range_pct)})</span>
 				</span>
 				<span>
-					Tembus <strong class="text-up tabular-nums">{fmtNum(range.resistance)}</strong> = konfirmasi
-					· jebol <strong class="text-down tabular-nums">{fmtNum(range.support)}</strong> = batal
+					Tembus <strong class="text-up tabular-nums">{fmtNum(range.resistance)}</strong> =
+					konfirmasi · jebol <strong class="text-down tabular-nums">{fmtNum(range.support)}</strong> =
+					batal
 				</span>
 			</div>
 		{/if}
@@ -223,11 +224,11 @@
 					text="Sebaran verdict SELURUH pasar di jendela yang sama (10 sesi), tanpa memotong emiten tipis — penyebutnya sengaja jujur. Persentase dihitung dari emiten yang punya arah (netral & data kurang tidak ikut), karena 'mayoritas pasar' harus dibaca dari yang memang bersuara. Gunanya: memisahkan 'emiten ini istimewa' dari 'seluruh pasar sedang begitu'."
 				/>
 				<span class="flex-1">
-					<strong class="text-[var(--fg)]">Konteks pasar:</strong>{" "}
-					<span class="text-down tabular-nums">{fmtNum(market.distributing)}</span> dibuang vs{" "}
+					<strong class="text-[var(--fg)]">Konteks pasar:</strong>{' '}
+					<span class="text-down tabular-nums">{fmtNum(market.distributing)}</span> dibuang vs{' '}
 					<span class="text-up tabular-nums">{fmtNum(market.accumulating)}</span> ditimbun
 					{#if market.distributing_share !== null}
-						{" "}— {fmtNum(market.distributing_share, 0)}% dari yang punya arah sedang dibuang
+						{' '}— {fmtNum(market.distributing_share, 0)}% dari yang punya arah sedang dibuang
 					{/if}
 				</span>
 			</p>
@@ -241,7 +242,7 @@
 					text="Berapa emiten di sektor yang sama yang juga searah — membedakan 'saham ini istimewa' dari 'seluruh sektor sedang begitu'. Sektor dari pemetaan kurasi; jika emiten tidak terpetakan, konteks tidak ditampilkan."
 				/>
 				<span class="flex-1">
-					<strong class="text-[var(--fg)]">Konteks {sector.sector}:</strong>{" "}
+					<strong class="text-[var(--fg)]">Konteks {sector.sector}:</strong>{' '}
 					{sector.position}
 				</span>
 			</p>

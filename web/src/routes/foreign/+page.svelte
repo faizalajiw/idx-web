@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { Earth, TrendingDown, TrendingUp, type LucideIcon } from "@lucide/svelte";
-	import { useForeignFlow } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtNum, fmtPct } from "#lib/format.ts";
-	import type { ForeignFlow } from "#lib/types.ts";
-	import Bars from "#lib/components/Bars.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import RegimeBanner from "#lib/components/RegimeBanner.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { Earth, TrendingDown, TrendingUp, type LucideIcon } from '@lucide/svelte';
+	import { useForeignFlow } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtNum, fmtPct } from '#lib/format.ts';
+	import type { ForeignFlow } from '#lib/types.ts';
+	import Bars from '#lib/components/Bars.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import RegimeBanner from '#lib/components/RegimeBanner.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
-	type Side = "in" | "out";
+	type Side = 'in' | 'out';
 	type Mover = { code: string; name: string | null; net: number | null; percent: number | null };
 
 	const TABS: { value: Side; label: string; icon: LucideIcon }[] = [
-		{ value: "in", label: "Net beli", icon: TrendingUp },
-		{ value: "out", label: "Net jual", icon: TrendingDown }
+		{ value: 'in', label: 'Net beli', icon: TrendingUp },
+		{ value: 'out', label: 'Net jual', icon: TrendingDown }
 	];
 
 	const flow = useForeignFlow(20);
 	const data = $derived<ForeignFlow | undefined>(flow.data);
-	let side = $state<Side>("in");
+	let side = $state<Side>('in');
 
 	// Hari tanpa nilai tidak digambar: `Bars` memetakan null ke 0, yang akan
 	// terbaca seperti "tidak ada arus" padahal datanya tidak ada.
@@ -36,14 +36,16 @@
 	const buy = $derived(data?.total_buy ?? 0);
 	const sell = $derived(data?.total_sell ?? 0);
 	const buyShare = $derived(buy + sell > 0 ? (buy / (buy + sell)) * 100 : 50);
-	const movers = $derived<Mover[]>(side === "in" ? (data?.top_net_in ?? []) : (data?.top_net_out ?? []));
+	const movers = $derived<Mover[]>(
+		side === 'in' ? (data?.top_net_in ?? []) : (data?.top_net_out ?? [])
+	);
 	const maxMover = $derived(Math.max(0, ...movers.map((m) => Math.abs(m.net ?? 0))));
 	const isNetIn = $derived(net >= 0);
 </script>
 
 {#snippet moverList(items: Mover[], direction: Side, max: number)}
-	{@const tone = direction === "in" ? "text-up" : "text-down"}
-	{@const bar = direction === "in" ? "bg-up" : "bg-down"}
+	{@const tone = direction === 'in' ? 'text-up' : 'text-down'}
+	{@const bar = direction === 'in' ? 'bg-up' : 'bg-down'}
 	<div
 		class="text-muted flex items-center justify-between gap-3 border-b border-[var(--border)] pb-2 text-xs"
 	>
@@ -103,7 +105,7 @@
 				<p
 					class="text-muted flex items-center gap-1 text-xs font-semibold tracking-widest uppercase"
 				>
-					Posisi asing · {data?.date ?? "-"}
+					Posisi asing · {data?.date ?? '-'}
 					<InfoHint
 						text="Selisih total beli dikurangi total jual oleh investor asing. Hijau = asing net masuk, merah = asing net keluar."
 					/>
@@ -114,7 +116,7 @@
 							? 'badge-buy'
 							: 'badge-sell'}"
 					>
-						{isNetIn ? "Net masuk" : "Net keluar"}
+						{isNetIn ? 'Net masuk' : 'Net keluar'}
 					</span>
 				{/if}
 			</div>
@@ -122,7 +124,7 @@
 				<Skeleton class="mt-3 h-24" />
 			{:else}
 				<p class="mt-3 text-3xl font-bold tabular-nums {isNetIn ? 'text-up' : 'text-down'}">
-					{isNetIn ? "+" : "-"}Rp {fmtCompact(Math.abs(net) || null)}
+					{isNetIn ? '+' : '-'}Rp {fmtCompact(Math.abs(net) || null)}
 				</p>
 				<div class="mt-4">
 					<div class="flex h-2.5 overflow-hidden rounded-full bg-[var(--border)]">
@@ -165,14 +167,14 @@
 						labels={chartData.map((d) => d.label)}
 						series={[
 							{
-								name: "Net asing",
+								name: 'Net asing',
 								values: chartData.map((d) => d.net),
-								color: "var(--chart-net-up)",
+								color: 'var(--chart-net-up)',
 								colors: chartData.map((d) =>
-									d.net >= 0 ? "var(--chart-net-up)" : "var(--chart-net-down)"
+									d.net >= 0 ? 'var(--chart-net-up)' : 'var(--chart-net-down)'
 								),
 								fmt: (v) =>
-									`${v >= 0 ? "Asing masuk" : "Asing keluar"} Rp ${Math.abs(v).toFixed(1)} miliar`
+									`${v >= 0 ? 'Asing masuk' : 'Asing keluar'} Rp ${Math.abs(v).toFixed(1)} miliar`
 							}
 						]}
 						height={190}
@@ -212,7 +214,7 @@
 						<Icon
 							size={15}
 							aria-hidden="true"
-							class={active ? (t.value === "in" ? "text-up" : "text-down") : "opacity-70"}
+							class={active ? (t.value === 'in' ? 'text-up' : 'text-down') : 'opacity-70'}
 						/>
 						{t.label}
 					</button>
@@ -234,8 +236,8 @@
 	</section>
 
 	<p class="text-muted text-xs leading-relaxed">
-		Catatan: IDX mempublikasikan volume asing dalam lembar saham; nilai rupiah di atas adalah estimasi
-		notional (lembar × close). Data diperbarui tiap hari bursa (EOD). Net beli besar bukan jaminan
-		harga naik.
+		Catatan: IDX mempublikasikan volume asing dalam lembar saham; nilai rupiah di atas adalah
+		estimasi notional (lembar × close). Data diperbarui tiap hari bursa (EOD). Net beli besar bukan
+		jaminan harga naik.
 	</p>
 </main>

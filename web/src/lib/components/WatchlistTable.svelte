@@ -1,21 +1,17 @@
 <script lang="ts">
-	import {
-		useWatchlist,
-		useAddToWatchlist,
-		useRemoveFromWatchlist
-	} from "#lib/hooks.svelte.ts";
-	import { fmtNum, fmtPct, fmtCompact } from "#lib/format.ts";
-	import type { WatchlistRow } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
+	import { useWatchlist, useAddToWatchlist, useRemoveFromWatchlist } from '#lib/hooks.svelte.ts';
+	import { fmtNum, fmtPct, fmtCompact } from '#lib/format.ts';
+	import type { WatchlistRow } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
 
 	const CODE_RE = /^[A-Z]{4}$/; // IDX tickers: four letters
 
-	type MoveFilter = "up" | "down";
+	type MoveFilter = 'up' | 'down';
 
 	let {
 		codes,
@@ -36,9 +32,9 @@
 	const addToWatchlist = useAddToWatchlist();
 	const removeFromWatchlist = useRemoveFromWatchlist();
 
-	let filter = $state("");
+	let filter = $state('');
 	let moveFilter = $state<MoveFilter | null>(null);
-	let newCode = $state("");
+	let newCode = $state('');
 	let mutateError = $state<string | null>(null);
 	let busy = $state(false);
 
@@ -60,8 +56,8 @@
 			dot: string;
 			text: string;
 		}[] = [
-			{ label: "Naik", key: "up", value: naik, dot: "bg-[var(--up)]", text: "text-up" },
-			{ label: "Turun", key: "down", value: turun, dot: "bg-[var(--down)]", text: "text-down" }
+			{ label: 'Naik', key: 'up', value: naik, dot: 'bg-[var(--up)]', text: 'text-up' },
+			{ label: 'Turun', key: 'down', value: turun, dot: 'bg-[var(--down)]', text: 'text-down' }
 		];
 		return items;
 	}
@@ -70,8 +66,8 @@
 		if (!data) return [];
 		const q = filter.trim().toUpperCase();
 		let filtered = q ? data.filter((r) => r.code.includes(q)) : data;
-		if (moveFilter === "up") filtered = filtered.filter((r) => (r.percent ?? 0) >= 0);
-		else if (moveFilter === "down") filtered = filtered.filter((r) => (r.percent ?? 0) < 0);
+		if (moveFilter === 'up') filtered = filtered.filter((r) => (r.percent ?? 0) >= 0);
+		else if (moveFilter === 'down') filtered = filtered.filter((r) => (r.percent ?? 0) < 0);
 		return [...filtered].sort((a, b) => a.code.localeCompare(b.code));
 	});
 
@@ -80,9 +76,9 @@
 	const inputExists = $derived(!!data?.some((r) => r.code === inputCode));
 	const inputMessage = $derived(
 		!inputCode
-			? "Contoh: BBCA"
+			? 'Contoh: BBCA'
 			: !inputValid
-				? "Kode harus 4 huruf, mis. BBCA"
+				? 'Kode harus 4 huruf, mis. BBCA'
 				: inputExists
 					? `${inputCode} sudah ada di watchlist`
 					: null
@@ -95,9 +91,9 @@
 		mutateError = null;
 		try {
 			await addToWatchlist([inputCode]);
-			newCode = "";
+			newCode = '';
 		} catch (e) {
-			mutateError = e instanceof Error ? e.message : "Gagal menambah emiten";
+			mutateError = e instanceof Error ? e.message : 'Gagal menambah emiten';
 		} finally {
 			busy = false;
 		}
@@ -110,7 +106,7 @@
 		try {
 			await removeFromWatchlist(code);
 		} catch (e) {
-			mutateError = e instanceof Error ? e.message : "Gagal menghapus emiten";
+			mutateError = e instanceof Error ? e.message : 'Gagal menghapus emiten';
 		} finally {
 			busy = false;
 		}
@@ -142,15 +138,12 @@
 	</div>
 {/snippet}
 
-{#snippet metric(label: string, value: string | number, tone?: "up" | "down")}
+{#snippet metric(label: string, value: string | number, tone?: 'up' | 'down')}
 	<div class="flex flex-col">
 		<span class="text-muted text-[10px] uppercase tracking-wide">{label}</span>
 		<span
-			class="text-xs tabular-nums {tone === 'up'
-				? 'text-up'
-				: tone === 'down'
-					? 'text-down'
-					: ''}">{value}</span
+			class="text-xs tabular-nums {tone === 'up' ? 'text-up' : tone === 'down' ? 'text-down' : ''}"
+			>{value}</span
 		>
 	</div>
 {/snippet}
@@ -164,7 +157,7 @@
 		tabindex="0"
 		onclick={() => onSelect?.(r.code)}
 		onkeydown={(e) => {
-			if (e.key !== "Enter" && e.key !== " ") return;
+			if (e.key !== 'Enter' && e.key !== ' ') return;
 			if (e.target !== e.currentTarget) return;
 			e.preventDefault();
 			onSelect?.(r.code);
@@ -175,8 +168,7 @@
 			: ''}"
 	>
 		<div class="flex items-center gap-2">
-			<span
-				class="h-1.5 w-1.5 shrink-0 rounded-full {up ? 'bg-[var(--up)]' : 'bg-[var(--down)]'}"
+			<span class="h-1.5 w-1.5 shrink-0 rounded-full {up ? 'bg-[var(--up)]' : 'bg-[var(--down)]'}"
 			></span>
 			<a
 				href="/stock/{r.code}"
@@ -203,14 +195,14 @@
 			</button>
 		</div>
 		<div class="grid grid-cols-4 gap-2 border-t border-[var(--border)] pt-2">
-			{@render metric("Change", fmtNum(r.change), (r.change ?? 0) >= 0 ? "up" : "down")}
-			{@render metric("Volume", fmtCompact(r.volume))}
+			{@render metric('Change', fmtNum(r.change), (r.change ?? 0) >= 0 ? 'up' : 'down')}
+			{@render metric('Volume', fmtCompact(r.volume))}
 			{@render metric(
-				"Foreign Net",
+				'Foreign Net',
 				fmtCompact(r.foreign_net),
-				(r.foreign_net ?? 0) >= 0 ? "up" : "down"
+				(r.foreign_net ?? 0) >= 0 ? 'up' : 'down'
 			)}
-			{@render metric("Hari", r.hist_days)}
+			{@render metric('Hari', r.hist_days)}
 		</div>
 	</div>
 {/snippet}
@@ -247,7 +239,7 @@
 					value={newCode}
 					oninput={(e) => (newCode = e.currentTarget.value.toUpperCase())}
 					onkeydown={(e) => {
-						if (e.key === "Enter") void handleAdd();
+						if (e.key === 'Enter') void handleAdd();
 					}}
 					placeholder="Tambah kode…"
 					maxlength={4}
@@ -280,7 +272,7 @@
 				message={filtering
 					? `Tidak ada emiten yang cocok dengan "${filter.trim()}".`
 					: moveFilter
-						? `Tidak ada emiten yang ${moveFilter === "up" ? "naik" : "turun"}.`
+						? `Tidak ada emiten yang ${moveFilter === 'up' ? 'naik' : 'turun'}.`
 						: undefined}
 			/>
 		{:else}

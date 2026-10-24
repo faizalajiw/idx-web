@@ -9,24 +9,66 @@
 
 	/** Item hasil gabungan: halaman (navigasi) atau emiten (cari ticker). */
 	type Item =
-		| { kind: 'nav'; id: string; label: string; href: string; current: boolean; header: string | null }
+		| {
+				kind: 'nav';
+				id: string;
+				label: string;
+				href: string;
+				current: boolean;
+				header: string | null;
+		  }
 		| { kind: 'stock'; id: string; code: string; name: string | null; header: string | null };
 
 	/** Navigasi utama — sinkron dengan NAV_GROUPS di Sidebar. */
 	const NAV_ACTIONS: Action[] = [
 		{ id: 'home', label: 'Dashboard', href: '/', keywords: 'beranda home dashboard' },
 		{ id: 'pantau', label: 'Pantau', href: '/pantau', keywords: 'pantau alert notifikasi' },
-		{ id: 'screener', label: 'Screener AI', href: '/screener', keywords: 'screener filter scan cari' },
-		{ id: 'rekomendasi', label: 'Rekomendasi Beli', href: '/rekomendasi', keywords: 'rekomendasi beli sinyal' },
-		{ id: 'keputusan', label: 'Ruang Keputusan', href: '/keputusan', keywords: 'keputusan decision' },
-		{ id: 'jejak-sinyal', label: 'Jejak Sinyal', href: '/jejak-sinyal', keywords: 'jejak sinyal history' },
-		{ id: 'backtest', label: 'Backtest', href: '/backtest', keywords: 'backtest simulasi strategi' },
+		{
+			id: 'screener',
+			label: 'Screener AI',
+			href: '/screener',
+			keywords: 'screener filter scan cari'
+		},
+		{
+			id: 'rekomendasi',
+			label: 'Rekomendasi Beli',
+			href: '/rekomendasi',
+			keywords: 'rekomendasi beli sinyal'
+		},
+		{
+			id: 'keputusan',
+			label: 'Ruang Keputusan',
+			href: '/keputusan',
+			keywords: 'keputusan decision'
+		},
+		{
+			id: 'jejak-sinyal',
+			label: 'Jejak Sinyal',
+			href: '/jejak-sinyal',
+			keywords: 'jejak sinyal history'
+		},
+		{
+			id: 'backtest',
+			label: 'Backtest',
+			href: '/backtest',
+			keywords: 'backtest simulasi strategi'
+		},
 		{ id: 'faktor', label: 'Faktor & Kalibrasi', href: '/faktor', keywords: 'faktor kalibrasi ic' },
-		{ id: 'radar', label: 'Radar Smart Money', href: '/radar', keywords: 'radar smart money bandarmologi' },
+		{
+			id: 'radar',
+			label: 'Radar Smart Money',
+			href: '/radar',
+			keywords: 'radar smart money bandarmologi'
+		},
 		{ id: 'foreign', label: 'Foreign Flow', href: '/foreign', keywords: 'foreign asing net' },
 		{ id: 'flow', label: 'Aliran Dana Emiten', href: '/flow', keywords: 'aliran dana flow' },
 		{ id: 'sentimen', label: 'Sentimen', href: '/sentimen', keywords: 'sentimen berita' },
-		{ id: 'broker-activity', label: 'Aktivitas Broker', href: '/broker-activity', keywords: 'broker bandar' },
+		{
+			id: 'broker-activity',
+			label: 'Aktivitas Broker',
+			href: '/broker-activity',
+			keywords: 'broker bandar'
+		},
 		{ id: 'sectors', label: 'Sektor', href: '/sectors', keywords: 'sektor sector rotasi' }
 	];
 
@@ -134,7 +176,9 @@
 	const navFiltered = $derived.by(() => {
 		const q = query.trim().toLowerCase();
 		if (!q) return NAV_ACTIONS;
-		return NAV_ACTIONS.filter((a) => `${a.label} ${a.href} ${a.keywords}`.toLowerCase().includes(q));
+		return NAV_ACTIONS.filter((a) =>
+			`${a.label} ${a.href} ${a.keywords}`.toLowerCase().includes(q)
+		);
 	});
 
 	// Gabungan: emiten dulu (lebih relevan saat mengetik ticker), lalu halaman.
@@ -167,8 +211,8 @@
 
 	// Hasil baru = pilihan kembali ke atas.
 	$effect(() => {
-		query;
-		stocks;
+		void query;
+		void stocks;
 		activeIndex = 0;
 	});
 

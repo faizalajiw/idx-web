@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { fmtNum, fmtNum1 } from "#lib/format.ts";
-	import { useStockRecommendation } from "#lib/hooks.svelte.ts";
-	import { asNumber, portfolioQuery, usePortfolio } from "#lib/portfolio.svelte.ts";
-	import type { PositionPlan, RecommendationRow, StockRecommendation } from "#lib/types.ts";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { fmtNum, fmtNum1 } from '#lib/format.ts';
+	import { useStockRecommendation } from '#lib/hooks.svelte.ts';
+	import { asNumber, portfolioQuery, usePortfolio } from '#lib/portfolio.svelte.ts';
+	import type { PositionPlan, RecommendationRow, StockRecommendation } from '#lib/types.ts';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	/**
 	 * Panel rencana posisi di halaman emiten (permukaan B, spec P5).
@@ -17,11 +17,11 @@
 	 */
 
 	const rp = (v: number | null | undefined) =>
-		v === null || v === undefined ? "-" : `Rp ${fmtNum(v)}`;
+		v === null || v === undefined ? '-' : `Rp ${fmtNum(v)}`;
 
 	/** Plafon ditulis apa adanya; `null` = memang tidak berlaku (bukan nol). */
 	const plafon = (v: number | null | undefined) =>
-		v === null || v === undefined ? "tidak berlaku" : `${fmtNum(v)}%`;
+		v === null || v === undefined ? 'tidak berlaku' : `${fmtNum(v)}%`;
 
 	/** Harga beli: rentang bila ada, kalau tidak harga acuan. */
 	function hargaBeli(row: RecommendationRow): string {
@@ -37,8 +37,8 @@
 	 * jadi di sini tidak diberi awalan yang mengulang maksudnya.
 	 */
 	function sebabTahan(rec: StockRecommendation): string {
-		if (rec.gate?.blocked) return rec.gate.reason ?? "kondisi pasar belum mendukung";
-		return rec.freshness?.reason ?? "data sesi ini belum segar";
+		if (rec.gate?.blocked) return rec.gate.reason ?? 'kondisi pasar belum mendukung';
+		return rec.freshness?.reason ?? 'data sesi ini belum segar';
 	}
 
 	let { code }: { code: string } = $props();
@@ -46,7 +46,10 @@
 	const { state, setField } = usePortfolio();
 	const query = $derived(portfolioQuery(state));
 
-	const recommendation = useStockRecommendation(() => code, () => query);
+	const recommendation = useStockRecommendation(
+		() => code,
+		() => query
+	);
 	// Getter hook: baca lewat objek, lalu salin ke `$derived` agar tetap reaktif.
 	const data = $derived(recommendation.data);
 	const error = $derived(recommendation.error);
@@ -105,7 +108,7 @@
 			<tr>
 				<td class="text-muted">Jumlah lot</td>
 				<td class="text-right tabular-nums">
-					{plan.lots === null ? "-" : `${fmtNum(plan.lots)} lot`}
+					{plan.lots === null ? '-' : `${fmtNum(plan.lots)} lot`}
 				</td>
 			</tr>
 			<tr>
@@ -167,11 +170,11 @@
 	</div>
 
 	<div class="mt-3 grid max-w-md grid-cols-2 gap-3">
-		{@render field("panel-modal", "Modal (Rp)", state.modal, modalSalah, (v) =>
-			setField("modal", v)
+		{@render field('panel-modal', 'Modal (Rp)', state.modal, modalSalah, (v) =>
+			setField('modal', v)
 		)}
-		{@render field("panel-risk", "Risiko per transaksi (%)", state.riskPct, riskSalah, (v) =>
-			setField("riskPct", v)
+		{@render field('panel-risk', 'Risiko per transaksi (%)', state.riskPct, riskSalah, (v) =>
+			setField('riskPct', v)
 		)}
 	</div>
 	{#if risk === null}
@@ -203,16 +206,14 @@
 	{:else if !candidate}
 		<div class="mt-3">
 			<EmptyState
-				message={data.reason ?? "Belum ada kandidat beli untuk emiten ini pada sesi terakhir."}
+				message={data.reason ?? 'Belum ada kandidat beli untuk emiten ini pada sesi terakhir.'}
 			/>
 		</div>
 	{:else if candidate.withheld}
 		{@render tabelLevel(data, candidate)}
 	{:else if plan === null || plan.pct === null}
 		<div class="mt-3">
-			<EmptyState
-				message={plan?.note ?? "Rencana ukuran tidak bisa dihitung dari level ini."}
-			/>
+			<EmptyState message={plan?.note ?? 'Rencana ukuran tidak bisa dihitung dari level ini.'} />
 		</div>
 	{:else}
 		{@render tabelRencana(plan, candidate.stop)}

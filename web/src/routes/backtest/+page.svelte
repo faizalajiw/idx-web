@@ -11,96 +11,101 @@
 		Settings2,
 		Trophy,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { runBacktest } from "#lib/api.ts";
-	import { fmtCompact } from "#lib/format.ts";
-	import { useBacktestConfig, useWatchlist } from "#lib/hooks.svelte.ts";
+	} from '@lucide/svelte';
+	import { runBacktest } from '#lib/api.ts';
+	import { fmtCompact } from '#lib/format.ts';
+	import { useBacktestConfig, useWatchlist } from '#lib/hooks.svelte.ts';
 	import type {
 		BacktestMetrics,
 		BacktestResult,
 		CostModelInfo,
 		CostSettings,
 		StrategyInfo
-	} from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import EquityCurveChart from "#lib/components/EquityCurveChart.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import RebalanceLedger from "#lib/components/RebalanceLedger.svelte";
-	import RegimeBanner from "#lib/components/RegimeBanner.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	} from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import EquityCurveChart from '#lib/components/EquityCurveChart.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import RebalanceLedger from '#lib/components/RebalanceLedger.svelte';
+	import RegimeBanner from '#lib/components/RegimeBanner.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	const PERIODS = [
-		{ id: "6M", label: "6 Bulan", months: 6 },
-		{ id: "1Y", label: "1 Tahun", months: 12 },
-		{ id: "3Y", label: "3 Tahun", months: 36 },
-		{ id: "ALL", label: "Semua", months: null }
+		{ id: '6M', label: '6 Bulan', months: 6 },
+		{ id: '1Y', label: '1 Tahun', months: 12 },
+		{ id: '3Y', label: '3 Tahun', months: 36 },
+		{ id: 'ALL', label: 'Semua', months: null }
 	] as const;
 
-	type PeriodId = (typeof PERIODS)[number]["id"];
-	type Tone = "up" | "down" | "neutral";
+	type PeriodId = (typeof PERIODS)[number]['id'];
+	type Tone = 'up' | 'down' | 'neutral';
 
 	/** Knob biaya dalam persen di UI; API menerima pecahan (0,0015 = 0,15%). */
 	type CostPct = { commission: number; tax: number; slippage: number; adv: number };
 
 	const COST_PRESETS: { id: string; label: string; desc: string; value: CostPct }[] = [
 		{
-			id: "zero",
-			label: "Tanpa biaya",
-			desc: "Batas atas teoretis — komisi, pajak, slippage, dan cap likuiditas dimatikan.",
+			id: 'zero',
+			label: 'Tanpa biaya',
+			desc: 'Batas atas teoretis — komisi, pajak, slippage, dan cap likuiditas dimatikan.',
 			value: { commission: 0, tax: 0, slippage: 0, adv: 0 }
 		},
 		{
-			id: "standard",
-			label: "Standar IDX",
-			desc: "Komisi 0,15%/sisi, pajak jual 0,1%, slippage 0,1%, cap likuiditas 2% nilai transaksi harian.",
+			id: 'standard',
+			label: 'Standar IDX',
+			desc: 'Komisi 0,15%/sisi, pajak jual 0,1%, slippage 0,1%, cap likuiditas 2% nilai transaksi harian.',
 			value: { commission: 0.15, tax: 0.1, slippage: 0.1, adv: 2 }
 		},
 		{
-			id: "conservative",
-			label: "Konservatif",
-			desc: "Komisi 0,25%/sisi, slippage 0,25%, cap likuiditas 1% — untuk saham berlikuiditas rendah.",
+			id: 'conservative',
+			label: 'Konservatif',
+			desc: 'Komisi 0,25%/sisi, slippage 0,25%, cap likuiditas 1% — untuk saham berlikuiditas rendah.',
 			value: { commission: 0.25, tax: 0.1, slippage: 0.25, adv: 1 }
 		}
 	];
 
 	const COST_FIELDS: { key: keyof CostPct; label: string; hint: string; step: number }[] = [
 		{
-			key: "commission",
-			label: "Komisi (%/sisi)",
-			hint: "Biaya jasa sekuritas tiap kali membeli atau menjual.",
+			key: 'commission',
+			label: 'Komisi (%/sisi)',
+			hint: 'Biaya jasa sekuritas tiap kali membeli atau menjual.',
 			step: 0.05
 		},
 		{
-			key: "tax",
-			label: "Pajak jual (%)",
-			hint: "Pajak penjualan saham 0,1% yang dipotong saat menjual.",
+			key: 'tax',
+			label: 'Pajak jual (%)',
+			hint: 'Pajak penjualan saham 0,1% yang dipotong saat menjual.',
 			step: 0.05
 		},
 		{
-			key: "slippage",
-			label: "Slippage (%/sisi)",
-			hint: "Selisih harga beli/jual nyata dari harga yang diharapkan.",
+			key: 'slippage',
+			label: 'Slippage (%/sisi)',
+			hint: 'Selisih harga beli/jual nyata dari harga yang diharapkan.',
 			step: 0.05
 		},
 		{
-			key: "adv",
-			label: "Cap likuiditas (% ADTV)",
-			hint: "Batas porsi order terhadap nilai transaksi harian emiten; 0 berarti tanpa batas.",
+			key: 'adv',
+			label: 'Cap likuiditas (% ADTV)',
+			hint: 'Batas porsi order terhadap nilai transaksi harian emiten; 0 berarti tanpa batas.',
 			step: 0.5
 		}
 	];
 
-	type TabId = "ringkasan" | "kurva" | "perbandingan" | "biaya" | "ledger";
+	type TabId = 'ringkasan' | 'kurva' | 'perbandingan' | 'biaya' | 'ledger';
 
 	const TABS: { id: TabId; label: string; hint: string; icon: LucideIcon }[] = [
-		{ id: "ringkasan", label: "Ringkasan", hint: "Hasil utama", icon: Trophy },
-		{ id: "kurva", label: "Kurva Modal", hint: "Pertumbuhan modal", icon: ChartLine },
-		{ id: "perbandingan", label: "Perbandingan", hint: "Strategi vs beli-tahan", icon: ChartColumn },
-		{ id: "biaya", label: "Biaya", hint: "Yang menggerus untung", icon: Coins },
-		{ id: "ledger", label: "Jejak Transaksi", hint: "Tiap sesi rebalance", icon: ScrollText }
+		{ id: 'ringkasan', label: 'Ringkasan', hint: 'Hasil utama', icon: Trophy },
+		{ id: 'kurva', label: 'Kurva Modal', hint: 'Pertumbuhan modal', icon: ChartLine },
+		{
+			id: 'perbandingan',
+			label: 'Perbandingan',
+			hint: 'Strategi vs beli-tahan',
+			icon: ChartColumn
+		},
+		{ id: 'biaya', label: 'Biaya', hint: 'Yang menggerus untung', icon: Coins },
+		{ id: 'ledger', label: 'Jejak Transaksi', hint: 'Tiap sesi rebalance', icon: ScrollText }
 	];
 
 	function costPctFromDefaults(d: CostModelInfo): CostPct {
@@ -128,7 +133,7 @@
 			`pajak jual ${asPct(c.sell_tax_pct)}`,
 			`slippage ${asPct(c.slippage_pct)}/sisi`,
 			`cap likuiditas ${asPct(c.max_adv_pct)} ADTV`
-		].join(" · ");
+		].join(' · ');
 	}
 
 	function defaultsFor(info: StrategyInfo): Record<string, number> {
@@ -144,30 +149,30 @@
 	}
 
 	function pct(v: number | null | undefined, digits = 2): string {
-		if (v === null || v === undefined) return "-";
-		return `${v > 0 ? "+" : ""}${(v * 100).toFixed(digits)}%`;
+		if (v === null || v === undefined) return '-';
+		return `${v > 0 ? '+' : ''}${(v * 100).toFixed(digits)}%`;
 	}
 
 	/** Persen tanpa tanda — dipakai saat tandanya sudah jelas dari label. */
 	function pctMag(v: number | null | undefined, digits = 2): string {
-		if (v === null || v === undefined) return "-";
+		if (v === null || v === undefined) return '-';
 		return `${(Math.abs(v) * 100).toFixed(digits)}%`;
 	}
 
 	function decimals(v: number | null | undefined, digits = 2): string {
-		if (v === null || v === undefined) return "-";
+		if (v === null || v === undefined) return '-';
 		return v.toFixed(digits);
 	}
 
 	function toneOf(v: number | null | undefined): Tone {
-		if (v === null || v === undefined || v === 0) return "neutral";
-		return v > 0 ? "up" : "down";
+		if (v === null || v === undefined || v === 0) return 'neutral';
+		return v > 0 ? 'up' : 'down';
 	}
 
 	function toneClass(tone?: Tone): string {
-		if (tone === "up") return "text-up";
-		if (tone === "down") return "text-down";
-		return "";
+		if (tone === 'up') return 'text-up';
+		if (tone === 'down') return 'text-down';
+		return '';
 	}
 
 	const configQuery = useBacktestConfig();
@@ -180,17 +185,17 @@
 
 	const strategies = $derived(config?.strategies);
 
-	let strategyId = $state("");
+	let strategyId = $state('');
 	let params = $state<Record<string, number>>({});
-	let codes = $state("");
-	let period = $state<PeriodId>("1Y");
+	let codes = $state('');
+	let period = $state<PeriodId>('1Y');
 	let cash = $state(100_000_000);
-	let rebalance = $state("");
+	let rebalance = $state('');
 	let costPct = $state<CostPct | null>(null);
 	let result = $state<BacktestResult | null>(null);
 	let error = $state<string | null>(null);
 	let loading = $state(false);
-	let tab = $state<TabId>("ringkasan");
+	let tab = $state<TabId>('ringkasan');
 	let showAdvanced = $state(false);
 
 	const current = $derived(strategies?.find((s) => s.id === strategyId) ?? null);
@@ -218,11 +223,11 @@
 
 	$effect(() => {
 		const rows = watchlist;
-		if (codes === "" && rows?.length) {
+		if (codes === '' && rows?.length) {
 			codes = rows
 				.slice(0, 10)
 				.map((r) => r.code)
-				.join(", ");
+				.join(', ');
 		}
 	});
 
@@ -246,7 +251,7 @@
 
 	const codelist = $derived(
 		codes
-			.split(",")
+			.split(',')
 			.map((c) => c.trim().toUpperCase())
 			.filter(Boolean)
 	);
@@ -258,7 +263,7 @@
 	);
 	const cadenceLabel = $derived.by(() => {
 		const r = result;
-		if (!r) return "";
+		if (!r) return '';
 		return config?.rebalance_options.find((o) => o.id === r.rebalance)?.label ?? r.rebalance;
 	});
 
@@ -278,7 +283,7 @@
 				rebalance
 			});
 			result = res;
-			tab = "ringkasan";
+			tab = 'ringkasan';
 		} catch (e) {
 			error = e instanceof Error ? e.message : String(e);
 			result = null;
@@ -321,12 +326,12 @@
 	{@const beatAfterCost = result.metrics.total_return > 0}
 	{@const tone: Tone = beatBenchmark ? "up" : beatAfterCost ? "neutral" : "down"}
 	{@const label = beatBenchmark
-		? "Strategi menang dari beli-tahan"
+		? 'Strategi menang dari beli-tahan'
 		: beatAfterCost
-			? "Untung, tapi kalah dari beli-tahan"
-			: "Strategi belum menghasilkan untung"}
+			? 'Untung, tapi kalah dari beli-tahan'
+			: 'Strategi belum menghasilkan untung'}
 	{@const accent =
-		tone === "up" ? "var(--up)" : tone === "down" ? "var(--down)" : "var(--border-strong)"}
+		tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : 'var(--border-strong)'}
 	<div class="card p-4" style="border-left: 3px solid {accent}">
 		<div class="flex flex-wrap items-baseline justify-between gap-2">
 			<p class="text-base font-bold {toneClass(tone)}">{label}</p>
@@ -335,7 +340,8 @@
 			</p>
 		</div>
 		<p class="text-muted mt-2 text-sm leading-relaxed">
-			Strategi <span class="font-semibold text-[var(--fg)]">{result.strategy_name}</span> menghasilkan
+			Strategi <span class="font-semibold text-[var(--fg)]">{result.strategy_name}</span>
+			menghasilkan
 			<span class="font-semibold {toneClass(toneOf(result.metrics.total_return))}">
 				{pct(result.metrics.total_return)}
 			</span>
@@ -398,44 +404,44 @@
 			</thead>
 			<tbody>
 				{@render metricRow({
-					label: "Total keuntungan",
-					hint: "Berapa persen modal bertambah atau berkurang selama periode uji.",
+					label: 'Total keuntungan',
+					hint: 'Berapa persen modal bertambah atau berkurang selama periode uji.',
 					gross: pct(gross.total_return),
 					net: pct(net.total_return),
 					benchmark: pct(benchmark.total_return),
 					tone: toneOf(net.total_return)
 				})}
 				{@render metricRow({
-					label: "Rata-rata per tahun",
-					hint: "Setara keuntungan tahunan bila hasilnya diratakan (CAGR).",
+					label: 'Rata-rata per tahun',
+					hint: 'Setara keuntungan tahunan bila hasilnya diratakan (CAGR).',
 					gross: pct(gross.annualized_return),
 					net: pct(net.annualized_return),
 					benchmark: pct(benchmark.annualized_return)
 				})}
 				{@render metricRow({
-					label: "Jatuh terdalam",
-					hint: "Penurunan terbesar dari puncak ke dasar selama uji (max drawdown).",
+					label: 'Jatuh terdalam',
+					hint: 'Penurunan terbesar dari puncak ke dasar selama uji (max drawdown).',
 					gross: pct(-gross.max_drawdown),
 					net: pct(-net.max_drawdown),
 					benchmark: pct(-benchmark.max_drawdown),
-					tone: "down"
+					tone: 'down'
 				})}
 				{@render metricRow({
-					label: "Naik-turun tahunan",
-					hint: "Seberapa liar nilai portofolio bergerak (volatilitas tahunan).",
+					label: 'Naik-turun tahunan',
+					hint: 'Seberapa liar nilai portofolio bergerak (volatilitas tahunan).',
 					gross: pct(gross.volatility),
 					net: pct(net.volatility),
 					benchmark: pct(benchmark.volatility)
 				})}
 				{@render metricRow({
-					label: "Imbal hasil per risiko",
-					hint: "Keuntungan dibanding naik-turunnya (Sharpe). Makin tinggi makin efisien.",
+					label: 'Imbal hasil per risiko',
+					hint: 'Keuntungan dibanding naik-turunnya (Sharpe). Makin tinggi makin efisien.',
 					gross: decimals(gross.sharpe),
 					net: decimals(net.sharpe),
 					benchmark: decimals(benchmark.sharpe)
 				})}
 				{@render metricRow({
-					label: "Modal akhir",
+					label: 'Modal akhir',
 					gross: `Rp ${fmtCompact(gross.final_equity)}`,
 					net: `Rp ${fmtCompact(net.final_equity)}`,
 					benchmark: `Rp ${fmtCompact(benchmark.final_equity)}`
@@ -456,8 +462,8 @@
 			Uji Strategi <span class="gradient-text">(Backtest)</span>
 		</h1>
 		<p class="text-muted mt-0.5 text-sm">
-			Coba sebuah strategi di data masa lalu — seolah-olah kamu sudah menjalankannya sejak dulu — lalu
-			lihat hasilnya setelah biaya nyata.
+			Coba sebuah strategi di data masa lalu — seolah-olah kamu sudah menjalankannya sejak dulu —
+			lalu lihat hasilnya setelah biaya nyata.
 		</p>
 	</div>
 
@@ -504,7 +510,9 @@
 									</span>
 									<span class="min-w-0">
 										<span class="text-sm font-semibold">{s.name}</span>
-										<span class="text-muted mt-1 block text-xs leading-relaxed">{s.description}</span>
+										<span class="text-muted mt-1 block text-xs leading-relaxed"
+											>{s.description}</span
+										>
 									</span>
 								</button>
 							{/each}
@@ -547,7 +555,7 @@
 											(codes = (watchlist ?? [])
 												.slice(0, 10)
 												.map((r) => r.code)
-												.join(", "))}
+												.join(', '))}
 									>
 										Pakai watchlist
 									</button>
@@ -558,8 +566,7 @@
 								rows={2}
 								value={codes}
 								placeholder="BBCA, BBRI, TLKM"
-								onchange={(e) => (codes = e.currentTarget.value)}
-							></textarea>
+								onchange={(e) => (codes = e.currentTarget.value)}></textarea>
 							<p class="text-muted mt-1 text-xs">
 								Pisahkan dengan koma. Maksimal {cfg.max_codes} emiten.
 							</p>
@@ -590,7 +597,7 @@
 							onclick={() => (showAdvanced = !showAdvanced)}
 						>
 							<Settings2 size={12} />
-							{showAdvanced ? "Sembunyikan pengaturan lanjutan" : "Pengaturan lanjutan"}
+							{showAdvanced ? 'Sembunyikan pengaturan lanjutan' : 'Pengaturan lanjutan'}
 						</button>
 
 						{#if showAdvanced}
@@ -682,7 +689,7 @@
 								disabled={!ready}
 							>
 								<Play size={16} />
-								{loading ? "Menghitung..." : "Jalankan Backtest"}
+								{loading ? 'Menghitung...' : 'Jalankan Backtest'}
 							</button>
 							<p class="text-muted mt-2 text-center text-xs">
 								{#if !strategyId}
@@ -706,7 +713,10 @@
 			{/if}
 
 			{#if !result && !error}
-				<Card title="2. Hasil" info="Hasil muncul di sini setelah kamu menekan “Jalankan Backtest”.">
+				<Card
+					title="2. Hasil"
+					info="Hasil muncul di sini setelah kamu menekan “Jalankan Backtest”."
+				>
 					{#if loading}
 						<div class="space-y-3">
 							<Skeleton class="h-20" />
@@ -743,30 +753,30 @@
 					{/each}
 				</div>
 
-				{#if tab === "ringkasan"}
+				{#if tab === 'ringkasan'}
 					<div class="space-y-4" role="tabpanel">
 						<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 							{@render stat({
-								label: "Keuntungan bersih",
-								hint: "Total perubahan modal setelah semua biaya dihitung.",
+								label: 'Keuntungan bersih',
+								hint: 'Total perubahan modal setelah semua biaya dihitung.',
 								value: pct(result.metrics.total_return),
 								tone: toneOf(result.metrics.total_return)
 							})}
 							{@render stat({
-								label: "Selisih vs beli-tahan",
-								hint: "Seberapa jauh strategi mengalahkan (atau kalah dari) cara pasif beli lalu diamkan.",
+								label: 'Selisih vs beli-tahan',
+								hint: 'Seberapa jauh strategi mengalahkan (atau kalah dari) cara pasif beli lalu diamkan.',
 								value: pct(alpha),
 								tone: toneOf(alpha)
 							})}
 							{@render stat({
-								label: "Jatuh terdalam",
-								hint: "Penurunan terbesar dari titik tertinggi ke titik terendah selama uji.",
+								label: 'Jatuh terdalam',
+								hint: 'Penurunan terbesar dari titik tertinggi ke titik terendah selama uji.',
 								value: pct(-result.metrics.max_drawdown),
-								tone: "down"
+								tone: 'down'
 							})}
 							{@render stat({
-								label: "Imbal hasil per risiko",
-								hint: "Keuntungan dibanding naik-turunnya nilai. Makin tinggi makin efisien.",
+								label: 'Imbal hasil per risiko',
+								hint: 'Keuntungan dibanding naik-turunnya nilai. Makin tinggi makin efisien.',
 								value: decimals(result.metrics.sharpe)
 							})}
 						</div>
@@ -780,11 +790,9 @@
 								<p class="text-muted mt-2 text-xs">
 									Dari modal awal Rp {fmtCompact(result.initial_cash)} →
 									<span
-										class={toneClass(
-											toneOf(result.metrics.final_equity - result.initial_cash)
-										)}
+										class={toneClass(toneOf(result.metrics.final_equity - result.initial_cash))}
 									>
-										{result.metrics.final_equity >= result.initial_cash ? "untung" : "rugi"} Rp
+										{result.metrics.final_equity >= result.initial_cash ? 'untung' : 'rugi'} Rp
 										{fmtCompact(Math.abs(result.metrics.final_equity - result.initial_cash))}
 									</span>
 								</p>
@@ -806,7 +814,8 @@
 									<span class="min-w-0">
 										<span class="font-semibold text-[var(--fg)]">Tanpa mengintip masa depan.</span>
 										<span class="text-muted">
-											Tiap hari simulasi hanya memakai harga dan data yang memang sudah ada saat itu.
+											Tiap hari simulasi hanya memakai harga dan data yang memang sudah ada saat
+											itu.
 										</span>
 									</span>
 								</li>
@@ -824,10 +833,11 @@
 								<li class="flex gap-2">
 									<Info size={16} class="text-muted mt-0.5 shrink-0" />
 									<span class="min-w-0">
-										<span class="font-semibold text-[var(--fg)]">Beli-tahan adalah tolok ukur.</span>
+										<span class="font-semibold text-[var(--fg)]">Beli-tahan adalah tolok ukur.</span
+										>
 										<span class="text-muted">
-											Kalau strategi kalah dari sekadar membeli lalu diam, strategi itu belum menambah
-											nilai.
+											Kalau strategi kalah dari sekadar membeli lalu diam, strategi itu belum
+											menambah nilai.
 										</span>
 									</span>
 								</li>
@@ -845,10 +855,11 @@
 					</div>
 				{/if}
 
-				{#if tab === "kurva"}
+				{#if tab === 'kurva'}
 					<Card
 						title="Kurva Modal"
-						subtitle="{result.codes.length} emiten · {result.days} hari bursa · {result.start} → {result.end}"
+						subtitle="{result.codes
+							.length} emiten · {result.days} hari bursa · {result.start} → {result.end}"
 						info="Grafik pertumbuhan modal dari waktu ke waktu. Garis naik = untung, turun = rugi. Perhatikan juga seberapa dalam jatuhnya, bukan cuma hasil akhirnya."
 					>
 						{#snippet right()}
@@ -858,10 +869,12 @@
 					</Card>
 				{/if}
 
-				{#if tab === "perbandingan"}
+				{#if tab === 'perbandingan'}
 					<Card
 						title="Perbandingan Hasil"
-						subtitle="Modal awal Rp {fmtCompact(result.initial_cash)} · strategi {result.strategy_name}"
+						subtitle="Modal awal Rp {fmtCompact(
+							result.initial_cash
+						)} · strategi {result.strategy_name}"
 						info="Membandingkan hasil strategi (setelah dan sebelum biaya) dengan cara pasif beli-tahan. Berguna untuk cek: apakah strategi ini benar-benar lebih baik daripada diam memegang saham?"
 					>
 						{@render metricsTable({
@@ -872,34 +885,36 @@
 					</Card>
 				{/if}
 
-				{#if tab === "biaya"}
+				{#if tab === 'biaya'}
 					<Card
 						title="Dampak Biaya"
-						subtitle="Susun ulang {cadenceLabel} ×{result.rebalance_days} · nilai transaksi Rp {fmtCompact(result.cost_impact.turnover)} · {result.days} hari bursa"
+						subtitle="Susun ulang {cadenceLabel} ×{result.rebalance_days} · nilai transaksi Rp {fmtCompact(
+							result.cost_impact.turnover
+						)} · {result.days} hari bursa"
 						info="Rincian biaya (komisi, pajak, slippage) yang menggerus keuntungan. Banyak strategi terlihat cuan di atas kertas tapi rugi setelah biaya nyata dihitung."
 					>
 						<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 							{@render stat({
-								label: "Total biaya",
-								hint: "Jumlah semua komisi, pajak, dan slippage selama periode uji.",
+								label: 'Total biaya',
+								hint: 'Jumlah semua komisi, pajak, dan slippage selama periode uji.',
 								value: `Rp ${fmtCompact(result.cost_impact.total_cost)}`,
-								tone: "down"
+								tone: 'down'
 							})}
 							{@render stat({
-								label: "Komisi + pajak",
+								label: 'Komisi + pajak',
 								value: `Rp ${fmtCompact(result.cost_impact.total_fees)}`,
-								tone: "down"
+								tone: 'down'
 							})}
 							{@render stat({
-								label: "Slippage",
+								label: 'Slippage',
 								value: `Rp ${fmtCompact(result.cost_impact.total_slippage)}`,
-								tone: "down"
+								tone: 'down'
 							})}
 							{@render stat({
-								label: "Porsi biaya dari modal",
-								hint: "Berapa persen modal yang habis hanya untuk biaya transaksi.",
+								label: 'Porsi biaya dari modal',
+								hint: 'Berapa persen modal yang habis hanya untuk biaya transaksi.',
 								value: pctMag(result.cost_impact.cost_pct_of_equity),
-								tone: "down"
+								tone: 'down'
 							})}
 						</div>
 						<p class="text-muted mt-3 text-xs leading-relaxed">
@@ -914,7 +929,7 @@
 					</Card>
 				{/if}
 
-				{#if tab === "ledger"}
+				{#if tab === 'ledger'}
 					<Card
 						title="Jejak Transaksi"
 						subtitle="Susun ulang {cadenceLabel} · klik satu sesi untuk lihat pembelian &amp; penjualannya"

@@ -1,14 +1,8 @@
 <script lang="ts">
-	import {
-		CircleCheck,
-		Clock,
-		TriangleAlert,
-		XCircle,
-		type LucideIcon
-	} from "@lucide/svelte";
-	import { useDataHealth } from "#lib/hooks.svelte.ts";
-	import { fmtDateStr } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
+	import { CircleCheck, Clock, TriangleAlert, XCircle, type LucideIcon } from '@lucide/svelte';
+	import { useDataHealth } from '#lib/hooks.svelte.ts';
+	import { fmtDateStr } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
 
 	/**
 	 * Kartu "Kesehatan Data" (Dashboard): menjawab "boleh percaya angka di layar?".
@@ -27,15 +21,15 @@
 	 */
 
 	const INFO =
-		"Semua angka di dashboard ini tunduk pada data EOD — kalau kartu ini bicara, angka lain ikut diragukan. Empat pemeriksa dibaca langsung dari database (read-only), bukan dari perhitungan sinyal.";
+		'Semua angka di dashboard ini tunduk pada data EOD — kalau kartu ini bicara, angka lain ikut diragukan. Empat pemeriksa dibaca langsung dari database (read-only), bukan dari perhitungan sinyal.';
 
-	type Sev = "ok" | "info" | "warn" | "bad";
+	type Sev = 'ok' | 'info' | 'warn' | 'bad';
 
 	const SEV_META: Record<Sev, { color: string; badge: string; label: string; sr: string }> = {
-		ok: { color: "var(--up)", badge: "badge-buy", label: "Sehat", sr: "aman" },
-		info: { color: "var(--fg-muted)", badge: "badge-hold", label: "Menunggu", sr: "menunggu" },
-		warn: { color: "var(--warn)", badge: "badge-warn", label: "Waspada", sr: "waspada" },
-		bad: { color: "var(--down)", badge: "badge-sell", label: "Bermasalah", sr: "bermasalah" }
+		ok: { color: 'var(--up)', badge: 'badge-buy', label: 'Sehat', sr: 'aman' },
+		info: { color: 'var(--fg-muted)', badge: 'badge-hold', label: 'Menunggu', sr: 'menunggu' },
+		warn: { color: 'var(--warn)', badge: 'badge-warn', label: 'Waspada', sr: 'waspada' },
+		bad: { color: 'var(--down)', badge: 'badge-sell', label: 'Bermasalah', sr: 'bermasalah' }
 	};
 
 	const IKON: Record<Sev, LucideIcon> = {
@@ -46,12 +40,12 @@
 	};
 
 	/** Urutan prioritas saat menggabungkan keparahan empat baris jadi satu badge. */
-	const URUT: Sev[] = ["bad", "warn", "info", "ok"];
+	const URUT: Sev[] = ['bad', 'warn', 'info', 'ok'];
 
 	const MAX_SEBUT = 4;
 
 	/** Tanggal ISO -> teks pendek; `null` jadi "—", bukan "null". */
-	const tgl = (s: string | null | undefined): string => fmtDateStr(s) ?? "—";
+	const tgl = (s: string | null | undefined): string => fmtDateStr(s) ?? '—';
 
 	type Baris = { label: string; detail: string; sev: Sev };
 
@@ -69,74 +63,75 @@
 		const kosong = freshness.eod_latest === null;
 
 		const sevKesegaran: Sev = !belumMasuk
-			? "ok"
+			? 'ok'
 			: freshness.overdue
-				? "bad"
+				? 'bad'
 				: kosong || tertinggal > 0
-					? "warn"
-					: "info";
+					? 'warn'
+					: 'info';
 
 		const detailKesegaran = !belumMasuk
 			? `Saham & IHSG lengkap sampai sesi ${tgl(freshness.eod_latest)}`
 			: freshness.overdue
-				? `Belum masuk: ${freshness.missing.join(", ")} — hari bursa ${tgl(freshness.expected)} sudah lewat batas 16:00 WIB`
+				? `Belum masuk: ${freshness.missing.join(', ')} — hari bursa ${tgl(freshness.expected)} sudah lewat batas 16:00 WIB`
 				: kosong || tertinggal > 0
-					? `Tertinggal ${tertinggal} sesi bursa dari ${tgl(freshness.expected)} — ${freshness.missing.join(", ")}`
+					? `Tertinggal ${tertinggal} sesi bursa dari ${tgl(freshness.expected)} — ${freshness.missing.join(', ')}`
 					: `Sesi ${tgl(freshness.expected)} belum masuk — normal sebelum ±16:15 WIB`;
 
-		const basisTeks = session_gaps.basis.startsWith("kalender-bursa")
-			? session_gaps.basis === "kalender-bursa-pendek"
-				? "kalender IHSG (cakupan lebih pendek dari rentang data — lubang di luar cakupan tidak terlihat)"
-				: "kalender IHSG"
-			: "hari-kerja (perkiraan — kalender IHSG kosong)";
+		const basisTeks = session_gaps.basis.startsWith('kalender-bursa')
+			? session_gaps.basis === 'kalender-bursa-pendek'
+				? 'kalender IHSG (cakupan lebih pendek dari rentang data — lubang di luar cakupan tidak terlihat)'
+				: 'kalender IHSG'
+			: 'hari-kerja (perkiraan — kalender IHSG kosong)';
 
 		const baris: Baris[] = [
-			{ label: "Kesegaran EOD", detail: detailKesegaran, sev: sevKesegaran },
+			{ label: 'Kesegaran EOD', detail: detailKesegaran, sev: sevKesegaran },
 			{
-				label: "Kolom arus asing (foreign_*)",
+				label: 'Kolom arus asing (foreign_*)',
 				detail:
 					field_coverage.checked === 0
-						? "Belum ada sesi yang bisa diperiksa"
+						? 'Belum ada sesi yang bisa diperiksa'
 						: field_coverage.troublemakers.length
 							? `${field_coverage.troublemakers.length} dari ${field_coverage.checked} sesi terakhir bolong (terburuk ${field_coverage.worst_pct}%)`
 							: `${field_coverage.checked} sesi terakhir terisi semua`,
-				sev:
-					field_coverage.checked === 0 || field_coverage.troublemakers.length > 0 ? "warn" : "ok"
+				sev: field_coverage.checked === 0 || field_coverage.troublemakers.length > 0 ? 'warn' : 'ok'
 			},
 			{
-				label: "Jumlah baris per sesi",
+				label: 'Jumlah baris per sesi',
 				detail:
 					row_counts.checked === 0
-						? "Belum ada sesi yang bisa diperiksa"
+						? 'Belum ada sesi yang bisa diperiksa'
 						: row_counts.troublemakers.length
 							? `${row_counts.troublemakers.length} sesi jauh di bawah ${row_counts.threshold_pct}% median (${row_counts.median_rows} baris) — ciri insert tersela di tengah sesi`
 							: `Median ${row_counts.median_rows} baris/sesi; tidak ada sesi di bawah ${row_counts.threshold_pct}% median`,
-				sev: row_counts.checked === 0 || row_counts.troublemakers.length > 0 ? "warn" : "ok"
+				sev: row_counts.checked === 0 || row_counts.troublemakers.length > 0 ? 'warn' : 'ok'
 			},
 			{
-				label: "Hari bursa tanpa sesi",
+				label: 'Hari bursa tanpa sesi',
 				detail:
 					session_gaps.sessions === 0
-						? "Belum ada sesi raw_eod yang bisa diperiksa"
+						? 'Belum ada sesi raw_eod yang bisa diperiksa'
 						: session_gaps.missing.length
 							? `${session_gaps.missing.length} hari bursa tanpa baris: ${session_gaps.missing
 									.slice(0, MAX_SEBUT)
-									.join(", ")}${session_gaps.missing.length > MAX_SEBUT ? ` +${session_gaps.missing.length - MAX_SEBUT} lagi` : ""}`
+									.join(
+										', '
+									)}${session_gaps.missing.length > MAX_SEBUT ? ` +${session_gaps.missing.length - MAX_SEBUT} lagi` : ''}`
 							: `0 lubang antara ${tgl(session_gaps.first)} → ${tgl(session_gaps.last)} (${session_gaps.sessions} sesi)`,
-				sev: session_gaps.sessions === 0 || session_gaps.missing.length > 0 ? "warn" : "ok"
+				sev: session_gaps.sessions === 0 || session_gaps.missing.length > 0 ? 'warn' : 'ok'
 			}
 		];
 
-		const sev: Sev = URUT.find((s) => baris.some((b) => b.sev === s)) ?? "ok";
+		const sev: Sev = URUT.find((s) => baris.some((b) => b.sev === s)) ?? 'ok';
 
 		const headline =
-			sev === "ok"
-				? "Boleh percaya angka di dashboard — semua pemeriksa aman."
-				: sev === "info"
-					? "Pemeriksa bersih; sesi hari ini belum masuk (normal sebelum ±16:15 WIB)."
-					: sev === "warn"
-						? "Ada yang janggal di dasar data — jangan andalkan angka sebelum dibereskan."
-						: "Data bermasalah — angka di dashboard ini belum bisa dipercaya.";
+			sev === 'ok'
+				? 'Boleh percaya angka di dashboard — semua pemeriksa aman.'
+				: sev === 'info'
+					? 'Pemeriksa bersih; sesi hari ini belum masuk (normal sebelum ±16:15 WIB).'
+					: sev === 'warn'
+						? 'Ada yang janggal di dasar data — jangan andalkan angka sebelum dibereskan.'
+						: 'Data bermasalah — angka di dashboard ini belum bisa dipercaya.';
 
 		const sebutSesi = [...field_coverage.troublemakers, ...row_counts.troublemakers];
 
@@ -151,8 +146,8 @@
 {:else if health.error || !data}
 	<Card title="Kesehatan Data" subtitle="Boleh percaya angka di layar ini?" info={INFO}>
 		<p class="text-warn text-xs">
-			Penjaga data tidak terbaca — endpoint <code>/api/data-health</code> belum aktif atau backend
-			mati. Selama kartu ini kosong, perlakukan angka di halaman ini dengan curiga.
+			Penjaga data tidak terbaca — endpoint <code>/api/data-health</code> belum aktif atau backend mati.
+			Selama kartu ini kosong, perlakukan angka di halaman ini dengan curiga.
 		</p>
 	</Card>
 {:else if view}

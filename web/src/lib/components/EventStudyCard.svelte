@@ -8,28 +8,28 @@
 		TrendingDown,
 		TrendingUp,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useStockEvents } from "#lib/hooks.svelte.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	} from '@lucide/svelte';
+	import { useStockEvents } from '#lib/hooks.svelte.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	const EVENT_LABEL: Record<string, { label: string; icon: LucideIcon }> = {
-		jump_up: { label: "Jump Up", icon: Rocket },
-		jump_down: { label: "Jump Down", icon: Droplet },
-		vol_spike: { label: "Volume Spike", icon: ChartColumn },
-		near_high: { label: "Dekat Puncak 63h", icon: Mountain },
-		ma_cross_up: { label: "SMA20↑50", icon: TrendingUp },
-		ma_cross_down: { label: "SMA20↓50", icon: TrendingDown }
+		jump_up: { label: 'Jump Up', icon: Rocket },
+		jump_down: { label: 'Jump Down', icon: Droplet },
+		vol_spike: { label: 'Volume Spike', icon: ChartColumn },
+		near_high: { label: 'Dekat Puncak 63h', icon: Mountain },
+		ma_cross_up: { label: 'SMA20↑50', icon: TrendingUp },
+		ma_cross_down: { label: 'SMA20↓50', icon: TrendingDown }
 	};
 
 	const pct = (v: number | null, digits = 1) =>
-		v === null ? "-" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(digits)}%`;
+		v === null ? '-' : `${v >= 0 ? '+' : ''}${(v * 100).toFixed(digits)}%`;
 
 	function tone(v: number | null): string {
-		if (v === null) return "text-muted";
-		return v >= 0 ? "text-up" : "text-down";
+		if (v === null) return 'text-muted';
+		return v >= 0 ? 'text-up' : 'text-down';
 	}
 
 	let { code }: { code: string } = $props();
@@ -66,9 +66,7 @@
 								Median 21h
 							</th>
 							<th class="text-right" title="Median emiten dikurangi median pasar">Abnormal</th>
-							<th class="text-right" title="Hit-rate semua emiten (baseline pasar)">
-								Pasar hit
-							</th>
+							<th class="text-right" title="Hit-rate semua emiten (baseline pasar)"> Pasar hit </th>
 						</tr>
 					</thead>
 					<tbody>
@@ -81,22 +79,20 @@
 									<EventIcon size={13} class="mr-1 inline align-[-2px]" aria-hidden="true" />
 									{meta.label}
 								</td>
-								<td
-									class="text-right tabular-nums {noData ? 'text-muted' : 'font-semibold'}"
-								>
+								<td class="text-right tabular-nums {noData ? 'text-muted' : 'font-semibold'}">
 									{e.my_count}
 								</td>
-								<td class="text-muted text-right tabular-nums">{e.my_last_date ?? "-"}</td>
+								<td class="text-muted text-right tabular-nums">{e.my_last_date ?? '-'}</td>
 								<td class="text-right tabular-nums {noData ? '' : tone(e.my_median_fwd)}">
-									{noData ? "-" : pct(e.my_median_fwd)}
+									{noData ? '-' : pct(e.my_median_fwd)}
 								</td>
 								<td class="text-right tabular-nums {noData ? '' : tone(e.my_median_abnormal)}">
-									{noData ? "-" : pct(e.my_median_abnormal)}
+									{noData ? '-' : pct(e.my_median_abnormal)}
 								</td>
 								<td class="text-muted text-right tabular-nums">
 									{e.market_hit_rate !== null
 										? `${(e.market_hit_rate * 100).toFixed(0)}% (${e.market_count})`
-										: "-"}
+										: '-'}
 								</td>
 							</tr>
 						{/each}

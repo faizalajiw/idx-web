@@ -6,29 +6,29 @@
 		Scale,
 		Target,
 		TrendingUp
-	} from "@lucide/svelte";
-	import { useSignalTrack } from "#lib/hooks.svelte.ts";
-	import type { SignalTrack, SignalTrackStat } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	} from '@lucide/svelte';
+	import { useSignalTrack } from '#lib/hooks.svelte.ts';
+	import type { SignalTrack, SignalTrackStat } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
 	const pct = (v: number | null) =>
-		v === null ? "-" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(2)}%`;
-	const hitPct = (v: number | null) => (v === null ? "-" : `${(v * 100).toFixed(0)}%`);
-	const num = (v: number | null, digits = 2) => (v === null ? "-" : v.toFixed(digits));
+		v === null ? '-' : `${v >= 0 ? '+' : ''}${(v * 100).toFixed(2)}%`;
+	const hitPct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(0)}%`);
+	const num = (v: number | null, digits = 2) => (v === null ? '-' : v.toFixed(digits));
 
 	const tone = (v: number | null) =>
-		v === null ? "text-muted" : v > 0 ? "text-up" : v < 0 ? "text-down" : "text-muted";
+		v === null ? 'text-muted' : v > 0 ? 'text-up' : v < 0 ? 'text-down' : 'text-muted';
 
 	// Horizon dihitung dalam hari bursa (trading day), bukan jam.
 	const HORIZON_LABEL: Record<number, { title: string; hint: string }> = {
-		5: { title: "1 minggu", hint: "5 hari bursa" },
-		10: { title: "2 minggu", hint: "10 hari bursa" },
-		21: { title: "1 bulan", hint: "21 hari bursa" }
+		5: { title: '1 minggu', hint: '5 hari bursa' },
+		10: { title: '2 minggu', hint: '10 hari bursa' },
+		21: { title: '1 bulan', hint: '21 hari bursa' }
 	};
 	const horizonLabel = (h: number) =>
 		HORIZON_LABEL[h] ?? { title: `${h} hari`, hint: `${h} hari bursa` };
@@ -36,14 +36,14 @@
 	/** Penilaian sederhana: apakah sinyal mengalahkan pasar, dan apakah buktinya cukup kuat. */
 	function verdict(row: SignalTrackStat | undefined) {
 		if (!row || row.mean_abnormal === null) {
-			return { text: "Data belum cukup", cls: "badge" };
+			return { text: 'Data belum cukup', cls: 'badge' };
 		}
 		const beats = row.mean_abnormal > 0;
 		const solid = row.t_stat !== null && Math.abs(row.t_stat) >= 2;
 		const rawPositive = row.mean_fwd !== null && row.mean_fwd > 0;
-		if (beats && solid && rawPositive) return { text: "Mengalahkan pasar", cls: "badge-buy" };
-		if (beats) return { text: "Unggul tipis, belum pasti", cls: "badge" };
-		return { text: "Belum mengalahkan pasar", cls: "badge-sell" };
+		if (beats && solid && rawPositive) return { text: 'Mengalahkan pasar', cls: 'badge-buy' };
+		if (beats) return { text: 'Unggul tipis, belum pasti', cls: 'badge' };
+		return { text: 'Belum mengalahkan pasar', cls: 'badge-sell' };
 	}
 
 	const track = useSignalTrack();
@@ -62,8 +62,8 @@
 	const overall = $derived(
 		(data?.overall ?? []).filter((r) => r.horizon === activeHorizon && r.regime === null)
 	);
-	const buyRow = $derived(overall.find((r) => r.signal === "BUY"));
-	const sellRow = $derived(overall.find((r) => r.signal === "SELL"));
+	const buyRow = $derived(overall.find((r) => r.signal === 'BUY'));
+	const sellRow = $derived(overall.find((r) => r.signal === 'SELL'));
 	const regimeRows = $derived(
 		(data?.by_regime ?? []).filter((r) => r.horizon === activeHorizon && r.n > 0)
 	);
@@ -102,15 +102,15 @@
 	</div>
 {/snippet}
 
-{#snippet signalResultCard(signal: "BUY" | "SELL", row: SignalTrackStat | undefined)}
-	{@const label = signal === "BUY" ? "Beli" : "Jual"}
+{#snippet signalResultCard(signal: 'BUY' | 'SELL', row: SignalTrackStat | undefined)}
+	{@const label = signal === 'BUY' ? 'Beli' : 'Jual'}
 	{@const v = verdict(row)}
 	<div class="card p-4">
 		<div class="flex items-center justify-between gap-2">
 			<span
 				class="badge {signal === 'BUY' ? 'badge-buy' : 'badge-sell'} inline-flex items-center gap-1"
 			>
-				{#if signal === "BUY"}
+				{#if signal === 'BUY'}
 					<ArrowUpRight size={12} aria-hidden="true" />
 				{:else}
 					<ArrowDownRight size={12} aria-hidden="true" />
@@ -148,7 +148,7 @@
 				<div>
 					<dt class="text-muted text-[11px] uppercase tracking-wide">Kekuatan bukti</dt>
 					<dd class="tabular-nums">
-						{row.t_stat === null ? "-" : Math.abs(row.t_stat) >= 2 ? "Kuat" : "Lemah"}
+						{row.t_stat === null ? '-' : Math.abs(row.t_stat) >= 2 ? 'Kuat' : 'Lemah'}
 						<span class="text-muted text-xs">(t {num(row.t_stat)})</span>
 					</dd>
 				</div>
@@ -159,18 +159,15 @@
 
 {#snippet regimeCard(row: SignalTrackStat)}
 	{@const v = verdict(row)}
-	{@const toneText = v.cls === "badge-buy"
-		? "text-up"
-		: v.cls === "badge-sell"
-			? "text-down"
-			: "text-muted"}
+	{@const toneText =
+		v.cls === 'badge-buy' ? 'text-up' : v.cls === 'badge-sell' ? 'text-down' : 'text-muted'}
 	<div class="rounded-xl border border-[var(--border)] p-3.5">
 		<div class="flex items-center justify-between gap-2">
 			<div class="flex min-w-0 items-center gap-2">
 				<span class="badge {row.signal === 'BUY' ? 'badge-buy' : 'badge-sell'}">
-					{row.signal === "BUY" ? "Beli" : "Jual"}
+					{row.signal === 'BUY' ? 'Beli' : 'Jual'}
 				</span>
-				<span class="truncate text-sm font-medium">{row.regime ?? "Semua kondisi"}</span>
+				<span class="truncate text-sm font-medium">{row.regime ?? 'Semua kondisi'}</span>
 			</div>
 			<span class="text-muted shrink-0 text-xs">n = {row.n}</span>
 		</div>
@@ -192,10 +189,10 @@
 
 {#snippet summaryStrip(d: SignalTrack)}
 	{@const items = [
-		{ label: "Sinyal tercatat", value: String(d.signals) },
-		{ label: "Beli / Jual", value: `${d.buy} / ${d.sell}` },
-		{ label: "Periode data", value: `${d.first_date ?? "-"} s/d ${d.last_date ?? "-"}` },
-		{ label: "Terakhir dihitung", value: d.generated_at?.replace("T", " ").slice(0, 16) ?? "-" }
+		{ label: 'Sinyal tercatat', value: String(d.signals) },
+		{ label: 'Beli / Jual', value: `${d.buy} / ${d.sell}` },
+		{ label: 'Periode data', value: `${d.first_date ?? '-'} s/d ${d.last_date ?? '-'}` },
+		{ label: 'Terakhir dihitung', value: d.generated_at?.replace('T', ' ').slice(0, 16) ?? '-' }
 	]}
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 		{#each items as it (it.label)}
@@ -223,8 +220,8 @@
 				Jejak <span class="gradient-text">Sinyal</span>
 			</h1>
 			<p class="text-muted mt-1 text-sm">
-				Seberapa sering sinyal beli dan jual di aplikasi ini benar-benar berhasil, dilihat dari
-				data masa lalu.
+				Seberapa sering sinyal beli dan jual di aplikasi ini benar-benar berhasil, dilihat dari data
+				masa lalu.
 			</p>
 			<div class="mt-1">
 				<LastUpdated sessionDate={data?.last_date} updatedAt={data?.generated_at} />
@@ -244,15 +241,16 @@
 
 			<section class="space-y-3">
 				<h2 class="flex items-center gap-2 text-base font-semibold">
-					<Target size={16} aria-hidden="true" /> Hasil sinyal dalam {horizonLabel(activeHorizon).title}
+					<Target size={16} aria-hidden="true" /> Hasil sinyal dalam {horizonLabel(activeHorizon)
+						.title}
 				</h2>
 				<div class="grid gap-3 md:grid-cols-2">
-					{@render signalResultCard("BUY", buyRow)}
-					{@render signalResultCard("SELL", sellRow)}
+					{@render signalResultCard('BUY', buyRow)}
+					{@render signalResultCard('SELL', sellRow)}
 				</div>
 				<p class="text-muted text-xs">
-					<strong class="text-[var(--fg)]">Vs pasar</strong> = selisih hasil sinyal dibanding rata-rata
-					pasar pada periode yang sama. Positif berarti sinyal lebih baik dari pasar.
+					<strong class="text-[var(--fg)]">Vs pasar</strong> = selisih hasil sinyal dibanding
+					rata-rata pasar pada periode yang sama. Positif berarti sinyal lebih baik dari pasar.
 					<strong class="text-[var(--fg)]">Kekuatan bukti</strong> menunjukkan apakah hasil ini cukup
 					konsisten, bukan sekadar kebetulan.
 				</p>
@@ -267,7 +265,7 @@
 					<EmptyState message="Belum cukup data per kondisi pasar untuk jangka waktu ini." />
 				{:else}
 					<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-						{#each regimeRows as r (`${r.signal}-${r.regime ?? "all"}-${r.horizon}`)}
+						{#each regimeRows as r (`${r.signal}-${r.regime ?? 'all'}-${r.horizon}`)}
 							{@render regimeCard(r)}
 						{/each}
 					</div>
@@ -307,7 +305,7 @@
 										</td>
 										<td>
 											<span class="badge {r.signal === 'BUY' ? 'badge-buy' : 'badge-sell'}">
-												{r.signal === "BUY" ? "Beli" : "Jual"}
+												{r.signal === 'BUY' ? 'Beli' : 'Jual'}
 											</span>
 										</td>
 										<td class="hidden text-right tabular-nums sm:table-cell">

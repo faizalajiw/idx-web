@@ -7,7 +7,7 @@
 	 * 100%). Sumbu, kisi, garis nol, legenda, dan tooltip mengikuti bentuk yang
 	 * sama dengan grafik garis.
 	 */
-	import { fmtNum } from "#lib/format.ts";
+	import { fmtNum } from '#lib/format.ts';
 
 	type Series = {
 		name: string;
@@ -28,13 +28,13 @@
 		maxBarSize = 26,
 		radius = 3,
 		refY = null,
-		yDomain = "auto",
+		yDomain = 'auto',
 		yFmt = (v: number) => fmtNum(v),
 		xFmt = (s: string) => s,
 		legend = false,
 		footer = null,
 		xTickGap = 24,
-		emptyLabel = "Tidak ada data."
+		emptyLabel = 'Tidak ada data.'
 	}: {
 		labels: string[];
 		series: Series[];
@@ -44,7 +44,7 @@
 		maxBarSize?: number;
 		radius?: number;
 		refY?: number | null;
-		yDomain?: "auto" | [number, number];
+		yDomain?: 'auto' | [number, number];
 		yFmt?: (v: number) => string;
 		xFmt?: (s: string) => string;
 		legend?: boolean;
@@ -54,8 +54,8 @@
 	} = $props();
 
 	const PAD = { right: 10, top: 8, bottom: 22 };
-	const AXIS = "var(--chart-axis)";
-	const GRID = "var(--chart-grid)";
+	const AXIS = 'var(--chart-axis)';
+	const GRID = 'var(--chart-grid)';
 
 	let box = $state<HTMLDivElement | null>(null);
 	let width = $state(0);
@@ -109,7 +109,8 @@
 
 	const band = $derived(labels.length === 0 ? 0 : plotW / labels.length);
 	const barW = $derived(Math.max(1, Math.min(maxBarSize, band * 0.68)));
-	const y = (v: number) => PAD.top + plotH - ((v - domain[0]) / (domain[1] - domain[0] || 1)) * plotH;
+	const y = (v: number) =>
+		PAD.top + plotH - ((v - domain[0]) / (domain[1] - domain[0] || 1)) * plotH;
 	const center = (i: number) => padL + band * (i + 0.5);
 
 	const xTickIdx = $derived.by<number[]>(() => {
@@ -124,7 +125,8 @@
 		for (let i = 0; i < labels.length; i += step) idx.push(i);
 		const last = labels.length - 1;
 		if (idx[idx.length - 1] !== last) {
-			const gapPx = labels.length <= 1 ? plotW : (plotW / (labels.length - 1)) * (last - idx[idx.length - 1]);
+			const gapPx =
+				labels.length <= 1 ? plotW : (plotW / (labels.length - 1)) * (last - idx[idx.length - 1]);
 			if (gapPx < minGap) idx.pop();
 			idx.push(last);
 		}
@@ -139,7 +141,9 @@
 		hover = idx >= 0 && idx < labels.length ? idx : null;
 	}
 
-	const tooltipX = $derived(hover === null ? 0 : Math.min(Math.max(center(hover), 100), Math.max(width - 100, 100)));
+	const tooltipX = $derived(
+		hover === null ? 0 : Math.min(Math.max(center(hover), 100), Math.max(width - 100, 100))
+	);
 </script>
 
 {#if labels.length === 0}
@@ -148,7 +152,7 @@
 	<div class="relative" bind:this={box} bind:clientWidth={width}>
 		<svg
 			width="100%"
-			height={height}
+			{height}
 			viewBox="0 0 {width || 1} {height}"
 			role="img"
 			aria-label="Grafik batang {series.map((s) => s.name).join(', ')}"
@@ -156,14 +160,7 @@
 			onmouseleave={() => (hover = null)}
 		>
 			{#each ticks as t (t)}
-				<line
-					x1={padL}
-					x2={padL + plotW}
-					y1={y(t)}
-					y2={y(t)}
-					stroke={GRID}
-					stroke-width="1"
-				/>
+				<line x1={padL} x2={padL + plotW} y1={y(t)} y2={y(t)} stroke={GRID} stroke-width="1" />
 				<text
 					x={padL - 8}
 					y={y(t) + 3.5}
@@ -178,7 +175,7 @@
 				<text
 					x={i === 0 ? padL : i === labels.length - 1 ? padL + plotW : center(i)}
 					y={height - 6}
-					text-anchor={i === 0 ? "start" : i === labels.length - 1 ? "end" : "middle"}
+					text-anchor={i === 0 ? 'start' : i === labels.length - 1 ? 'end' : 'middle'}
 					font-size="10"
 					fill={AXIS}>{xFmt(labels[i])}</text
 				>
@@ -272,10 +269,15 @@
 	</div>
 
 	{#if legend}
-		<div class="text-muted mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]">
+		<div
+			class="text-muted mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]"
+		>
 			{#each series as s (s.name)}
 				<span class="inline-flex items-center gap-1.5">
-					<span class="inline-block h-2 w-2 rounded-full" style="background: {s.color}" aria-hidden="true"
+					<span
+						class="inline-block h-2 w-2 rounded-full"
+						style="background: {s.color}"
+						aria-hidden="true"
 					></span>
 					{s.name}
 				</span>

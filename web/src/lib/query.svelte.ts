@@ -5,7 +5,7 @@
  * Kunci = path API. Semua komponen yang memakai kunci sama berbagi satu entri,
  * jadi dua panel di satu halaman tidak mengirim dua request.
  */
-import { fetcher } from "#lib/api.ts";
+import { fetcher } from '#lib/api.ts';
 
 export interface QueryOptions {
 	/** Jeda auto-refresh (ms). Kosong = tidak ada polling. */
@@ -144,7 +144,7 @@ export function mutateMatch(match: (key: string) => boolean): void {
 	}
 }
 
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
 	const revalidateAll = () => {
 		for (const entry of entries.values()) {
 			if (entry.subscribers > 0 && entry.options.revalidateOnFocus !== false) {
@@ -152,10 +152,10 @@ if (typeof window !== "undefined") {
 			}
 		}
 	};
-	window.addEventListener("focus", revalidateAll);
-	window.addEventListener("online", revalidateAll);
-	document.addEventListener("visibilitychange", () => {
-		if (document.visibilityState === "visible") revalidateAll();
+	window.addEventListener('focus', revalidateAll);
+	window.addEventListener('online', revalidateAll);
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'visible') revalidateAll();
 	});
 }
 
@@ -167,7 +167,7 @@ export function createQuery<T>(
 	source: string | null | (() => string | null),
 	options: QueryOptions = {}
 ): QueryResult<T> {
-	const key = $derived(typeof source === "function" ? source() : source);
+	const key = $derived(typeof source === 'function' ? source() : source);
 
 	const view = $state<{ data: T | undefined; error: unknown; validating: boolean }>({
 		data: undefined,
@@ -188,7 +188,9 @@ export function createQuery<T>(
 
 		const entry = entryFor(current, options);
 		const carried =
-			options.keepPreviousData && entry.data === undefined ? (previous?.data as T | undefined) : undefined;
+			options.keepPreviousData && entry.data === undefined
+				? (previous?.data as T | undefined)
+				: undefined;
 		previous = entry;
 
 		view.data = (entry.data !== undefined ? entry.data : carried) as T | undefined;

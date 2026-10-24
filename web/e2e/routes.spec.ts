@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
-import { RUTE } from "./rute";
+import { RUTE } from './rute';
 
 /**
  * Setiap rute harus tampil, bukan layar kosong.
@@ -17,8 +17,6 @@ for (const rute of RUTE) {
 		const balasan = await page.goto(rute);
 
 		expect(balasan?.status(), `status ${rute}`).toBe(200);
-		await expect(
-			page.locator("h1").or(page.getByRole("alert")).first()
-		).toBeVisible();
+		await expect(page.locator('h1').or(page.getByRole('alert')).first()).toBeVisible();
 	});
 }

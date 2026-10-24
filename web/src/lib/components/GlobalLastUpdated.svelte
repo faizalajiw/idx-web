@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { useMarketOverview } from "#lib/hooks.svelte.ts";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
+	import { useMarketOverview } from '#lib/hooks.svelte.ts';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
 
 	const overview = useMarketOverview();
 </script>

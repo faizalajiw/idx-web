@@ -1,36 +1,36 @@
 <script lang="ts">
-	import { useMarketLeaders } from "#lib/hooks.svelte.ts";
-	import { fmtNum, fmtPct, fmtCompact } from "#lib/format.ts";
-	import type { LeaderRow, MarketLeaders } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { useMarketLeaders } from '#lib/hooks.svelte.ts';
+	import { fmtNum, fmtPct, fmtCompact } from '#lib/format.ts';
+	import type { LeaderRow, MarketLeaders } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
-	type Metric = "volume" | "value" | "frequency";
+	type Metric = 'volume' | 'value' | 'frequency';
 
 	const META: Record<
 		Metric,
 		{ title: string; subtitle: string; info: string; unit: (r: LeaderRow) => string }
 	> = {
 		volume: {
-			title: "Top Volume",
-			subtitle: "Lembar diperdagangkan terbanyak",
-			info: "Emiten dengan jumlah lembar saham (volume) diperdagangkan terbanyak. Saat jam bursa memakai data realtime; di luar jam pakai data akhir sesi (EOD) terakhir.",
+			title: 'Top Volume',
+			subtitle: 'Lembar diperdagangkan terbanyak',
+			info: 'Emiten dengan jumlah lembar saham (volume) diperdagangkan terbanyak. Saat jam bursa memakai data realtime; di luar jam pakai data akhir sesi (EOD) terakhir.',
 			unit: (r) => fmtCompact(r.volume)
 		},
 		value: {
-			title: "Top Value",
-			subtitle: "Nilai transaksi terbesar (Rp)",
-			info: "Emiten dengan nilai transaksi (rupiah) terbesar. Saat jam bursa memakai data realtime; di luar jam pakai data akhir sesi (EOD) terakhir.",
+			title: 'Top Value',
+			subtitle: 'Nilai transaksi terbesar (Rp)',
+			info: 'Emiten dengan nilai transaksi (rupiah) terbesar. Saat jam bursa memakai data realtime; di luar jam pakai data akhir sesi (EOD) terakhir.',
 			unit: (r) => `Rp ${fmtCompact(r.value)}`
 		},
 		frequency: {
-			title: "Top Frequency",
-			subtitle: "Frekuensi transaksi terbanyak",
-			info: "Emiten dengan jumlah transaksi (frekuensi) terbanyak. Frekuensi tidak tersedia realtime, jadi panel ini selalu memakai data akhir sesi (EOD) terakhir.",
+			title: 'Top Frequency',
+			subtitle: 'Frekuensi transaksi terbanyak',
+			info: 'Emiten dengan jumlah transaksi (frekuensi) terbanyak. Frekuensi tidak tersedia realtime, jadi panel ini selalu memakai data akhir sesi (EOD) terakhir.',
 			unit: (r) => `${fmtNum(r.frequency)}x`
 		}
 	};
@@ -59,16 +59,16 @@
 </script>
 
 {#snippet sourceBadge(d: MarketLeaders)}
-	{@const live = d.source === "intraday"}
+	{@const live = d.source === 'intraday'}
 	<span
 		title={live
-			? "Ranking realtime dari data intraday"
-			: "Ranking dari data akhir sesi (EOD) terakhir"}
+			? 'Ranking realtime dari data intraday'
+			: 'Ranking dari data akhir sesi (EOD) terakhir'}
 		class="rounded-full border px-1.5 py-0.5 text-[9px] font-semibold tracking-wide uppercase {live
 			? 'border-[var(--up)]/40 bg-[var(--up)]/10 text-up'
 			: 'border-[var(--border)] text-muted'}"
 	>
-		{live ? "Live" : "EOD"}
+		{live ? 'Live' : 'EOD'}
 	</span>
 {/snippet}
 
@@ -88,7 +88,7 @@
 	</div>
 {/snippet}
 
-<Card title={meta.title} subtitle={meta.subtitle} info={meta.info} right={right}>
+<Card title={meta.title} subtitle={meta.subtitle} info={meta.info} {right}>
 	{#if error}
 		<ErrorState message={pesanError} />
 	{:else if isLoading || !data}
@@ -137,10 +137,10 @@
 					</button>
 					{#if open[r.code]}
 						<div class="grid grid-cols-4 gap-2 border-t border-[var(--border)] px-3 py-2">
-							{@render detail("Harga", fmtNum(r.close))}
-							{@render detail("Volume", fmtCompact(r.volume))}
-							{@render detail("Value", `Rp ${fmtCompact(r.value)}`)}
-							{@render detail("Freq", r.frequency !== null ? `${fmtNum(r.frequency)}x` : "-")}
+							{@render detail('Harga', fmtNum(r.close))}
+							{@render detail('Volume', fmtCompact(r.volume))}
+							{@render detail('Value', `Rp ${fmtCompact(r.value)}`)}
+							{@render detail('Freq', r.frequency !== null ? `${fmtNum(r.frequency)}x` : '-')}
 						</div>
 					{/if}
 				</div>

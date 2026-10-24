@@ -13,7 +13,9 @@
 		root.classList.toggle('sidebar-collapsed', next);
 		try {
 			localStorage.setItem(SIDEBAR_KEY, next ? '1' : '0');
-		} catch {}
+		} catch {
+			// localStorage bisa diblokir (mode privat); rail tetap bekerja tanpa memori.
+		}
 	}
 </script>
 

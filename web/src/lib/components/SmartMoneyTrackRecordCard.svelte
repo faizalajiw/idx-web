@@ -1,31 +1,31 @@
 <script lang="ts">
-	import { BookOpenCheck, TrendingDown, TrendingUp } from "@lucide/svelte";
-	import { useSmartMoneyTrackRecord } from "#lib/hooks.svelte.ts";
-	import { fmtPct } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { BookOpenCheck, TrendingDown, TrendingUp } from '@lucide/svelte';
+	import { useSmartMoneyTrackRecord } from '#lib/hooks.svelte.ts';
+	import { fmtPct } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	const HORIZONS = [
-		{ key: "fwd1", label: "Hari ini" },
-		{ key: "fwd5", label: "1 minggu" },
-		{ key: "fwd10", label: "2 minggu" },
-		{ key: "fwd21", label: "1 bulan" }
+		{ key: 'fwd1', label: 'Hari ini' },
+		{ key: 'fwd5', label: '1 minggu' },
+		{ key: 'fwd10', label: '2 minggu' },
+		{ key: 'fwd21', label: '1 bulan' }
 	];
 
 	// hit_rate adalah pecahan (0.54) -> "54%".
 	function pctOf(x: number | null | undefined): string {
-		return x === null || x === undefined ? "−" : `${Math.round(x * 100)}%`;
+		return x === null || x === undefined ? '−' : `${Math.round(x * 100)}%`;
 	}
 
 	// Kepercayaan dari t-stat mean-vs-nol: |t|>=2 kuat, 1-2 sedang, <1 lemah.
 	function confidence(tstat: number | null | undefined): { label: string; cls: string } {
-		if (tstat === null || tstat === undefined) return { label: "−", cls: "text-muted" };
+		if (tstat === null || tstat === undefined) return { label: '−', cls: 'text-muted' };
 		const a = Math.abs(tstat);
-		if (a >= 2) return { label: "tinggi", cls: "text-up" };
-		if (a >= 1) return { label: "sedang", cls: "text-[var(--accent-text)]" };
-		return { label: "lemah", cls: "text-muted" };
+		if (a >= 2) return { label: 'tinggi', cls: 'text-up' };
+		if (a >= 1) return { label: 'sedang', cls: 'text-[var(--accent-text)]' };
+		return { label: 'lemah', cls: 'text-muted' };
 	}
 
 	/**
@@ -33,11 +33,11 @@
 	 * Menjawab rasa skeptis orang awam: bukan cuma hari ini apa yang terjadi,
 	 * tapi seberapa sering tiap pola bekerja di 120 sesi terakhir + beat pasar.
 	 */
-	let { class: className = "" }: { class?: string } = $props();
+	let { class: className = '' }: { class?: string } = $props();
 
 	const track = useSmartMoneyTrackRecord();
 	const data = $derived(track.data);
-	let horizon = $state("fwd10");
+	let horizon = $state('fwd10');
 </script>
 
 {#snippet cardTitle()}
@@ -98,7 +98,7 @@
 				{#each data.patterns as p (p.pattern)}
 					{#if p.horizons[horizon]}
 						{@const h = p.horizons[horizon]}
-						{@const buy = p.direction === "buy-side"}
+						{@const buy = p.direction === 'buy-side'}
 						{@const conf = confidence(h.tstat)}
 						{@const eff = h.effective_alpha}
 						{@const works = h.aligned_hit_rate !== null}
@@ -135,7 +135,7 @@
 										? 'text-up'
 										: 'text-down'}"
 							>
-								{eff === null ? "−" : fmtPct(eff)}
+								{eff === null ? '−' : fmtPct(eff)}
 							</span>
 							<span class="text-right text-xs font-medium {conf.cls}">{conf.label}</span>
 						</div>

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { useSignals } from "#lib/hooks.svelte.ts";
-	import { fmtNum, fmtPct } from "#lib/format.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	import { useSignals } from '#lib/hooks.svelte.ts';
+	import { fmtNum, fmtPct } from '#lib/format.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
-	type SignalFilter = "BUY" | "SELL" | "HOLD";
+	type SignalFilter = 'BUY' | 'SELL' | 'HOLD';
 
 	let {
 		codes,
@@ -21,9 +21,9 @@
 	} = $props();
 
 	function badgeClass(sig: string): string {
-		if (sig === "BUY") return "badge badge-buy";
-		if (sig === "SELL") return "badge badge-sell";
-		return "badge badge-hold";
+		if (sig === 'BUY') return 'badge badge-buy';
+		if (sig === 'SELL') return 'badge badge-sell';
+		return 'badge badge-hold';
 	}
 
 	const signals = useSignals(() => codes);
@@ -42,23 +42,23 @@
 	const tallyItems = $derived.by(() => {
 		const counts = { BUY: 0, SELL: 0, HOLD: 0 };
 		for (const s of data ?? []) {
-			if (s.signal === "BUY") counts.BUY++;
-			else if (s.signal === "SELL") counts.SELL++;
+			if (s.signal === 'BUY') counts.BUY++;
+			else if (s.signal === 'SELL') counts.SELL++;
 			else counts.HOLD++;
 		}
 		return [
-			{ label: "BUY" as SignalFilter, value: counts.BUY, dot: "bg-[var(--up)]", text: "text-up" },
+			{ label: 'BUY' as SignalFilter, value: counts.BUY, dot: 'bg-[var(--up)]', text: 'text-up' },
 			{
-				label: "HOLD" as SignalFilter,
+				label: 'HOLD' as SignalFilter,
 				value: counts.HOLD,
-				dot: "bg-[var(--muted)]",
-				text: "text-muted"
+				dot: 'bg-[var(--muted)]',
+				text: 'text-muted'
 			},
 			{
-				label: "SELL" as SignalFilter,
+				label: 'SELL' as SignalFilter,
 				value: counts.SELL,
-				dot: "bg-[var(--down)]",
-				text: "text-down"
+				dot: 'bg-[var(--down)]',
+				text: 'text-down'
 			}
 		];
 	});
@@ -68,7 +68,7 @@
 	);
 </script>
 
-{#snippet metric(label: string, value: string, tone?: "up" | "down")}
+{#snippet metric(label: string, value: string, tone?: 'up' | 'down')}
 	<div class="flex flex-col">
 		<span class="text-muted text-[10px] tracking-wide uppercase">{label}</span>
 		<span
@@ -89,7 +89,7 @@
 						type="button"
 						onclick={() => toggleFilter(it.label)}
 						aria-pressed={isActive}
-						title={isActive ? "Tampilkan semua" : `Filter ${it.label} saja`}
+						title={isActive ? 'Tampilkan semua' : `Filter ${it.label} saja`}
 						class="flex items-center gap-1.5 rounded-full border bg-white/[0.02] px-2.5 py-1 transition-colors {isActive
 							? 'border-[var(--accent)] ring-1 ring-[var(--accent)]'
 							: 'border-[var(--border)] hover:border-[var(--fg)]/40'}"
@@ -103,11 +103,7 @@
 				{/each}
 			</div>
 		{/if}
-		<LastUpdated
-			dep={data}
-			sessionDate={data?.[0]?.as_of}
-			updatedAt={data?.[0]?.generated_at}
-		/>
+		<LastUpdated dep={data} sessionDate={data?.[0]?.as_of} updatedAt={data?.[0]?.generated_at} />
 	</div>
 {/snippet}
 
@@ -115,7 +111,7 @@
 	title="Trading Signals"
 	subtitle="SMA20/50 + RSI(14) rule-based"
 	info="Sinyal beli/jual/tahan otomatis berdasarkan rumus teknikal (rata-rata harga & momentum). Ini alat bantu, BUKAN ajakan beli. Selalu cek konteks lain dan jangan ikut buta."
-	right={right}
+	{right}
 >
 	{#if error}
 		<ErrorState message={pesanError} />
@@ -165,17 +161,17 @@
 					</div>
 					<div class="grid grid-cols-4 gap-2 border-t border-[var(--border)] pt-2">
 						{@render metric(
-							"RSI",
-							s.rsi !== null ? s.rsi.toFixed(1) : "-",
-							s.rsi !== null ? (s.rsi >= 70 ? "down" : s.rsi <= 30 ? "up" : undefined) : undefined
+							'RSI',
+							s.rsi !== null ? s.rsi.toFixed(1) : '-',
+							s.rsi !== null ? (s.rsi >= 70 ? 'down' : s.rsi <= 30 ? 'up' : undefined) : undefined
 						)}
-						{@render metric("SMA20", fmtNum(s.sma20))}
+						{@render metric('SMA20', fmtNum(s.sma20))}
 						{@render metric(
-							"MACD",
-							s.macd !== null ? s.macd.toFixed(2) : "-",
-							s.macd !== null ? (s.macd >= 0 ? "up" : "down") : undefined
+							'MACD',
+							s.macd !== null ? s.macd.toFixed(2) : '-',
+							s.macd !== null ? (s.macd >= 0 ? 'up' : 'down') : undefined
 						)}
-						{@render metric("Trend", s.trend_up ? "Naik" : "Turun", s.trend_up ? "up" : "down")}
+						{@render metric('Trend', s.trend_up ? 'Naik' : 'Turun', s.trend_up ? 'up' : 'down')}
 					</div>
 				</button>
 			{/each}

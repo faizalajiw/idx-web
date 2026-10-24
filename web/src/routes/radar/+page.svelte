@@ -1,61 +1,61 @@
 <script lang="ts">
-	import { ChevronRight, Radar, TrendingDown, TrendingUp, type LucideIcon } from "@lucide/svelte";
-	import { useSmartMoneyRadar } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtNum } from "#lib/format.ts";
-	import type { SmartMoneyRadarRow } from "#lib/types.ts";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
-	import SmartMoneyTrackRecordCard from "#lib/components/SmartMoneyTrackRecordCard.svelte";
-	import SmartMoneyPatternsBoard from "#lib/components/SmartMoneyPatternsBoard.svelte";
+	import { ChevronRight, Radar, TrendingDown, TrendingUp, type LucideIcon } from '@lucide/svelte';
+	import { useSmartMoneyRadar } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtNum } from '#lib/format.ts';
+	import type { SmartMoneyRadarRow } from '#lib/types.ts';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
+	import SmartMoneyTrackRecordCard from '#lib/components/SmartMoneyTrackRecordCard.svelte';
+	import SmartMoneyPatternsBoard from '#lib/components/SmartMoneyPatternsBoard.svelte';
 
 	/** Jendela waktu agregasi (hari bursa). */
 	const WINDOWS = [
-		{ days: 1, label: "Hari ini" },
-		{ days: 5, label: "1 minggu" },
-		{ days: 10, label: "2 minggu" },
-		{ days: 21, label: "1 bulan" }
+		{ days: 1, label: 'Hari ini' },
+		{ days: 5, label: '1 minggu' },
+		{ days: 10, label: '2 minggu' },
+		{ days: 21, label: '1 bulan' }
 	];
 
-	type Side = "akumulasi" | "distribusi";
+	type Side = 'akumulasi' | 'distribusi';
 
 	const SIDES: { key: Side; label: string; hint: string; icon: LucideIcon }[] = [
 		{
-			key: "akumulasi",
-			label: "Asing sedang borong",
-			hint: "Dana asing net beli",
+			key: 'akumulasi',
+			label: 'Asing sedang borong',
+			hint: 'Dana asing net beli',
 			icon: TrendingUp
 		},
 		{
-			key: "distribusi",
-			label: "Asing sedang lepas",
-			hint: "Dana asing net jual",
+			key: 'distribusi',
+			label: 'Asing sedang lepas',
+			hint: 'Dana asing net jual',
 			icon: TrendingDown
 		}
 	];
 
 	let days = $state(10);
-	let side = $state<Side>("akumulasi");
+	let side = $state<Side>('akumulasi');
 
 	const radar = useSmartMoneyRadar(() => days);
 	const data = $derived(radar.data);
 	const acc = $derived(data?.accumulation ?? []);
 	const dist = $derived(data?.distribution ?? []);
 	const hasAny = $derived(acc.length > 0 || dist.length > 0);
-	const rows = $derived(side === "akumulasi" ? acc : dist);
+	const rows = $derived(side === 'akumulasi' ? acc : dist);
 </script>
 
 {#snippet radarList(rows: SmartMoneyRadarRow[], side: Side, days: number)}
-	{@const isAcc = side === "akumulasi"}
+	{@const isAcc = side === 'akumulasi'}
 	{@const maxAbs = Math.max(...rows.map((r) => Math.abs(r.net_sum_idr ?? 0)), 1)}
 	{#if rows.length === 0}
 		<EmptyState
-			message={`Belum ada emiten yang ${isAcc
-				? "diborong"
-				: "dilepas"} asing dalam ${WINDOWS.find((w) => w.days === days)?.label.toLowerCase() ?? `${days} sesi`} terakhir.`}
+			message={`Belum ada emiten yang ${
+				isAcc ? 'diborong' : 'dilepas'
+			} asing dalam ${WINDOWS.find((w) => w.days === days)?.label.toLowerCase() ?? `${days} sesi`} terakhir.`}
 		/>
 	{:else}
 		<ul class="divide-y divide-[var(--border)]">
@@ -83,18 +83,14 @@
 							</span>
 						</span>
 						<span class="flex shrink-0 flex-col items-end">
-							<span
-								class="text-sm font-bold tabular-nums {isAcc ? 'text-up' : 'text-down'}"
-							>
-								{isAcc ? "+" : "−"}Rp {fmtCompact(value)}
+							<span class="text-sm font-bold tabular-nums {isAcc ? 'text-up' : 'text-down'}">
+								{isAcc ? '+' : '−'}Rp {fmtCompact(value)}
 							</span>
 							<span class="text-muted flex items-center gap-1.5 text-[11px] tabular-nums">
 								{fmtNum(r.netval_pct, 1)}% dari transaksi
 								{#if (r.streak ?? 0) >= 3}
 									<span
-										class="rounded bg-white/10 px-1 font-semibold {isAcc
-											? 'text-up'
-											: 'text-down'}"
+										class="rounded bg-white/10 px-1 font-semibold {isAcc ? 'text-up' : 'text-down'}"
 										title="{r.streak} sesi berturut-turut"
 									>
 										{r.streak} hari berturut
@@ -183,9 +179,9 @@
 				>
 					{#each SIDES as s (s.key)}
 						{@const active = side === s.key}
-						{@const count = s.key === "akumulasi" ? acc.length : dist.length}
+						{@const count = s.key === 'akumulasi' ? acc.length : dist.length}
 						{@const Icon = s.icon}
-						{@const tone = s.key === "akumulasi" ? "text-up" : "text-down"}
+						{@const tone = s.key === 'akumulasi' ? 'text-up' : 'text-down'}
 						<button
 							type="button"
 							role="tab"
@@ -208,7 +204,9 @@
 					{/each}
 				</div>
 				<p class="text-muted px-4 pt-3 text-xs">
-					{SIDES.find((s) => s.key === side)?.hint} · {WINDOWS.find((w) => w.days === days)?.label.toLowerCase()}
+					{SIDES.find((s) => s.key === side)?.hint} · {WINDOWS.find(
+						(w) => w.days === days
+					)?.label.toLowerCase()}
 					terakhir
 				</p>
 				<div class="px-1 pb-2 sm:px-2">
@@ -227,8 +225,8 @@
 	</div>
 
 	<p class="text-muted text-xs leading-relaxed">
-		Data EOD IDX (delayed ~5–15 menit, diperbarui tiap hari bursa). Nilai rupiah = volume saham asing ×
-		harga penutupan
-		{data ? ` · dipindai dari ${fmtNum(data.scanned)} emiten` : ""}.
+		Data EOD IDX (delayed ~5–15 menit, diperbarui tiap hari bursa). Nilai rupiah = volume saham
+		asing × harga penutupan
+		{data ? ` · dipindai dari ${fmtNum(data.scanned)} emiten` : ''}.
 	</p>
 </main>

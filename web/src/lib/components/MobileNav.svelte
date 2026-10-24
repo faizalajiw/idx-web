@@ -110,12 +110,7 @@
 		data-open={open}
 		inert={!open}
 	>
-		<button
-			type="button"
-			class="drawer-scrim"
-			aria-label="Tutup menu"
-			tabindex="-1"
-			onclick={close}
+		<button type="button" class="drawer-scrim" aria-label="Tutup menu" tabindex="-1" onclick={close}
 		></button>
 		<div bind:this={panel} class="drawer-panel">
 			<div class="drawer-head">

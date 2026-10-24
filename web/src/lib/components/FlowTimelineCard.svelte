@@ -1,18 +1,23 @@
 <script lang="ts">
-	import { useStockBrokerActivity } from "#lib/hooks.svelte.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LineArea from "#lib/components/LineArea.svelte";
+	import { useStockBrokerActivity } from '#lib/hooks.svelte.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LineArea from '#lib/components/LineArea.svelte';
 
-	const SCORE_LINE = "var(--chart-score)";
-	const MEDIAN_LINE = "var(--chart-median)";
+	const SCORE_LINE = 'var(--chart-score)';
+	const MEDIAN_LINE = 'var(--chart-median)';
 
 	/** Pilihan zoom sesi bursa. */
 	const ZOOMS = [5, 20, 60, 120] as const;
 	type Zoom = (typeof ZOOMS)[number];
-	const ZOOM_LABEL: Record<Zoom, string> = { 5: "5 hari", 20: "1 bulan", 60: "3 bulan", 120: "6 bulan" };
+	const ZOOM_LABEL: Record<Zoom, string> = {
+		5: '5 hari',
+		20: '1 bulan',
+		60: '3 bulan',
+		120: '6 bulan'
+	};
 
 	type TimelinePoint = {
 		date: string;
@@ -23,8 +28,8 @@
 	let {
 		code,
 		lookback = 120,
-		title = "Riwayat Aliran Dana",
-		class: className = ""
+		title = 'Riwayat Aliran Dana',
+		class: className = ''
 	}: {
 		code: string;
 		lookback?: number;
@@ -32,7 +37,10 @@
 		class?: string;
 	} = $props();
 
-	const activity = useStockBrokerActivity(() => code, () => lookback);
+	const activity = useStockBrokerActivity(
+		() => code,
+		() => lookback
+	);
 	const data = $derived(activity.data);
 	let zoom = $state<Zoom>(20);
 
@@ -54,20 +62,20 @@
 		const delta = score - ref;
 		const intensity = Math.min(Math.abs(delta) / 25, 1); // 25 poin = penuh
 		const alpha = 0.25 + 0.6 * intensity;
-		const base = delta >= 0 ? "var(--chart-up)" : "var(--chart-down)";
+		const base = delta >= 0 ? 'var(--chart-up)' : 'var(--chart-down)';
 		return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(0)}%, transparent)`;
 	}
 
 	const subtitle = $derived(
 		data?.as_of
 			? `Seberapa kuat tekanan beli vs jual dari broker, sampai ${data.as_of}`
-			: "Seberapa kuat tekanan beli vs jual dari broker"
+			: 'Seberapa kuat tekanan beli vs jual dari broker'
 	);
 </script>
 
 <Card
 	class={className}
-	title={title}
+	{title}
 	{subtitle}
 	info="Skor 0–100 menunjukkan arah tekanan broker. Di atas garis putus-putus (50) berarti lebih banyak yang mengumpulkan saham; di bawah berarti lebih banyak yang melepas. Garis abu-abu = rata-rata pasar hari itu sebagai pembanding."
 >
@@ -103,11 +111,13 @@
 		<div>
 			<div class="text-muted mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
 				<span class="flex items-center gap-1.5">
-					<span class="inline-block h-2 w-3 rounded-sm" style="background-color: {SCORE_LINE}"></span>
+					<span class="inline-block h-2 w-3 rounded-sm" style="background-color: {SCORE_LINE}"
+					></span>
 					Skor emiten
 				</span>
 				<span class="flex items-center gap-1.5">
-					<span class="inline-block w-3 border-t border-dashed" style="border-color: {MEDIAN_LINE}"></span>
+					<span class="inline-block w-3 border-t border-dashed" style="border-color: {MEDIAN_LINE}"
+					></span>
 					Rata-rata pasar
 				</span>
 			</div>
@@ -116,16 +126,16 @@
 				labels={view.map((p) => p.date)}
 				series={[
 					{
-						name: "Skor",
+						name: 'Skor',
 						values: view.map((p) => p.score),
 						color: SCORE_LINE,
-						kind: "area",
-						fill: "var(--chart-area-fill)",
+						kind: 'area',
+						fill: 'var(--chart-area-fill)',
 						width: 2,
 						fmt: (v) => v.toFixed(1)
 					},
 					{
-						name: "Median pasar",
+						name: 'Median pasar',
 						values: view.map((p) => p.median),
 						color: MEDIAN_LINE,
 						width: 1.5,
@@ -138,7 +148,7 @@
 				yTicks={[0, 50, 100]}
 				yFmt={(v) => String(Math.round(v))}
 				xFmt={(d) => d.slice(5)}
-				refs={[{ y: 50, color: "var(--chart-ref-soft)", dashed: true }]}
+				refs={[{ y: 50, color: 'var(--chart-ref-soft)', dashed: true }]}
 				legend={false}
 				xTickGap={24}
 			/>

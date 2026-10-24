@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { RefreshCw } from "@lucide/svelte";
-	import { fmtDateTime, fmtDateStr, fmtTimeStr } from "#lib/format.ts";
+	import { RefreshCw } from '@lucide/svelte';
+	import { fmtDateTime, fmtDateStr, fmtTimeStr } from '#lib/format.ts';
 
 	/**
 	 * Badge "update terakhir". Prioritas tampil:
@@ -43,7 +43,7 @@
 	>
 		<RefreshCw size={11} aria-hidden />
 		{sesi && `Sesi bursa ${sesi}`}
-		{sesi && jam && " · "}
+		{sesi && jam && ' · '}
 		{jam && `diperbarui ${jam}`}
 	</span>
 {:else if at}

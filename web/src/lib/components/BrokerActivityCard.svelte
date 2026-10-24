@@ -1,38 +1,35 @@
 <script lang="ts">
-	import { useStockBrokerActivity } from "#lib/hooks.svelte.ts";
+	import { useStockBrokerActivity } from '#lib/hooks.svelte.ts';
 	import type {
 		BrokerActivityDriver,
 		BrokerActivitySector,
 		StockBrokerActivity
-	} from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import LineArea from "#lib/components/LineArea.svelte";
+	} from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import LineArea from '#lib/components/LineArea.svelte';
 
-	const SCORE_LINE = "var(--chart-score)";
+	const SCORE_LINE = 'var(--chart-score)';
 
 	/** Berapa sesi riwayat driver yang ditampilkan di daftar (bukan di chart). */
 	const DRIVER_ROWS = 10;
 
 	function scoreTone(score: number): string {
-		if (score >= 60) return "var(--up)";
-		if (score <= 40) return "var(--down)";
-		return "var(--accent)";
+		if (score >= 60) return 'var(--up)';
+		if (score <= 40) return 'var(--down)';
+		return 'var(--accent)';
 	}
 
 	const p0 = (v: number) => `${(v * 100).toFixed(0)}%`;
 
-	function vsMedianText(
-		self: { score: number } | undefined,
-		median: number | null
-	): string {
-		if (!self || median === null) return "";
-		if (self.score > median) return " — di atas median sektor";
-		if (self.score < median) return " — di bawah median sektor";
-		return " — tepat di median sektor";
+	function vsMedianText(self: { score: number } | undefined, median: number | null): string {
+		if (!self || median === null) return '';
+		if (self.score > median) return ' — di atas median sektor';
+		if (self.score < median) return ' — di bawah median sektor';
+		return ' — tepat di median sektor';
 	}
 
 	let { code }: { code: string } = $props();
@@ -51,8 +48,8 @@
 		<div class="flex flex-wrap gap-1">
 			{#each drivers as d (d.factor)}
 				<span class="badge badge-hold gap-1 whitespace-nowrap">
-					<span class={d.contribution >= 0 ? "text-up" : "text-down"}>
-						{d.contribution >= 0 ? "▲" : "▼"}
+					<span class={d.contribution >= 0 ? 'text-up' : 'text-down'}>
+						{d.contribution >= 0 ? '▲' : '▼'}
 					</span>
 					{d.label}
 					{#if d.percentile !== null}
@@ -81,7 +78,9 @@
 			<div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
 				<div
 					class="h-full rounded-full transition-all"
-					style="width: {Math.max(0, Math.min(100, cur.score))}%; background: {scoreTone(cur.score)}"
+					style="width: {Math.max(0, Math.min(100, cur.score))}%; background: {scoreTone(
+						cur.score
+					)}"
 				></div>
 			</div>
 			<p class="text-muted mt-1 text-[11px] tabular-nums">
@@ -107,7 +106,7 @@
 				labels={pts.map((h) => h.date)}
 				series={[
 					{
-						name: "Skor",
+						name: 'Skor',
 						values: pts.map((h) => h.score),
 						color: SCORE_LINE,
 						width: 2,
@@ -119,7 +118,7 @@
 				yTicks={[0, 50, 100]}
 				yFmt={(v) => String(Math.round(v))}
 				xFmt={(s) => s.slice(5)}
-				refs={[{ y: 50, color: "var(--chart-ref)", dashed: true }]}
+				refs={[{ y: 50, color: 'var(--chart-ref)', dashed: true }]}
 				legend={false}
 				xTickGap={24}
 			/>
@@ -131,9 +130,9 @@
 	{@const self = sector.peers.find((p) => p.is_self)}
 	{#if !sector.comparable}
 		<p class="text-muted text-[11px] leading-snug">
-			Emiten ini belum dipetakan ke sektor spesifik (masuk bucket
-			&ldquo;{sector.name}&rdquo;), jadi skornya tidak dibandingkan dengan emiten lain: bucket itu menampung
-			emiten dari berbagai sektor, sehingga perbandingannya tidak berarti.
+			Emiten ini belum dipetakan ke sektor spesifik (masuk bucket &ldquo;{sector.name}&rdquo;), jadi
+			skornya tidak dibandingkan dengan emiten lain: bucket itu menampung emiten dari berbagai
+			sektor, sehingga perbandingannya tidak berarti.
 		</p>
 	{:else}
 		<div>
@@ -169,7 +168,9 @@
 						<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
 							<div
 								class="h-full rounded-full"
-								style="width: {Math.max(0, Math.min(100, p.score))}%; background: {scoreTone(p.score)}"
+								style="width: {Math.max(0, Math.min(100, p.score))}%; background: {scoreTone(
+									p.score
+								)}"
 							></div>
 						</div>
 						<span
@@ -184,14 +185,13 @@
 
 			{#if !self && sector.my_rank !== null}
 				<p class="text-muted mt-1.5 text-[11px]">
-					Emiten ini (peringkat {sector.my_rank}) di luar {sector.peers.length} besar daftar yang
-					ditampilkan.
+					Emiten ini (peringkat {sector.my_rank}) di luar {sector.peers.length} besar daftar yang ditampilkan.
 				</p>
 			{/if}
 
 			<p class="text-muted mt-1.5 text-[11px] leading-snug">
-				Hanya emiten sektor ini yang <em>sudah</em> punya skor yang ikut dibandingkan — yang belum punya skor
-				tidak dihitung sebagai nol.
+				Hanya emiten sektor ini yang <em>sudah</em> punya skor yang ikut dibandingkan — yang belum punya
+				skor tidak dihitung sebagai nol.
 			</p>
 		</div>
 	{/if}
@@ -207,7 +207,9 @@
 					<li class="border-b border-[var(--border)] pb-1.5">
 						<div class="flex items-center justify-between text-[11px] tabular-nums">
 							<span class="text-muted">{h.date}</span>
-							<span class="font-semibold" style="color: {scoreTone(h.score)}">{h.score.toFixed(0)}</span>
+							<span class="font-semibold" style="color: {scoreTone(h.score)}"
+								>{h.score.toFixed(0)}</span
+							>
 						</div>
 						<div class="mt-1">
 							{@render driverChips(h.drivers)}
@@ -222,10 +224,10 @@
 {#snippet body(d: StockBrokerActivity)}
 	{#if !d.validated}
 		<div class="space-y-2">
-			<p class="text-muted text-sm">{d.reason ?? "Skor aktivitas broker belum tervalidasi."}</p>
+			<p class="text-muted text-sm">{d.reason ?? 'Skor aktivitas broker belum tervalidasi.'}</p>
 			<p class="text-muted text-[11px] leading-snug">
-				Skor hanya dihitung dari faktor aliran yang sudah lolos uji statistik (IC), jadi selama belum ada yang
-				lolos bagian ini sengaja dikosongkan alih-alih menampilkan angka tanpa dasar.
+				Skor hanya dihitung dari faktor aliran yang sudah lolos uji statistik (IC), jadi selama
+				belum ada yang lolos bagian ini sengaja dikosongkan alih-alih menampilkan angka tanpa dasar.
 			</p>
 		</div>
 	{:else if !d.current && d.history.length === 0}

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Info } from "@lucide/svelte";
+	import { Info } from '@lucide/svelte';
 
 	let {
 		text,
-		label = "Penjelasan"
+		label = 'Penjelasan'
 	}: {
 		text: string;
 		label?: string;

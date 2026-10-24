@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { ArrowLeft } from "@lucide/svelte";
-	import { page } from "$app/state";
-	import SmartMoneyBanner from "#lib/components/SmartMoneyBanner.svelte";
-	import SmartMoneyTrackRecordCard from "#lib/components/SmartMoneyTrackRecordCard.svelte";
+	import { ArrowLeft } from '@lucide/svelte';
+	import { page } from '$app/state';
+	import SmartMoneyBanner from '#lib/components/SmartMoneyBanner.svelte';
+	import SmartMoneyTrackRecordCard from '#lib/components/SmartMoneyTrackRecordCard.svelte';
 
 	// `/radar/[code]` deep-link dari Radar Smart Money, mis. /radar/BBRI.
-	const code = $derived((page.params.code ?? "").toUpperCase());
+	const code = $derived((page.params.code ?? '').toUpperCase());
 </script>
 
 <svelte:head>
-	<title>Radar Smart Money{code ? ` ${code}` : ""} · Market Labs</title>
+	<title>Radar Smart Money{code ? ` ${code}` : ''} · Market Labs</title>
 </svelte:head>
 
 {#if !code}

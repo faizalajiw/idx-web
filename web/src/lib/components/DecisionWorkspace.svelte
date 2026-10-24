@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { untrack } from "svelte";
-	import { goto } from "$app/navigation";
+	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
 	import {
 		ChevronDown,
 		Gauge,
@@ -10,59 +10,59 @@
 		Shield,
 		TrendingUp,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useRecommendations, useStockDecision } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtPct } from "#lib/format.ts";
-	import type { StockDecision } from "#lib/types.ts";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import PositionPlanPanel from "#lib/components/PositionPlanPanel.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	} from '@lucide/svelte';
+	import { useRecommendations, useStockDecision } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtPct } from '#lib/format.ts';
+	import type { StockDecision } from '#lib/types.ts';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import PositionPlanPanel from '#lib/components/PositionPlanPanel.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	type Decision = NonNullable<StockDecision>;
 
 	// ------------------------------------------------------- terjemahan bahasa awam
 
 	const VERDICT_VIEW: Record<string, { title: string; hint: string; tone: string }> = {
-		"STRONG HOLD": {
-			title: "Kuat, layak dipertahankan",
-			hint: "Sinyal teknikal dan aliran dana mendukung. Tetap pantau.",
-			tone: "var(--up)"
+		'STRONG HOLD': {
+			title: 'Kuat, layak dipertahankan',
+			hint: 'Sinyal teknikal dan aliran dana mendukung. Tetap pantau.',
+			tone: 'var(--up)'
 		},
 		HOLD: {
-			title: "Tahan, pantau saja",
-			hint: "Belum ada alasan kuat untuk menambah atau menjual.",
-			tone: "var(--accent)"
+			title: 'Tahan, pantau saja',
+			hint: 'Belum ada alasan kuat untuk menambah atau menjual.',
+			tone: 'var(--accent)'
 		},
 		TRIM: {
-			title: "Kurangi sebagian",
-			hint: "Sinyal mulai melemah. Pertimbangkan mengurangi sebagian posisi.",
-			tone: "#f59e0b"
+			title: 'Kurangi sebagian',
+			hint: 'Sinyal mulai melemah. Pertimbangkan mengurangi sebagian posisi.',
+			tone: '#f59e0b'
 		},
 		EXIT: {
-			title: "Pertimbangkan keluar",
-			hint: "Sinyal lemah dan tekanan jual dominan. Hati-hati menahan posisi.",
-			tone: "var(--down)"
+			title: 'Pertimbangkan keluar',
+			hint: 'Sinyal lemah dan tekanan jual dominan. Hati-hati menahan posisi.',
+			tone: 'var(--down)'
 		}
 	};
 
 	const EVENT_VIEW: Record<string, string> = {
-		jump_down: "Harga anjlok tiba-tiba",
-		jump_up: "Harga melonjak tiba-tiba",
-		ma_cross_up: "Harga tembus rata-rata 50 hari ke atas",
-		ma_cross_down: "Harga tembus rata-rata 50 hari ke bawah",
-		near_high: "Harga mendekati puncak terbaru",
-		near_low: "Harga mendekati titik terendah terbaru",
-		vol_spike: "Volume perdagangan melonjak"
+		jump_down: 'Harga anjlok tiba-tiba',
+		jump_up: 'Harga melonjak tiba-tiba',
+		ma_cross_up: 'Harga tembus rata-rata 50 hari ke atas',
+		ma_cross_down: 'Harga tembus rata-rata 50 hari ke bawah',
+		near_high: 'Harga mendekati puncak terbaru',
+		near_low: 'Harga mendekati titik terendah terbaru',
+		vol_spike: 'Volume perdagangan melonjak'
 	};
 
-	const TABS: { key: "aliran" | "level" | "riwayat"; label: string; icon: LucideIcon }[] = [
-		{ key: "aliran", label: "Aliran Asing", icon: TrendingUp },
-		{ key: "level", label: "Level Batas", icon: Shield },
-		{ key: "riwayat", label: "Riwayat Pola", icon: RotateCcwClock }
+	const TABS: { key: 'aliran' | 'level' | 'riwayat'; label: string; icon: LucideIcon }[] = [
+		{ key: 'aliran', label: 'Aliran Asing', icon: TrendingUp },
+		{ key: 'level', label: 'Level Batas', icon: Shield },
+		{ key: 'riwayat', label: 'Riwayat Pola', icon: RotateCcwClock }
 	];
 
-	type TabKey = (typeof TABS)[number]["key"];
+	type TabKey = (typeof TABS)[number]['key'];
 
 	/**
 	 * Isi halaman Ruang Keputusan: pemilih emiten, kesimpulan utama, konteks
@@ -78,13 +78,13 @@
 	const isLoading = $derived(decision.isLoading);
 
 	// Saran cepat: kandidat terbaik sesi ini, emiten aktif tetap ikut ditawarkan.
-	const recs = useRecommendations(20, "A");
+	const recs = useRecommendations(20, 'A');
 	const recCodes = $derived((recs.data?.rows ?? []).map((r) => r.code));
 
 	// Draft mengikuti URL saat emiten berganti dari luar (chip / tautan).
-	let draft = $state(untrack(() => code) ?? "");
+	let draft = $state(untrack(() => code) ?? '');
 	$effect(() => {
-		draft = code ?? "";
+		draft = code ?? '';
 	});
 
 	const suggestions = $derived.by<string[]>(() => {
@@ -102,7 +102,7 @@
 	}
 
 	let showAll = $state(false);
-	let tab = $state<TabKey>("aliran");
+	let tab = $state<TabKey>('aliran');
 </script>
 
 {#snippet stockPicker(value: string | null)}
@@ -135,7 +135,8 @@
 				{#each suggestions as c (c)}
 					<a
 						href="/keputusan/{c}"
-						class="rounded-full border px-3 py-1 text-xs font-semibold transition-colors {c === value
+						class="rounded-full border px-3 py-1 text-xs font-semibold transition-colors {c ===
+						value
 							? 'border-[var(--accent)] bg-[var(--accent)] text-white'
 							: 'border-[var(--border)] text-muted hover:bg-white/[0.06] hover:text-[var(--fg)]'}"
 					>
@@ -149,9 +150,9 @@
 
 {#snippet guide()}
 	{@const steps = [
-		"Ketik kode saham yang ingin dicek, misalnya BBRI.",
-		"Lihat kesimpulan utama: tahan, kurangi, atau keluar.",
-		"Baca alasannya dalam bahasa sederhana, lalu cek tab detail bila perlu."
+		'Ketik kode saham yang ingin dicek, misalnya BBRI.',
+		'Lihat kesimpulan utama: tahan, kurangi, atau keluar.',
+		'Baca alasannya dalam bahasa sederhana, lalu cek tab detail bila perlu.'
 	]}
 	<section class="card p-5 sm:p-6">
 		<h2 class="text-base font-semibold">Cara membaca halaman ini</h2>
@@ -181,7 +182,7 @@
 			<EmptyState message="Data harga emiten ini belum cukup untuk membuat kesimpulan." />
 		</section>
 	{:else}
-		{@const view = VERDICT_VIEW[hc.verdict] ?? { title: hc.verdict, hint: "", tone: "var(--fg)" }}
+		{@const view = VERDICT_VIEW[hc.verdict] ?? { title: hc.verdict, hint: '', tone: 'var(--fg)' }}
 		{@const reasons = hc.reasons ?? []}
 		{@const shown = showAll ? reasons : reasons.slice(0, 3)}
 		{@const score = Math.max(0, Math.min(100, hc.score))}
@@ -229,7 +230,7 @@
 							onclick={() => (showAll = !showAll)}
 							class="flex items-center gap-1 text-xs font-semibold text-[var(--accent-text)] hover:underline"
 						>
-							{showAll ? "Sembunyikan" : `Lihat ${reasons.length - 3} alasan lainnya`}
+							{showAll ? 'Sembunyikan' : `Lihat ${reasons.length - 3} alasan lainnya`}
 							<ChevronDown
 								size={14}
 								class="transition-transform {showAll ? 'rotate-180' : ''}"
@@ -241,11 +242,13 @@
 			{/if}
 
 			<details class="group rounded-xl border border-[var(--border)] p-3 text-sm">
-				<summary
-					class="flex cursor-pointer list-none items-center justify-between font-medium"
-				>
+				<summary class="flex cursor-pointer list-none items-center justify-between font-medium">
 					Bagaimana skor ini dihitung?
-					<ChevronDown size={16} class="transition-transform group-open:rotate-180" aria-hidden="true" />
+					<ChevronDown
+						size={16}
+						class="transition-transform group-open:rotate-180"
+						aria-hidden="true"
+					/>
 				</summary>
 				<ul class="text-muted mt-3 space-y-1.5 text-xs leading-relaxed">
 					<li>
@@ -255,13 +258,13 @@
 					<li>
 						Penyesuaian faktor tambahan:
 						<b class="text-[var(--fg)] tabular-nums"
-							>{hc.factor_adj >= 0 ? "+" : ""}{hc.factor_adj}</b
+							>{hc.factor_adj >= 0 ? '+' : ''}{hc.factor_adj}</b
 						>
 					</li>
 					<li>
 						Penyesuaian pendapat broker:
 						<b class="text-[var(--fg)] tabular-nums"
-							>{hc.broker_adj >= 0 ? "+" : ""}{hc.broker_adj}</b
+							>{hc.broker_adj >= 0 ? '+' : ''}{hc.broker_adj}</b
 						>
 					</li>
 				</ul>
@@ -272,8 +275,8 @@
 
 {#snippet contextTiles(d: Decision)}
 	{@const regime = d.regime?.regime ?? null}
-	{@const regimeDown = d.regime?.dir_hint === "down"}
-	{@const regimeUp = regime?.startsWith("TRENDING") && !regimeDown}
+	{@const regimeDown = d.regime?.dir_hint === 'down'}
+	{@const regimeUp = regime?.startsWith('TRENDING') && !regimeDown}
 	{@const sent = d.sentiment}
 	{@const sentScore = sent?.score ?? 0}
 	{@const tiles: {
@@ -330,7 +333,7 @@
 	</div>
 {/snippet}
 
-{#snippet foreignFlow(rows: Decision["foreign_10"])}
+{#snippet foreignFlow(rows: Decision['foreign_10'])}
 	{@const vals = rows.filter((r) => r.net !== null)}
 	{#if vals.length === 0}
 		<EmptyState message="Belum ada data aliran asing." />
@@ -346,13 +349,9 @@
 					{@const net = r.net ?? 0}
 					{@const positive = net >= 0}
 					<!-- Batang tumbuh dari garis tengah: net beli ke kanan, net jual ke kiri. -->
-					{@const barStyle = `width: ${(Math.abs(net) / maxAbs) * 50}%; ${positive
-						? "left"
-						: "right"}: 50%; background-color: ${r.flip
-						? "#f59e0b"
-						: positive
-							? "var(--up)"
-							: "var(--down)"}`}
+					{@const barStyle = `width: ${(Math.abs(net) / maxAbs) * 50}%; ${
+						positive ? 'left' : 'right'
+					}: 50%; background-color: ${r.flip ? '#f59e0b' : positive ? 'var(--up)' : 'var(--down)'}`}
 					<div class="flex items-center gap-3 text-xs">
 						<span class="text-muted w-12 shrink-0 tabular-nums">{r.date.slice(5)}</span>
 						<div class="relative h-3 flex-1 overflow-hidden rounded-full bg-white/5">
@@ -373,33 +372,33 @@
 	{/if}
 {/snippet}
 
-{#snippet levels(inv: NonNullable<Decision["invalidation"]>, rsi: number | null)}
+{#snippet levels(inv: NonNullable<Decision['invalidation']>, rsi: number | null)}
 	{@const rows = [
-		{ label: "Harga sekarang", level: inv.close, note: "Harga penutupan terakhir" },
+		{ label: 'Harga sekarang', level: inv.close, note: 'Harga penutupan terakhir' },
 		{
-			label: "Batas tren menengah",
+			label: 'Batas tren menengah',
 			level: inv.ma50_level,
-			note: "Jika ditutup di bawah ini, tren menengah patah"
+			note: 'Jika ditutup di bawah ini, tren menengah patah'
 		},
 		{
-			label: "Rata-rata 60 hari",
+			label: 'Rata-rata 60 hari',
 			level: inv.mean60_level,
-			note: "Di atas level ini berarti harga sudah terlalu tinggi"
+			note: 'Di atas level ini berarti harga sudah terlalu tinggi'
 		},
 		{
-			label: "Batas bawah Bollinger",
+			label: 'Batas bawah Bollinger',
 			level: inv.bb_lower != null ? Math.round(inv.bb_lower) : null,
-			note: "Jika ditembus, tekanan jual biasanya meningkat"
+			note: 'Jika ditembus, tekanan jual biasanya meningkat'
 		}
 	].filter((r) => r.level != null)}
 	{@const rsiText =
 		rsi == null
 			? null
 			: rsi >= 65
-				? "Sudah mendekati area jenuh beli (overbought)."
+				? 'Sudah mendekati area jenuh beli (overbought).'
 				: rsi <= 35
-					? "Sudah mendekati area jenuh jual (oversold)."
-					: "Berada di area netral."}
+					? 'Sudah mendekati area jenuh jual (oversold).'
+					: 'Berada di area netral.'}
 	<div class="space-y-4">
 		<p class="text-muted text-sm leading-relaxed">
 			Level ini adalah titik acuan. Jika harga bergerak melewatinya, tesis untuk menahan saham bisa
@@ -413,20 +412,20 @@
 						<p class="text-muted text-xs leading-snug">{r.note}</p>
 					</div>
 					<p class="shrink-0 text-sm font-semibold tabular-nums">
-						Rp {Number(r.level).toLocaleString("id-ID")}
+						Rp {Number(r.level).toLocaleString('id-ID')}
 					</p>
 				</li>
 			{/each}
 		</ul>
 		{#if rsiText}
 			<p class="text-muted text-xs">
-				Momentum (RSI {inv.rsi?.toFixed(0) ?? "-"}): {rsiText}
+				Momentum (RSI {inv.rsi?.toFixed(0) ?? '-'}): {rsiText}
 			</p>
 		{/if}
 	</div>
 {/snippet}
 
-{#snippet eventHistory(events: Decision["events"])}
+{#snippet eventHistory(events: Decision['events'])}
 	<div class="space-y-4">
 		<p class="text-muted text-sm leading-relaxed">
 			Ini menunjukkan apa yang biasanya terjadi pada saham ini setelah pola tertentu, dibandingkan
@@ -440,24 +439,20 @@
 					<div class="flex flex-wrap items-baseline justify-between gap-2">
 						<p class="text-sm font-semibold">{EVENT_VIEW[e.event] ?? e.event}</p>
 						<p class="text-muted text-xs tabular-nums">
-							Terjadi {e.my_count} kali{e.my_last_date ? `, terakhir ${e.my_last_date}` : ""}
+							Terjadi {e.my_count} kali{e.my_last_date ? `, terakhir ${e.my_last_date}` : ''}
 						</p>
 					</div>
 					<div class="mt-3 grid grid-cols-2 gap-3 text-sm">
 						<div>
 							<p class="text-muted text-xs">Rata-rata hasil setelahnya</p>
-							<p
-								class="font-semibold tabular-nums {(fwd ?? 0) >= 0 ? 'text-up' : 'text-down'}"
-							>
-								{fwd === null ? "-" : fmtPct(fwd * 100)}
+							<p class="font-semibold tabular-nums {(fwd ?? 0) >= 0 ? 'text-up' : 'text-down'}">
+								{fwd === null ? '-' : fmtPct(fwd * 100)}
 							</p>
 						</div>
 						<div>
 							<p class="text-muted text-xs">Dibanding pasar</p>
-							<p
-								class="font-semibold tabular-nums {(abn ?? 0) >= 0 ? 'text-up' : 'text-down'}"
-							>
-								{abn === null ? "-" : fmtPct(abn * 100)}
+							<p class="font-semibold tabular-nums {(abn ?? 0) >= 0 ? 'text-up' : 'text-down'}">
+								{abn === null ? '-' : fmtPct(abn * 100)}
 							</p>
 						</div>
 					</div>
@@ -495,9 +490,9 @@
 			{/each}
 		</div>
 		<div role="tabpanel" class="mt-5">
-			{#if tab === "aliran"}
+			{#if tab === 'aliran'}
 				{@render foreignFlow(d.foreign_10)}
-			{:else if tab === "level"}
+			{:else if tab === 'level'}
 				{#if d.invalidation}
 					{@render levels(d.invalidation, d.hold_check?.rsi ?? d.invalidation.rsi)}
 				{:else}
@@ -519,7 +514,8 @@
 			Ruang <span class="gradient-text">Keputusan</span>
 		</h1>
 		<p class="text-muted text-sm">
-			Cek apakah saham ini layak ditahan, dikurangi, atau dilepas, dengan bahasa yang mudah dipahami.
+			Cek apakah saham ini layak ditahan, dikurangi, atau dilepas, dengan bahasa yang mudah
+			dipahami.
 		</p>
 	</header>
 

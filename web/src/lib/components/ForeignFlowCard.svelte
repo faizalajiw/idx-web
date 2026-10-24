@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { useStockForeignFlow } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtDateStr, fmtNum } from "#lib/format.ts";
-	import type { StockForeignFlowDay, StockForeignFlowPeer } from "#lib/types.ts";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
-	import Bars from "#lib/components/Bars.svelte";
+	import { useStockForeignFlow } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtDateStr, fmtNum } from '#lib/format.ts';
+	import type { StockForeignFlowDay, StockForeignFlowPeer } from '#lib/types.ts';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
+	import Bars from '#lib/components/Bars.svelte';
 
-	const UP = "var(--chart-up)"; // asing net beli
-	const DOWN = "var(--chart-down)"; // asing net jual
-	const FLIP = "var(--chart-flip)"; // hari asing balik arah
+	const UP = 'var(--chart-up)'; // asing net beli
+	const DOWN = 'var(--chart-down)'; // asing net jual
+	const FLIP = 'var(--chart-flip)'; // hari asing balik arah
 
 	type FlowPoint = {
 		label: string;
@@ -29,7 +29,7 @@
 	let {
 		code,
 		compact = false,
-		class: className = ""
+		class: className = ''
 	}: {
 		code: string;
 		compact?: boolean;
@@ -63,28 +63,28 @@
 			}))
 	);
 
-	const isBuy = $derived(fs?.current_side === "net_buy");
-	const isSell = $derived(fs?.current_side === "net_sell");
+	const isBuy = $derived(fs?.current_side === 'net_buy');
+	const isSell = $derived(fs?.current_side === 'net_sell');
 	const headline = $derived(
 		isBuy
-			? "Asing sedang net beli"
+			? 'Asing sedang net beli'
 			: isSell
-				? "Asing sedang net jual"
-				: "Asing belum punya arah jelas"
+				? 'Asing sedang net jual'
+				: 'Asing belum punya arah jelas'
 	);
-	const tone = $derived(isBuy ? "text-up" : isSell ? "text-down" : "");
+	const tone = $derived(isBuy ? 'text-up' : isSell ? 'text-down' : '');
 
 	const LEGEND = [
-		{ color: UP, text: "Asing net beli" },
-		{ color: DOWN, text: "Asing net jual" },
-		{ color: FLIP, text: "Hari asing balik arah" }
+		{ color: UP, text: 'Asing net beli' },
+		{ color: DOWN, text: 'Asing net jual' },
+		{ color: FLIP, text: 'Hari asing balik arah' }
 	];
 
 	const netFmt = (v: number) =>
-		`${v > 0 ? "Asing net beli" : "Asing net jual"} Rp ${fmtCompact(Math.abs(v) * 1e9)}`;
+		`${v > 0 ? 'Asing net beli' : 'Asing net jual'} Rp ${fmtCompact(Math.abs(v) * 1e9)}`;
 </script>
 
-{#snippet fact(label: string, value: string, toneClass = "")}
+{#snippet fact(label: string, value: string, toneClass = '')}
 	<div class="rounded-xl border border-[var(--border)] p-3">
 		<p class="text-muted text-[11px]">{label}</p>
 		<p class="mt-0.5 text-sm font-semibold tabular-nums {toneClass}">{value}</p>
@@ -95,7 +95,8 @@
 	<div class="text-muted flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
 		{#each LEGEND as item (item.text)}
 			<span class="flex items-center gap-1.5">
-				<span class="inline-block h-2 w-2 rounded-full" style="background-color: {item.color}"></span>
+				<span class="inline-block h-2 w-2 rounded-full" style="background-color: {item.color}"
+				></span>
 				{item.text}
 			</span>
 		{/each}
@@ -124,23 +125,22 @@
 						<TickerLogo code={p.code} size={16} />
 						<span class="font-semibold {p.is_self ? 'text-up' : ''}">
 							{p.code}
-							{p.is_self ? " ←" : ""}
+							{p.is_self ? ' ←' : ''}
 						</span>
 					</span>
 					<span class="relative h-2 flex-1 overflow-hidden rounded-full bg-white/5">
 						<span
 							class="absolute top-0 h-full rounded-full"
-							style="width: {share}%; {p.net_sum >= 0 ? 'left' : 'right'}: 50%; background-color: {p.net_sum >=
-							0
-								? UP
-								: DOWN}"
+							style="width: {share}%; {p.net_sum >= 0
+								? 'left'
+								: 'right'}: 50%; background-color: {p.net_sum >= 0 ? UP : DOWN}"
 						></span>
 						<span class="absolute top-0 left-1/2 h-full w-px bg-white/25"></span>
 					</span>
 					<span
 						class="w-20 shrink-0 text-right tabular-nums {p.net_sum >= 0 ? 'text-up' : 'text-down'}"
 					>
-						{p.net_sum >= 0 ? "+" : "-"}Rp {fmtCompact(Math.abs(p.net_sum))}
+						{p.net_sum >= 0 ? '+' : '-'}Rp {fmtCompact(Math.abs(p.net_sum))}
 					</span>
 				</li>
 			{/each}
@@ -160,7 +160,7 @@
 			<p class="text-muted mt-0.5 text-sm">
 				Apakah investor asing sedang membeli atau menjual saham ini{data?.sector
 					? ` · ${data.sector}`
-					: ""}.
+					: ''}.
 			</p>
 		</div>
 		<LastUpdated sessionDate={data?.date} updatedAt={null} dep={data} />
@@ -185,10 +185,10 @@
 				<p class="text-muted mt-1 text-sm tabular-nums">
 					{#if lastNet !== null}
 						Sesi terakhir
-						<span class={lastNet >= 0 ? "text-up font-semibold" : "text-down font-semibold"}>
-							{lastNet >= 0 ? "+" : "-"}Rp {fmtCompact(Math.abs(lastNet))}
+						<span class={lastNet >= 0 ? 'text-up font-semibold' : 'text-down font-semibold'}>
+							{lastNet >= 0 ? '+' : '-'}Rp {fmtCompact(Math.abs(lastNet))}
 						</span>
-						{fs?.current_streak ? ` · sudah ${fs.current_streak} sesi berturut-turut` : ""}
+						{fs?.current_streak ? ` · sudah ${fs.current_streak} sesi berturut-turut` : ''}
 					{:else}
 						Belum ada nilai sesi terakhir.
 					{/if}
@@ -197,25 +197,25 @@
 
 			<div class="grid gap-3 {compact ? 'grid-cols-1' : 'grid-cols-2'}">
 				{@render fact(
-					"Terakhir berbalik arah",
+					'Terakhir berbalik arah',
 					fs?.last_flip
-						? fs.last_flip.to === "net_buy"
-							? "Dari jual ke beli"
-							: "Dari beli ke jual"
-						: "Belum pernah",
-					fs?.last_flip?.to === "net_buy"
-						? "text-up"
-						: fs?.last_flip?.to === "net_sell"
-							? "text-down"
-							: ""
+						? fs.last_flip.to === 'net_buy'
+							? 'Dari jual ke beli'
+							: 'Dari beli ke jual'
+						: 'Belum pernah',
+					fs?.last_flip?.to === 'net_buy'
+						? 'text-up'
+						: fs?.last_flip?.to === 'net_sell'
+							? 'text-down'
+							: ''
 				)}
 				{@render fact(
-					"Sudah berjalan sejak balik arah",
+					'Sudah berjalan sejak balik arah',
 					fs?.days_since_flip !== null && fs?.days_since_flip !== undefined
 						? fs.days_since_flip === 0
-							? "Hari ini"
+							? 'Hari ini'
 							: `${fs.days_since_flip} sesi`
-						: "-"
+						: '-'
 				)}
 			</div>
 
@@ -234,7 +234,7 @@
 						labels={points.map((p) => p.label)}
 						series={[
 							{
-								name: "Net asing harian",
+								name: 'Net asing harian',
 								values: points.map((p) => p.net),
 								color: UP,
 								colors: points.map((p) => (p.flip ? FLIP : p.raw > 0 ? UP : DOWN)),
@@ -246,7 +246,7 @@
 						radius={3}
 						refY={0}
 						yFmt={(v) => `${fmtNum(Math.round(v))} M`}
-						footer={(i) => (points[i]?.flip ? "Hari asing balik arah" : null)}
+						footer={(i) => (points[i]?.flip ? 'Hari asing balik arah' : null)}
 						xTickGap={24}
 					/>
 				{/if}
@@ -258,8 +258,8 @@
 
 			{#if !compact && data.peer_rank.count > 1}
 				<p class="text-muted text-xs leading-relaxed">
-					Saham ini ada di urutan <strong class="text-[var(--fg)]">#{data.peer_rank.rank}</strong
-					> dari
+					Saham ini ada di urutan <strong class="text-[var(--fg)]">#{data.peer_rank.rank}</strong>
+					dari
 					{data.peer_rank.count} saham sejenis.
 				</p>
 			{/if}

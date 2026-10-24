@@ -20,7 +20,9 @@
 		root.classList.toggle('light', next === 'light');
 		try {
 			localStorage.setItem(KEY, next);
-		} catch {}
+		} catch {
+			// localStorage bisa diblokir (mode privat); tema tetap berlaku di sesi ini.
+		}
 		theme = next;
 	}
 

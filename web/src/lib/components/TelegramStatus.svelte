@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { testTelegram } from "#lib/api.ts";
-	import { useAlerts } from "#lib/hooks.svelte.ts";
-	import Card from "#lib/components/Card.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { testTelegram } from '#lib/api.ts';
+	import { useAlerts } from '#lib/hooks.svelte.ts';
+	import Card from '#lib/components/Card.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	/**
 	 * Telegram wiring check. Alerts are useless if the bot is not reachable, and
@@ -30,7 +30,7 @@
 		} catch (e) {
 			result = {
 				ok: false,
-				detail: e instanceof Error ? e.message : "Gagal mengirim pesan uji"
+				detail: e instanceof Error ? e.message : 'Gagal mengirim pesan uji'
 			};
 		} finally {
 			busy = false;
@@ -45,14 +45,16 @@
 >
 	{#snippet right()}
 		{#if data}
-			<span class={enabled ? "badge badge-buy" : "badge badge-warn"}>
-				{enabled ? "Terhubung" : "Belum diatur"}
+			<span class={enabled ? 'badge badge-buy' : 'badge badge-warn'}>
+				{enabled ? 'Terhubung' : 'Belum diatur'}
 			</span>
 		{/if}
 	{/snippet}
 
 	{#if error}
-		<ErrorState message="Gagal memeriksa status: {error instanceof Error ? error.message : String(error)}" />
+		<ErrorState
+			message="Gagal memeriksa status: {error instanceof Error ? error.message : String(error)}"
+		/>
 	{:else if isLoading || !data}
 		<Skeleton class="h-40" />
 	{:else}
@@ -70,9 +72,9 @@
 				<pre
 					class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-card-solid)] p-3 text-xs">{`TELEGRAM_BOT_TOKEN=123456:ABC…\nTELEGRAM_CHAT_ID=123456789`}</pre>
 				<p class="text-muted text-xs leading-relaxed">
-					Bikin bot lewat @BotFather di Telegram, lalu kirim pesan apa saja ke bot itu dan
-					ambil chat id-nya. Aturan tetap tersimpan dan dievaluasi walau Telegram belum
-					diisi — cuma notifikasinya yang belum terkirim.
+					Bikin bot lewat @BotFather di Telegram, lalu kirim pesan apa saja ke bot itu dan ambil
+					chat id-nya. Aturan tetap tersimpan dan dievaluasi walau Telegram belum diisi — cuma
+					notifikasinya yang belum terkirim.
 				</p>
 			{/if}
 
@@ -81,9 +83,9 @@
 				class="btn btn-primary"
 				onclick={() => void handleTest()}
 				disabled={!enabled || busy}
-				title={enabled ? undefined : "Isi TELEGRAM_BOT_TOKEN & TELEGRAM_CHAT_ID dulu"}
+				title={enabled ? undefined : 'Isi TELEGRAM_BOT_TOKEN & TELEGRAM_CHAT_ID dulu'}
 			>
-				{busy ? "Mengirim…" : "Kirim pesan uji"}
+				{busy ? 'Mengirim…' : 'Kirim pesan uji'}
 			</button>
 
 			{#if result}

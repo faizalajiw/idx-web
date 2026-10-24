@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
+	import type { Snippet } from 'svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
 
 	let {
 		title,
@@ -8,7 +8,7 @@
 		info,
 		right,
 		children,
-		class: className = "",
+		class: className = '',
 		hover = false
 	}: {
 		title?: string | Snippet;
@@ -27,7 +27,7 @@
 			<div class="min-w-0">
 				{#if title}
 					<h2 class="flex items-center gap-1.5 text-[13px] font-semibold tracking-tight">
-						{#if typeof title === "string"}
+						{#if typeof title === 'string'}
 							{title}
 						{:else}
 							{@render title()}

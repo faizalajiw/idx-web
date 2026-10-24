@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import DecisionWorkspace from "#lib/components/DecisionWorkspace.svelte";
+	import { page } from '$app/state';
+	import DecisionWorkspace from '#lib/components/DecisionWorkspace.svelte';
 
-	const code = $derived((page.params.code ?? "").toUpperCase());
+	const code = $derived((page.params.code ?? '').toUpperCase());
 </script>
 
 <svelte:head>

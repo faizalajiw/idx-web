@@ -1,60 +1,61 @@
 <script lang="ts">
-	import { Check, ShieldCheck } from "@lucide/svelte";
-	import { useFactorsOverview, useRegimeHistory } from "#lib/hooks.svelte.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
+	import { Check, ShieldCheck } from '@lucide/svelte';
+	import { useFactorsOverview, useRegimeHistory } from '#lib/hooks.svelte.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
 
-	const f4 = (v: number | null) => (v === null ? "-" : v.toFixed(4));
-	const f2 = (v: number | null) => (v === null ? "-" : v.toFixed(2));
-	const p1 = (v: number | null) => (v === null ? "-" : `${(v * 100).toFixed(1)}%`);
+	const f4 = (v: number | null) => (v === null ? '-' : v.toFixed(4));
+	const f2 = (v: number | null) => (v === null ? '-' : v.toFixed(2));
+	const p1 = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`);
 
 	const FACTOR_LABEL: Record<string, string> = {
-		vol_21d: "Volatilitas 21h",
-		turnover_21d: "Likuiditas 21h",
-		dist_52w_high: "Jarak puncak 52w",
-		mom_5d: "Momentum 5h",
-		mom_10d: "Momentum 10h",
-		mom_21d: "Momentum 21h",
-		mom_63d: "Momentum 63h",
-		mom_12_1: "Momentum 12-1",
-		rev_1d: "Reversal 1h",
-		amihud_21d: "Illiquidity Amihud",
-		rel_volume: "Volume relatif",
-		vol_rank_63d: "Rank volume 63h",
-		foreign_net_pct: "Foreign net %",
-		foreign_streak: "Foreign streak",
-		ob_imbalance: "Ketimpangan buku",
-		ob_absorption: "Absorption"
+		vol_21d: 'Volatilitas 21h',
+		turnover_21d: 'Likuiditas 21h',
+		dist_52w_high: 'Jarak puncak 52w',
+		mom_5d: 'Momentum 5h',
+		mom_10d: 'Momentum 10h',
+		mom_21d: 'Momentum 21h',
+		mom_63d: 'Momentum 63h',
+		mom_12_1: 'Momentum 12-1',
+		rev_1d: 'Reversal 1h',
+		amihud_21d: 'Illiquidity Amihud',
+		rel_volume: 'Volume relatif',
+		vol_rank_63d: 'Rank volume 63h',
+		foreign_net_pct: 'Foreign net %',
+		foreign_streak: 'Foreign streak',
+		ob_imbalance: 'Ketimpangan buku',
+		ob_absorption: 'Absorption'
 	};
 
 	/** Fallback registry bila API belum menyertakan `definitions`. */
 	const FACTOR_FALLBACK: Record<string, string> = {
-		mom_5d: "Return 5 hari bursa (momentum jangka pendek)",
-		mom_10d: "Return 10 hari bursa",
-		mom_21d: "Return 1 bulan bursa (~21 hari)",
-		mom_63d: "Return 3 bulan bursa (~63 hari)",
-		mom_12_1: "Momentum klasik 12-1: return ~252h dikurangi bulan terakhir",
-		rev_1d: "Reversal 1 hari (kebalikan return kemarin)",
-		vol_21d: "Volatilitas 21 hari (std return harian)",
-		amihud_21d: "Illiquidity Amihud 21 hari: |ret| per rupiah volume",
-		turnover_21d: "Rata-rata value transaksi 21 hari (log)",
-		rel_volume: "Volume hari ini relatif rata-rata 21 hari",
-		dist_52w_high: "Jarak dari puncak 52 minggu (<= 0)",
-		vol_rank_63d: "Percentile volume hari ini dalam 63 hari terakhir",
-		foreign_net_pct: "Foreign net / value transaksi (hari yang sama)",
-		foreign_streak: "Hari berturut-turut foreign net positif (negatif = jual)",
-		ob_imbalance: "Ketimpangan buku intraday: (bid_vol-offer_vol)/(total) rata-rata",
-		ob_absorption: "Buku vs arah harga: imbalance tertanda saat tick bergerak (negatif = absorption)"
+		mom_5d: 'Return 5 hari bursa (momentum jangka pendek)',
+		mom_10d: 'Return 10 hari bursa',
+		mom_21d: 'Return 1 bulan bursa (~21 hari)',
+		mom_63d: 'Return 3 bulan bursa (~63 hari)',
+		mom_12_1: 'Momentum klasik 12-1: return ~252h dikurangi bulan terakhir',
+		rev_1d: 'Reversal 1 hari (kebalikan return kemarin)',
+		vol_21d: 'Volatilitas 21 hari (std return harian)',
+		amihud_21d: 'Illiquidity Amihud 21 hari: |ret| per rupiah volume',
+		turnover_21d: 'Rata-rata value transaksi 21 hari (log)',
+		rel_volume: 'Volume hari ini relatif rata-rata 21 hari',
+		dist_52w_high: 'Jarak dari puncak 52 minggu (<= 0)',
+		vol_rank_63d: 'Percentile volume hari ini dalam 63 hari terakhir',
+		foreign_net_pct: 'Foreign net / value transaksi (hari yang sama)',
+		foreign_streak: 'Hari berturut-turut foreign net positif (negatif = jual)',
+		ob_imbalance: 'Ketimpangan buku intraday: (bid_vol-offer_vol)/(total) rata-rata',
+		ob_absorption:
+			'Buku vs arah harga: imbalance tertanda saat tick bergerak (negatif = absorption)'
 	};
 
 	const REGIME_BADGE: Record<string, string> = {
-		TRENDING_UP: "badge badge-buy",
-		TRENDING_DOWN: "badge badge-sell",
-		TRANSITION: "badge badge-warn",
-		RANGING: "badge badge-hold"
+		TRENDING_UP: 'badge badge-buy',
+		TRENDING_DOWN: 'badge badge-sell',
+		TRANSITION: 'badge badge-warn',
+		RANGING: 'badge badge-hold'
 	};
 
 	// Satu kunci cache untuk semua kartu di halaman ini — dipakai bersama.
@@ -97,9 +98,9 @@
 				{/each}
 			</div>
 			<p class="text-muted text-[11px]">
-				Bobot di atas 0 hanya untuk faktor yang lolos ambang ketat (|IC| ≥ 0,05 dan |ICIR| ≥ 0,5). Bila
-				tidak ada yang lolos, composite memakai bobot default indikatif — keputusan tetap didominasi
-				sinyal teknikal.
+				Bobot di atas 0 hanya untuk faktor yang lolos ambang ketat (|IC| ≥ 0,05 dan |ICIR| ≥ 0,5).
+				Bila tidak ada yang lolos, composite memakai bobot default indikatif — keputusan tetap
+				didominasi sinyal teknikal.
 			</p>
 		</div>
 	{/if}
@@ -110,19 +111,19 @@
 		{@const s = regime.summary}
 		{#if !s || s.days === 0}
 			<p class="text-muted text-sm">
-				Histori kondisi IHSG belum tersedia — job harian 16:10 WIB akan mengisinya (atau buka halaman
-				ini lagi untuk memicu backfill).
+				Histori kondisi IHSG belum tersedia — job harian 16:10 WIB akan mengisinya (atau buka
+				halaman ini lagi untuk memicu backfill).
 			</p>
 		{:else}
 			<div class="space-y-2 text-sm">
 				<p class="text-muted">
-					{s.days} hari bursa ({s.first ?? ""} → {s.last ?? ""}) · rata-rata ADX {s.avg_adx ?? "—"} ·
+					{s.days} hari bursa ({s.first ?? ''} → {s.last ?? ''}) · rata-rata ADX {s.avg_adx ?? '—'} ·
 					{s.transitions} transisi kondisi.
 				</p>
 				<div class="flex flex-wrap gap-2">
 					{#each Object.entries(s.share) as [rg, pct] (rg)}
 						<span class="{REGIME_BADGE[rg] ?? 'badge badge-hold'} tabular-nums">
-							{rg.replace("TRENDING_", "TREND ").replace("_", " ")}: {pct}%
+							{rg.replace('TRENDING_', 'TREND ').replace('_', ' ')}: {pct}%
 						</span>
 					{/each}
 				</div>
@@ -168,7 +169,7 @@
 							<td class="text-right tabular-nums">{f2(f.icir)}</td>
 							<td class="text-right tabular-nums">{f2(f.t_stat)}</td>
 							<td class="text-muted text-right tabular-nums">{p1(f.hit_rate)}</td>
-							<td class="text-muted text-right tabular-nums">{f.n_days ?? "-"}</td>
+							<td class="text-muted text-right tabular-nums">{f.n_days ?? '-'}</td>
 							<td class="text-center">
 								{#if f.eligible}
 									<span class="badge badge-buy"><Check size={13} /></span>
@@ -177,7 +178,7 @@
 								{/if}
 							</td>
 							<td class="text-right tabular-nums">
-								{f.weight && f.weight > 0 ? `${(f.weight * 100).toFixed(0)}%` : "-"}
+								{f.weight && f.weight > 0 ? `${(f.weight * 100).toFixed(0)}%` : '-'}
 							</td>
 						</tr>
 					{/each}
@@ -208,8 +209,8 @@
 	{@const entries = Object.entries(defs)}
 	<div class="space-y-2">
 		<p class="text-muted text-sm">
-			{entries.length} faktor dihitung engine IC tiap rekalibrasi — termasuk faktor order-book dari
-			snapshot intraday.
+			{entries.length} faktor dihitung engine IC tiap rekalibrasi — termasuk faktor order-book dari snapshot
+			intraday.
 		</p>
 		<ul class="grid grid-cols-1 gap-x-6 gap-y-1.5 md:grid-cols-2">
 			{#each entries as [key, desc] (key)}
@@ -288,8 +289,8 @@
 	</Card>
 
 	<p class="text-muted text-[11px] leading-snug">
-		Metodologi: IC = korelasi rank (Spearman) antara nilai faktor di hari T dan return T+1 → T+1+k; t-stat
-		memakai Newey-West lag 5 karena window return tumpang tindih. Ambang kelayakan |IC| ≥ 0,05 dan |ICIR| ≥
-		0,5 adalah rule-of-thumb kuantitatif, bukan jaminan hasil masa depan.
+		Metodologi: IC = korelasi rank (Spearman) antara nilai faktor di hari T dan return T+1 → T+1+k;
+		t-stat memakai Newey-West lag 5 karena window return tumpang tindih. Ambang kelayakan |IC| ≥
+		0,05 dan |ICIR| ≥ 0,5 adalah rule-of-thumb kuantitatif, bukan jaminan hasil masa depan.
 	</p>
 </main>

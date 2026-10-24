@@ -15,8 +15,14 @@ import {
 	haltJournal,
 	resumeJournal,
 	screenerQuery
-} from "#lib/api.ts";
-import { createQuery, mutateKey, mutateMatch, type QueryOptions, type QueryResult } from "#lib/query.svelte.ts";
+} from '#lib/api.ts';
+import {
+	createQuery,
+	mutateKey,
+	mutateMatch,
+	type QueryOptions,
+	type QueryResult
+} from '#lib/query.svelte.ts';
 import type {
 	AlertRuleCreate,
 	AlertStatus,
@@ -62,7 +68,7 @@ import type {
 	TechnicalChart,
 	TopBrokers,
 	WatchlistRow
-} from "#lib/types.ts";
+} from '#lib/types.ts';
 
 /** Auto-refresh cadence (ms). Data pasar memang tertunda, 30 detik cukup. */
 const REFRESH = 30_000;
@@ -70,7 +76,7 @@ const REFRESH = 30_000;
 type MaybeGetter<T> = T | (() => T);
 
 function read<T>(value: MaybeGetter<T>): T {
-	return typeof value === "function" ? (value as () => T)() : value;
+	return typeof value === 'function' ? (value as () => T)() : value;
 }
 
 /** Kode emiten -> potongan path, atau `null` bila kode belum ada. */
@@ -89,7 +95,7 @@ function useQuery<T>(
 // ------------------------------------------------------------------ pasar
 
 export function useMarketOverview() {
-	return useQuery<MarketOverview>("/api/market/overview", { refreshInterval: REFRESH });
+	return useQuery<MarketOverview>('/api/market/overview', { refreshInterval: REFRESH });
 }
 
 /**
@@ -97,21 +103,24 @@ export function useMarketOverview() {
  * sesi. Angka EOD — baru final setelah pasar tutup, jadi refresh 1 menit cukup.
  */
 export function useMarketTradeSummary() {
-	return useQuery<MarketTradeSummary>("/api/market/trade-summary", {
+	return useQuery<MarketTradeSummary>('/api/market/trade-summary', {
 		refreshInterval: 60_000,
 		shouldRetryOnError: false
 	});
 }
 
 export function useMarketRegime() {
-	return useQuery<MarketRegime>("/api/market/regime", { refreshInterval: 300_000 });
+	return useQuery<MarketRegime>('/api/market/regime', { refreshInterval: 300_000 });
 }
 
 export function useWatchlist(codes?: MaybeGetter<string | undefined>) {
-	return useQuery<WatchlistRow[]>(() => {
-		const c = codes === undefined ? undefined : read(codes);
-		return `/api/watchlist${c ? `?codes=${encodeURIComponent(c)}` : ""}`;
-	}, { refreshInterval: REFRESH });
+	return useQuery<WatchlistRow[]>(
+		() => {
+			const c = codes === undefined ? undefined : read(codes);
+			return `/api/watchlist${c ? `?codes=${encodeURIComponent(c)}` : ''}`;
+		},
+		{ refreshInterval: REFRESH }
+	);
 }
 
 /**
@@ -119,7 +128,7 @@ export function useWatchlist(codes?: MaybeGetter<string | undefined>) {
  * realtime saat jam bursa, EOD di luar jam. Frequency selalu EOD.
  */
 export function useMarketLeaders(
-	metric: MaybeGetter<"volume" | "value" | "frequency">,
+	metric: MaybeGetter<'volume' | 'value' | 'frequency'>,
 	limit: MaybeGetter<number> = 5
 ) {
 	return useQuery<MarketLeaders>(
@@ -154,10 +163,13 @@ export function useStockForeignFlow(
 	days: MaybeGetter<number> = 30,
 	peerDays: MaybeGetter<number> = 10
 ) {
-	return useQuery<StockForeignFlow>(() => {
-		const c = read(code);
-		return `/api/stocks/${encodeURIComponent(c)}/foreign-flow?days=${read(days)}&peer_days=${read(peerDays)}`;
-	}, { refreshInterval: 300_000 });
+	return useQuery<StockForeignFlow>(
+		() => {
+			const c = read(code);
+			return `/api/stocks/${encodeURIComponent(c)}/foreign-flow?days=${read(days)}&peer_days=${read(peerDays)}`;
+		},
+		{ refreshInterval: 300_000 }
+	);
 }
 
 /**
@@ -165,7 +177,7 @@ export function useStockForeignFlow(
  * Dibaca sekali per halaman; refresh 5 menit cukup (data EOD harian).
  */
 export function useStockDossier(code: MaybeGetter<string | null>) {
-	return useQuery<StockDossier>(() => stockPath(code, "/dossier"), { refreshInterval: 300_000 });
+	return useQuery<StockDossier>(() => stockPath(code, '/dossier'), { refreshInterval: 300_000 });
 }
 
 /**
@@ -173,7 +185,7 @@ export function useStockDossier(code: MaybeGetter<string | null>) {
  * Verdict bergerak harian & gauge intraday menit-menit — refresh 2 menit.
  */
 export function useStockDecision(code: MaybeGetter<string | null>) {
-	return useQuery<StockDecision>(() => stockPath(code, "/decision"), { refreshInterval: 120_000 });
+	return useQuery<StockDecision>(() => stockPath(code, '/decision'), { refreshInterval: 120_000 });
 }
 
 /**
@@ -190,31 +202,33 @@ export function useSignals(
 	codes?: MaybeGetter<string | undefined>,
 	minDays: MaybeGetter<number> = 25
 ) {
-	return useQuery<Signal[]>(() => {
-		const c = codes === undefined ? undefined : read(codes);
-		return `/api/signals?min_days=${read(minDays)}${c ? `&codes=${encodeURIComponent(c)}` : ""}`;
-	}, { refreshInterval: REFRESH });
+	return useQuery<Signal[]>(
+		() => {
+			const c = codes === undefined ? undefined : read(codes);
+			return `/api/signals?min_days=${read(minDays)}${c ? `&codes=${encodeURIComponent(c)}` : ''}`;
+		},
+		{ refreshInterval: REFRESH }
+	);
 }
 
 export function useTechnical(code: MaybeGetter<string | null>) {
-	return useQuery<TechnicalChart>(() => stockPath(code, "/technical"), {
+	return useQuery<TechnicalChart>(() => stockPath(code, '/technical'), {
 		refreshInterval: REFRESH
 	});
 }
 
 export function useHistory(code: MaybeGetter<string | null>, limit: MaybeGetter<number> = 120) {
-	return useQuery<PriceBar[]>(
-		() => stockPath(code, `/history?limit=${read(limit)}`),
-		{ refreshInterval: REFRESH }
-	);
+	return useQuery<PriceBar[]>(() => stockPath(code, `/history?limit=${read(limit)}`), {
+		refreshInterval: REFRESH
+	});
 }
 
 export function useLatestNews() {
-	return useQuery<NewsList>("/api/news/latest?limit=20", { refreshInterval: 120_000 });
+	return useQuery<NewsList>('/api/news/latest?limit=20', { refreshInterval: 120_000 });
 }
 
 export function useSectors() {
-	return useQuery<SectorAnalysis>("/api/sectors", { refreshInterval: REFRESH });
+	return useQuery<SectorAnalysis>('/api/sectors', { refreshInterval: REFRESH });
 }
 
 export function useForeignFlow(days: MaybeGetter<number> = 20) {
@@ -260,22 +274,22 @@ export function useStockBrokerActivity(
 }
 
 export function useStockBrokers(code: MaybeGetter<string | null>) {
-	return useQuery<StockBrokerSummary>(() => stockPath(code, "/brokers"), {
+	return useQuery<StockBrokerSummary>(() => stockPath(code, '/brokers'), {
 		refreshInterval: REFRESH
 	});
 }
 
 // ------------------------------------------------------------- watchlist (mutasi)
 
-const WATCHLIST_KEY = "/api/watchlist";
+const WATCHLIST_KEY = '/api/watchlist';
 
 /** Sinyal, skor, dan screener ikut berubah saat daftar pantau berubah. */
 function invalidateDerived(): void {
 	mutateMatch(
 		(key) =>
-			key.startsWith("/api/signals") ||
-			key.startsWith("/api/stocks") ||
-			key.startsWith("/api/screener")
+			key.startsWith('/api/signals') ||
+			key.startsWith('/api/stocks') ||
+			key.startsWith('/api/screener')
 	);
 }
 
@@ -303,7 +317,7 @@ export function useRemoveFromWatchlist() {
 
 /** Event study per emiten (backend cache 1 jam; slow-moving). */
 export function useStockEvents(code: MaybeGetter<string | null>) {
-	return useQuery<StockEvents>(() => stockPath(code, "/events"), {
+	return useQuery<StockEvents>(() => stockPath(code, '/events'), {
 		refreshInterval: 600_000,
 		shouldRetryOnError: false
 	});
@@ -311,7 +325,7 @@ export function useStockEvents(code: MaybeGetter<string | null>) {
 
 /** Ringkasan kalibrasi faktor (IC bulanan + bobot aktif). */
 export function useFactorsOverview() {
-	return useQuery<FactorsOverview>("/api/factors/overview", { refreshInterval: 600_000 });
+	return useQuery<FactorsOverview>('/api/factors/overview', { refreshInterval: 600_000 });
 }
 
 /** Histori regime harian + agregat. */
@@ -326,7 +340,7 @@ export function useRegimeHistory(days: MaybeGetter<number> = 90) {
  * per regime. Backend menghitung dari layer PIT (cache 1 jam) — lambat berubah.
  */
 export function useSignalTrack() {
-	return useQuery<SignalTrack>("/api/signals/track", {
+	return useQuery<SignalTrack>('/api/signals/track', {
 		refreshInterval: 600_000,
 		shouldRetryOnError: false
 	});
@@ -334,7 +348,7 @@ export function useSignalTrack() {
 
 // ------------------------------------------------------------------- alert
 
-const ALERTS_KEY = "/api/alerts";
+const ALERTS_KEY = '/api/alerts';
 
 /** Stored watch conditions with their live values. */
 export function useAlerts() {
@@ -377,7 +391,7 @@ export function useSectorRotation(
 
 /** Strategy catalog + cost defaults for the backtest form (rarely changes). */
 export function useBacktestConfig() {
-	return useQuery<BacktestConfig>("/api/backtest/config", { refreshInterval: 300_000 });
+	return useQuery<BacktestConfig>('/api/backtest/config', { refreshInterval: 300_000 });
 }
 
 // ------------------------------------------------------- jejak smart money
@@ -397,7 +411,7 @@ export function useSmartMoneyRadar(days: MaybeGetter<number> = 10) {
  * Verdict bergerak harian — refresh 5 menit.
  */
 export function useStockSmartMoney(code: MaybeGetter<string | null>) {
-	return useQuery<SmartMoneyStock>(() => stockPath(code, "/smart-money"), {
+	return useQuery<SmartMoneyStock>(() => stockPath(code, '/smart-money'), {
 		refreshInterval: 300_000
 	});
 }
@@ -407,7 +421,7 @@ export function useStockSmartMoney(code: MaybeGetter<string | null>) {
  * Hitungannya berat & harian — refresh 1 jam.
  */
 export function useSmartMoneyTrackRecord() {
-	return useQuery<SmartMoneyTrackRecord>("/api/smart-money/track-record", {
+	return useQuery<SmartMoneyTrackRecord>('/api/smart-money/track-record', {
 		refreshInterval: 3_600_000
 	});
 }
@@ -417,7 +431,7 @@ export function useSmartMoneyTrackRecord() {
  * urut kekuatan bukti. Data harian (EOD) — refresh 30 menit.
  */
 export function useSmartMoneyPatternsBoard() {
-	return useQuery<SmartMoneyPatternsBoard>("/api/smart-money/patterns", {
+	return useQuery<SmartMoneyPatternsBoard>('/api/smart-money/patterns', {
 		refreshInterval: 1_800_000
 	});
 }
@@ -427,7 +441,7 @@ export function useSmartMoneyPatternsBoard() {
  * Data EOD — refresh 5 menit cukup.
  */
 export function useSmartMoneyWatchlist() {
-	return useQuery<SmartMoneyWatchList>("/api/smart-money/verdicts", {
+	return useQuery<SmartMoneyWatchList>('/api/smart-money/verdicts', {
 		refreshInterval: 300_000
 	});
 }
@@ -437,7 +451,7 @@ export function useSmartMoneyWatchlist() {
  * (bulanan) — refresh 1 jam.
  */
 export function useStockOwnership(code: MaybeGetter<string | null>) {
-	return useQuery<StockOwnership>(() => stockPath(code, "/ownership"), {
+	return useQuery<StockOwnership>(() => stockPath(code, '/ownership'), {
 		refreshInterval: 3_600_000
 	});
 }
@@ -450,8 +464,8 @@ export function useStockOwnership(code: MaybeGetter<string | null>) {
  */
 export function useRecommendations(
 	limit: MaybeGetter<number> = 20,
-	minGrade: MaybeGetter<string> = "C",
-	query: MaybeGetter<string> = ""
+	minGrade: MaybeGetter<string> = 'C',
+	query: MaybeGetter<string> = ''
 ) {
 	return useQuery<RecommendationResponse>(
 		() => `/api/recommendations?limit=${read(limit)}&min_grade=${read(minGrade)}${read(query)}`,
@@ -468,12 +482,12 @@ export function useRecommendations(
  */
 export function useStockRecommendation(
 	code: MaybeGetter<string | null>,
-	extra: MaybeGetter<string> = ""
+	extra: MaybeGetter<string> = ''
 ) {
 	return useQuery<StockRecommendation>(
 		() => {
 			const q = read(extra);
-			return stockPath(code, `/recommendation${q ? `?${q.slice(1)}` : ""}`);
+			return stockPath(code, `/recommendation${q ? `?${q.slice(1)}` : ''}`);
 		},
 		{ refreshInterval: 300_000, keepPreviousData: true }
 	);
@@ -484,7 +498,7 @@ export function useStockRecommendation(
  * Hitungan mahal & harian (backend cache 1 jam) — refresh 1 jam.
  */
 export function useRecommendationTrack() {
-	return useQuery<RecommendationTrack>("/api/recommendations/track", {
+	return useQuery<RecommendationTrack>('/api/recommendations/track', {
 		refreshInterval: 3_600_000,
 		shouldRetryOnError: false
 	});
@@ -495,7 +509,7 @@ export function useRecommendationTrack() {
  * sesi + lubang sesi. Dipakai kartu "Kesehatan Data" di Dashboard.
  */
 export function useDataHealth() {
-	return useQuery<DataHealth>("/api/data-health", {
+	return useQuery<DataHealth>('/api/data-health', {
 		refreshInterval: 60_000,
 		shouldRetryOnError: false
 	});
@@ -506,7 +520,7 @@ export function useDataHealth() {
  * Dua query `max(...)` di backend, jadi 60 detik cukup.
  */
 export function useFreshness() {
-	return useQuery<Freshness>("/api/freshness", {
+	return useQuery<Freshness>('/api/freshness', {
 		refreshInterval: 60_000,
 		shouldRetryOnError: false
 	});
@@ -514,8 +528,8 @@ export function useFreshness() {
 
 // ---------------------------------------------------- buku klaim (lapis 4)
 
-const JOURNAL_SUMMARY_KEY = "/api/journal/summary";
-const JOURNAL_STATE_KEY = "/api/journal/state";
+const JOURNAL_SUMMARY_KEY = '/api/journal/summary';
+const JOURNAL_STATE_KEY = '/api/journal/state';
 
 export function useJournalSummary(
 	rule?: MaybeGetter<string | undefined>,
@@ -526,10 +540,10 @@ export function useJournalSummary(
 			const p = new URLSearchParams();
 			const r = rule === undefined ? undefined : read(rule);
 			const c = code === undefined ? undefined : read(code);
-			if (r) p.set("rule", r);
-			if (c) p.set("code", c);
+			if (r) p.set('rule', r);
+			if (c) p.set('code', c);
 			const q = p.toString();
-			return `${JOURNAL_SUMMARY_KEY}${q ? `?${q}` : ""}`;
+			return `${JOURNAL_SUMMARY_KEY}${q ? `?${q}` : ''}`;
 		},
 		{ refreshInterval: 300_000, shouldRetryOnError: false }
 	);
@@ -544,7 +558,7 @@ export function useJournalClaims(
 		() => {
 			const p = new URLSearchParams({ limit: String(read(limit)) });
 			const d = tradeDate === undefined ? undefined : read(tradeDate);
-			if (d) p.set("trade_date", d);
+			if (d) p.set('trade_date', d);
 			return `/api/journal/claims?${p}`;
 		},
 		{ refreshInterval: 300_000, shouldRetryOnError: false }
@@ -562,12 +576,12 @@ export function useJournalState() {
 /** Angka buku ikut berubah begitu gerbangnya berubah (klaim baru / penolakan). */
 function refreshJournal(): void {
 	mutateMatch(
-		(key) => key.startsWith(JOURNAL_SUMMARY_KEY) || key.startsWith("/api/journal/claims")
+		(key) => key.startsWith(JOURNAL_SUMMARY_KEY) || key.startsWith('/api/journal/claims')
 	);
 }
 
 export function useJournalHalt() {
-	return async (reason: string, by = "pemilik"): Promise<JournalGateState> => {
+	return async (reason: string, by = 'pemilik'): Promise<JournalGateState> => {
 		const state = await haltJournal(reason, by);
 		await mutateKey(JOURNAL_STATE_KEY, state, { revalidate: false });
 		refreshJournal();
@@ -576,7 +590,7 @@ export function useJournalHalt() {
 }
 
 export function useJournalResume() {
-	return async (by = "pemilik"): Promise<JournalGateState> => {
+	return async (by = 'pemilik'): Promise<JournalGateState> => {
 		const state = await resumeJournal(by);
 		await mutateKey(JOURNAL_STATE_KEY, state, { revalidate: false });
 		refreshJournal();

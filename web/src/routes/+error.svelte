@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import { goto } from "$app/navigation";
-	import ThemeToggle from "#lib/components/ThemeToggle.svelte";
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 
 	/**
 	 * Pengganti `app/not-found.tsx` + `app/error.tsx` dari Next: rute yang tidak
@@ -9,7 +9,7 @@
 	 * kegagalan. Judul tab dibiarkan "Market Labs" seperti di Next.
 	 */
 	const notFound = $derived(page.status === 404);
-	const detail = $derived(page.error?.message ?? "-");
+	const detail = $derived(page.error?.message ?? '-');
 </script>
 
 {#if notFound}
@@ -21,7 +21,7 @@
 				alamatnya.
 			</p>
 			<div class="mt-6 flex items-center justify-center gap-3">
-				<button type="button" class="btn btn-primary" onclick={() => goto("/")}>
+				<button type="button" class="btn btn-primary" onclick={() => goto('/')}>
 					Kembali ke beranda
 				</button>
 				<button type="button" class="btn btn-ghost" onclick={() => window.history.back()}>

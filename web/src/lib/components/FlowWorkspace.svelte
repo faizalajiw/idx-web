@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { untrack } from "svelte";
-	import { goto } from "$app/navigation";
-	import { ArrowLeftRight, Search } from "@lucide/svelte";
-	import { useWatchlist } from "#lib/hooks.svelte.ts";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ForeignFlowCard from "#lib/components/ForeignFlowCard.svelte";
-	import FlowTimelineCard from "#lib/components/FlowTimelineCard.svelte";
+	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { ArrowLeftRight, Search } from '@lucide/svelte';
+	import { useWatchlist } from '#lib/hooks.svelte.ts';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ForeignFlowCard from '#lib/components/ForeignFlowCard.svelte';
+	import FlowTimelineCard from '#lib/components/FlowTimelineCard.svelte';
 
 	/**
 	 * Isi halaman Aliran Dana Emiten: arah asing harian dan timeline skor
@@ -19,9 +19,9 @@
 
 	// Draft mengikuti URL saat emiten berganti dari luar (mis. chip / link).
 	// Nilai awal cukup dibaca sekali; sinkronisasi berikutnya lewat effect.
-	let draft = $state(untrack(() => code) ?? "");
+	let draft = $state(untrack(() => code) ?? '');
 	$effect(() => {
-		draft = code ?? "";
+		draft = code ?? '';
 	});
 
 	// Emiten aktif tetap ditawarkan walau tidak ada di watchlist.
@@ -109,6 +109,8 @@
 			<FlowTimelineCard {code} />
 		</div>
 	{:else}
-		<EmptyState message="Belum ada emiten dipilih. Ketik kode di atas atau klik salah satu saran cepat." />
+		<EmptyState
+			message="Belum ada emiten dipilih. Ketik kode di atas atau klik salah satu saran cepat."
+		/>
 	{/if}
 </main>

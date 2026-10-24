@@ -15,10 +15,10 @@ export const MAX_OPEN_POSITIONS = 6;
 export const MAX_EXPOSURE_PCT = 80;
 
 export const PORTFOLIO_KEYS = {
-	modal: "ml-modal",
-	riskPct: "ml-risk-pct",
-	openPositions: "ml-open-positions",
-	exposurePct: "ml-exposure-pct"
+	modal: 'ml-modal',
+	riskPct: 'ml-risk-pct',
+	openPositions: 'ml-open-positions',
+	exposurePct: 'ml-exposure-pct'
 } as const;
 
 export type PortfolioField = keyof typeof PORTFOLIO_KEYS;
@@ -32,16 +32,16 @@ export interface PortfolioState {
 }
 
 export const EMPTY_PORTFOLIO: PortfolioState = {
-	modal: "",
-	riskPct: "",
-	openPositions: "",
-	exposurePct: ""
+	modal: '',
+	riskPct: '',
+	openPositions: '',
+	exposurePct: ''
 };
 
 /** Angka dari isian; `null` bila kosong atau bukan angka. */
 export function asNumber(raw: string): number | null {
 	const text = raw.trim();
-	if (text === "") return null;
+	if (text === '') return null;
 	const n = Number(text);
 	return Number.isFinite(n) ? n : null;
 }
@@ -62,7 +62,7 @@ export function portfolioQuery(state: PortfolioState): string {
 	if (open !== null && open >= 0) parts.push(`open_positions=${open}`);
 	const exposure = asNumber(state.exposurePct);
 	if (exposure !== null && exposure >= 0) parts.push(`exposure_pct=${exposure}`);
-	return parts.length > 0 ? `&${parts.join("&")}` : "";
+	return parts.length > 0 ? `&${parts.join('&')}` : '';
 }
 
 const state = $state<PortfolioState>({ ...EMPTY_PORTFOLIO });
@@ -76,7 +76,7 @@ let hydrated = false;
 function hydrate(): void {
 	if (hydrated) return;
 	hydrated = true;
-	if (typeof localStorage === "undefined") return;
+	if (typeof localStorage === 'undefined') return;
 	for (const field of Object.keys(PORTFOLIO_KEYS) as PortfolioField[]) {
 		try {
 			const saved = localStorage.getItem(PORTFOLIO_KEYS[field]);

@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { useBrokerFlow } from "#lib/hooks.svelte.ts";
-	import { fmtCompact, fmtDateStr } from "#lib/format.ts";
+	import { useBrokerFlow } from '#lib/hooks.svelte.ts';
+	import { fmtCompact, fmtDateStr } from '#lib/format.ts';
 	import type {
 		BrokerFlow,
 		BrokerFlowCategory,
 		BrokerFlowCategoryStat,
 		BrokerFlowTopRow
-	} from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import InfoHint from "#lib/components/InfoHint.svelte";
-	import Bars from "#lib/components/Bars.svelte";
+	} from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import InfoHint from '#lib/components/InfoHint.svelte';
+	import Bars from '#lib/components/Bars.svelte';
 
 	// Warna konsisten dengan legenda broker di seluruh dashboard (lihat lib/brokerType).
 	const CAT_META: Record<BrokerFlowCategory, { label: string; color: string }> = {
-		asing: { label: "Asing", color: "var(--chart-foreign)" },
-		lokal: { label: "Lokal", color: "var(--chart-local)" },
-		bumn: { label: "BUMN", color: "var(--chart-bumn)" }
+		asing: { label: 'Asing', color: 'var(--chart-foreign)' },
+		lokal: { label: 'Lokal', color: 'var(--chart-local)' },
+		bumn: { label: 'BUMN', color: 'var(--chart-bumn)' }
 	};
-	const CATS: BrokerFlowCategory[] = ["asing", "lokal", "bumn"];
+	const CATS: BrokerFlowCategory[] = ['asing', 'lokal', 'bumn'];
 
 	type HistoryPoint = {
 		label: string;
@@ -34,7 +34,7 @@
 		total_value: number | null;
 	};
 
-	let { compact = false, class: className = "" }: { compact?: boolean; class?: string } = $props();
+	let { compact = false, class: className = '' }: { compact?: boolean; class?: string } = $props();
 
 	const flow = useBrokerFlow(20, 5);
 	const data = $derived(flow.data);
@@ -59,7 +59,7 @@
 	const subtitle = $derived(
 		data?.date
 			? `Nilai transaksi asing / lokal / BUMN — sesi ${fmtDateStr(data.date)}`
-			: "Nilai transaksi asing / lokal / BUMN"
+			: 'Nilai transaksi asing / lokal / BUMN'
 	);
 
 	function historyFooter(i: number): string | null {
@@ -68,15 +68,20 @@
 		return `Nilai: Rp ${fmtCompact(p.asing_value)} asing · Rp ${fmtCompact(p.lokal_value)} lokal · Rp ${fmtCompact(p.bumn_value)} BUMN · Total Rp ${fmtCompact(p.total_value)}`;
 	}
 
-	const sharePct = (s: number | null) => (s === null ? "-" : `${(s * 100).toFixed(1)}%`);
+	const sharePct = (s: number | null) => (s === null ? '-' : `${(s * 100).toFixed(1)}%`);
 </script>
 
-{#snippet categoryColumn(cat: BrokerFlowCategory, stat: BrokerFlowCategoryStat, top: BrokerFlowTopRow[])}
+{#snippet categoryColumn(
+	cat: BrokerFlowCategory,
+	stat: BrokerFlowCategoryStat,
+	top: BrokerFlowTopRow[]
+)}
 	{@const meta = CAT_META[cat]}
 	<div class="rounded-lg border border-[var(--border)] p-3">
 		<div class="flex items-baseline justify-between gap-2">
 			<span class="inline-flex items-center gap-1.5 text-xs font-semibold">
-				<span class="inline-block h-2 w-2 rounded-full" style="background-color: {meta.color}"></span>
+				<span class="inline-block h-2 w-2 rounded-full" style="background-color: {meta.color}"
+				></span>
 				{meta.label}
 			</span>
 			<span class="text-sm font-semibold tabular-nums">{sharePct(stat.share)}</span>
@@ -89,7 +94,7 @@
 				{#each top as b (b.broker_code)}
 					<li class="flex items-center gap-2 text-[11px]">
 						<span class="w-7 shrink-0 font-semibold">{b.broker_code}</span>
-						<span class="text-muted min-w-0 flex-1 truncate">{b.broker_name ?? "-"}</span>
+						<span class="text-muted min-w-0 flex-1 truncate">{b.broker_name ?? '-'}</span>
 						<span class="shrink-0 tabular-nums">{sharePct(b.share)}</span>
 					</li>
 				{/each}
@@ -145,19 +150,19 @@
 					labels={points.map((p) => p.label)}
 					series={[
 						{
-							name: "Asing",
+							name: 'Asing',
 							values: points.map((p) => p.asing),
 							color: CAT_META.asing.color,
 							fmt: (v) => `${v.toFixed(1)}%`
 						},
 						{
-							name: "Lokal",
+							name: 'Lokal',
 							values: points.map((p) => p.lokal),
 							color: CAT_META.lokal.color,
 							fmt: (v) => `${v.toFixed(1)}%`
 						},
 						{
-							name: "BUMN",
+							name: 'BUMN',
 							values: points.map((p) => p.bumn),
 							color: CAT_META.bumn.color,
 							fmt: (v) => `${v.toFixed(1)}%`
@@ -176,15 +181,16 @@
 
 		<div class="space-y-1">
 			<p class="text-muted text-[11px] leading-snug">
-				Yang diukur adalah <strong>porsi nilai transaksi</strong> (setiap trade dihitung sekali di broker
-				pembeli dan sekali di broker penjual, jadi totalnya dua sisi perdagangan) — bukan net beli/jual: IDX
-				tidak mempublikasikan split beli/jual per broker di data gratis. Kategori dari map kurasi kode broker{' '}
+				Yang diukur adalah <strong>porsi nilai transaksi</strong> (setiap trade dihitung sekali di
+				broker pembeli dan sekali di broker penjual, jadi totalnya dua sisi perdagangan) — bukan net
+				beli/jual: IDX tidak mempublikasikan split beli/jual per broker di data gratis. Kategori
+				dari map kurasi kode broker{' '}
 				<button
 					type="button"
 					class="underline decoration-dotted hover:underline"
 					onclick={() => (showMap = !showMap)}
 				>
-					{showMap ? "sembunyikan" : "lihat klasifikasi"}
+					{showMap ? 'sembunyikan' : 'lihat klasifikasi'}
 				</button>
 				.
 			</p>
@@ -195,7 +201,7 @@
 							{#each d.classification as b (b.broker_code)}
 								<tr class="border-b border-[var(--border)] last:border-0">
 									<td class="py-0.5 pr-2 font-semibold">{b.broker_code}</td>
-									<td class="text-muted py-0.5 pr-2">{b.broker_name ?? "-"}</td>
+									<td class="text-muted py-0.5 pr-2">{b.broker_name ?? '-'}</td>
 									<td class="py-0.5 text-right">
 										<span
 											class="inline-flex items-center gap-1"

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { Bell } from "@lucide/svelte";
-	import AlertRules from "#lib/components/AlertRules.svelte";
-	import TechnicalChart from "#lib/components/TechnicalChart.svelte";
-	import TelegramStatus from "#lib/components/TelegramStatus.svelte";
-	import WatchlistTable from "#lib/components/WatchlistTable.svelte";
-	import SmartMoneyWatchCard from "#lib/components/SmartMoneyWatchCard.svelte";
+	import { Bell } from '@lucide/svelte';
+	import AlertRules from '#lib/components/AlertRules.svelte';
+	import TechnicalChart from '#lib/components/TechnicalChart.svelte';
+	import TelegramStatus from '#lib/components/TelegramStatus.svelte';
+	import WatchlistTable from '#lib/components/WatchlistTable.svelte';
+	import SmartMoneyWatchCard from '#lib/components/SmartMoneyWatchCard.svelte';
 
 	/**
 	 * Pantau = watchlist + notifikasi dalam satu tempat. Watchlist menggerakkan
@@ -32,9 +32,9 @@
 	<div class="card p-4 text-sm leading-relaxed text-[var(--fg-muted)]">
 		<span class="font-semibold text-[var(--fg)]">Cara kerja: </span>
 		aturan diperiksa setiap kali data EOD baru masuk. Notifikasi dikirim
-		<span class="font-semibold text-[var(--fg)]">sekali per persilangan</span> —
-		begitu kondisi terpenuhi, aturan itu “tersimpan aman” dan baru bisa bunyi lagi setelah
-		kondisinya kembali normal. Jadi tidak ada spam tiap hari selama harga masih di atas batas.
+		<span class="font-semibold text-[var(--fg)]">sekali per persilangan</span> — begitu kondisi terpenuhi,
+		aturan itu “tersimpan aman” dan baru bisa bunyi lagi setelah kondisinya kembali normal. Jadi tidak
+		ada spam tiap hari selama harga masih di atas batas.
 	</div>
 
 	<WatchlistTable onSelect={(code) => (selected = code)} {selected} />

@@ -1,38 +1,38 @@
 <script lang="ts">
-	import { X } from "@lucide/svelte";
+	import { X } from '@lucide/svelte';
 
 	/** Faktor yang dipakai screener — daftar dari halaman Next, teks apa adanya. */
 	const FACTORS: [string, string][] = [
-		["Signal teknikal", "Rule SMA20/50 + RSI(14) — sama dengan panel Trading Signals."],
-		["Momentum 20 hari", "Perubahan harga 20 hari bursa terakhir (%)."],
-		["RSI(14)", "Kelebihanbelian relatif; <35 oversold, >70 overbought."],
-		["Volume ratio", "Volume hari ini ÷ rata-rata 20 hari. >2 = aktivitas menonjol."],
+		['Signal teknikal', 'Rule SMA20/50 + RSI(14) — sama dengan panel Trading Signals.'],
+		['Momentum 20 hari', 'Perubahan harga 20 hari bursa terakhir (%).'],
+		['RSI(14)', 'Kelebihanbelian relatif; <35 oversold, >70 overbought.'],
+		['Volume ratio', 'Volume hari ini ÷ rata-rata 20 hari. >2 = aktivitas menonjol.'],
 		[
-			"ATR%",
-			"ATR(14) sebagai % dari close — volatilitas komparabel antar emiten. Tinggi = lebih berisiko."
+			'ATR%',
+			'ATR(14) sebagai % dari close — volatilitas komparabel antar emiten. Tinggi = lebih berisiko.'
 		],
 		[
-			"Jarak 52w",
-			"Posisi harga vs puncak 52 minggu (%). 0% = sedang di puncak; jauh di bawah = momentum lemah."
+			'Jarak 52w',
+			'Posisi harga vs puncak 52 minggu (%). 0% = sedang di puncak; jauh di bawah = momentum lemah.'
 		],
 		[
-			"Hari sejak sinyal",
-			"Hari bursa sejak BUY/SELL terakhir. Besar = sinyal sudah tua; 0-5 = sinyal baru."
+			'Hari sejak sinyal',
+			'Hari bursa sejak BUY/SELL terakhir. Besar = sinyal sudah tua; 0-5 = sinyal baru.'
 		],
 		[
-			"Skor aktivitas broker",
-			"Skor 0-100 dari aliran asing bernotasi rupiah + ketimpangan buku intraday, dibobot oleh uji IC. 50 = median pasar. Butuh run `idx ic` di backend dulu; sebelum itu kolomnya kosong dan filter menyaring semua."
+			'Skor aktivitas broker',
+			'Skor 0-100 dari aliran asing bernotasi rupiah + ketimpangan buku intraday, dibobot oleh uji IC. 50 = median pasar. Butuh run `idx ic` di backend dulu; sebelum itu kolomnya kosong dan filter menyaring semua.'
 		],
 		[
-			"Order-book imbalance",
-			"Ketimpangan bid vs offer dari snapshot intraday (-1..1). Positif = bid lebih tebal — akumulasi diam-diam; negatif = offer tebal — distribusi."
+			'Order-book imbalance',
+			'Ketimpangan bid vs offer dari snapshot intraday (-1..1). Positif = bid lebih tebal — akumulasi diam-diam; negatif = offer tebal — distribusi.'
 		],
 		[
-			"Absorption",
-			"Buku vs arah harga (-1..1). Negatif = offer tebal tapi harga tetap naik — buyer kuat menyerap (bullish)."
+			'Absorption',
+			'Buku vs arah harga (-1..1). Negatif = offer tebal tapi harga tetap naik — buyer kuat menyerap (bullish).'
 		],
-		["Foreign net", "Net buy/sell asing hari terakhir (Rp, notional = lembar × close)."],
-		["Likuiditas", "Nilai transaksi harian — filter minimal untuk hindari saham 'oleh-oleh'."]
+		['Foreign net', 'Net buy/sell asing hari terakhir (Rp, notional = lembar × close).'],
+		['Likuiditas', "Nilai transaksi harian — filter minimal untuk hindari saham 'oleh-oleh'."]
 	];
 
 	let { onClose }: { onClose: () => void } = $props();
@@ -42,14 +42,14 @@
 	$effect(() => {
 		const prevOverflow = document.body.style.overflow;
 		const prevFocus = document.activeElement as HTMLElement | null;
-		document.body.style.overflow = "hidden";
+		document.body.style.overflow = 'hidden';
 		closeRef?.focus();
 		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") onClose();
+			if (e.key === 'Escape') onClose();
 		};
-		window.addEventListener("keydown", onKeyDown);
+		window.addEventListener('keydown', onKeyDown);
 		return () => {
-			window.removeEventListener("keydown", onKeyDown);
+			window.removeEventListener('keydown', onKeyDown);
 			document.body.style.overflow = prevOverflow;
 			prevFocus?.focus();
 		};
@@ -73,9 +73,13 @@
 	<div
 		class="relative flex max-h-[85vh] w-[min(640px,100%)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-[popIn_180ms_ease-out]"
 	>
-		<header class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+		<header
+			class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4"
+		>
 			<div>
-				<h3 id="factors-title" class="text-base font-semibold tracking-tight">Faktor yang dihitung</h3>
+				<h3 id="factors-title" class="text-base font-semibold tracking-tight">
+					Faktor yang dihitung
+				</h3>
 				<p class="mt-0.5 text-xs text-[var(--fg-muted)]">
 					{FACTORS.length} faktor · dipakai untuk menyaring dan mengurutkan saham
 				</p>

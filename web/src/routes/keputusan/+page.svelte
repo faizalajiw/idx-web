@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DecisionWorkspace from "#lib/components/DecisionWorkspace.svelte";
+	import DecisionWorkspace from '#lib/components/DecisionWorkspace.svelte';
 </script>
 
 <svelte:head>

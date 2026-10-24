@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
-import { RUTE } from "./rute";
+import { RUTE } from './rute';
 
 /**
  * Tidak ada luber horizontal di 390 px.
@@ -11,7 +11,7 @@ import { RUTE } from "./rute";
 for (const rute of RUTE) {
 	test(`${rute} tidak luber horizontal`, async ({ page }) => {
 		await page.goto(rute);
-		await page.locator("h1").first().waitFor();
+		await page.locator('h1').first().waitFor();
 		// Data dimuat klien sesudah HTML pertama; beri satu ketukan supaya tabel
 		// yang baru terisi ikut diukur, bukan kerangka kosongnya.
 		await page.evaluate(() => document.fonts.ready);

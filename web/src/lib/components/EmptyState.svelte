@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { message = "Tidak ada data." }: { message?: string } = $props();
+	let { message = 'Tidak ada data.' }: { message?: string } = $props();
 </script>
 
 <div

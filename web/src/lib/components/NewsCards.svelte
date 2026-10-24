@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { ArrowUpRight, X } from "@lucide/svelte";
-	import { useLatestNews } from "#lib/hooks.svelte.ts";
-	import type { NewsItem } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
+	import { ArrowUpRight, X } from '@lucide/svelte';
+	import { useLatestNews } from '#lib/hooks.svelte.ts';
+	import type { NewsItem } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
 
 	const PREVIEW_COUNT = 3;
 
 	function relTime(iso: string): string {
 		const diff = (Date.now() - new Date(iso).getTime()) / 60_000;
-		if (Number.isNaN(diff)) return "";
-		if (diff < 1) return "baru saja";
+		if (Number.isNaN(diff)) return '';
+		if (diff < 1) return 'baru saja';
 		if (diff < 60) return `${Math.floor(diff)} menit lalu`;
 		if (diff < 1440) return `${Math.floor(diff / 60)} jam lalu`;
 		return `${Math.floor(diff / 1440)} hari lalu`;
@@ -26,21 +26,19 @@
 	const pesanError = $derived(error instanceof Error ? error.message : String(error));
 
 	let showAll = $state(false);
-	const modalOpen = $derived(
-		showAll && !!data && !error && data.items.length > PREVIEW_COUNT
-	);
+	const modalOpen = $derived(showAll && !!data && !error && data.items.length > PREVIEW_COUNT);
 
 	// Modal: kunci scroll halaman dan tutup dengan Escape, seperti versi Next.
 	$effect(() => {
 		if (!modalOpen) return;
 		const prev = document.body.style.overflow;
-		document.body.style.overflow = "hidden";
+		document.body.style.overflow = 'hidden';
 		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") showAll = false;
+			if (e.key === 'Escape') showAll = false;
 		};
-		window.addEventListener("keydown", onKeyDown);
+		window.addEventListener('keydown', onKeyDown);
 		return () => {
-			window.removeEventListener("keydown", onKeyDown);
+			window.removeEventListener('keydown', onKeyDown);
 			document.body.style.overflow = prev;
 		};
 	});
@@ -92,7 +90,9 @@
 		<div
 			class="relative flex max-h-[80vh] w-[min(600px,100%)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-[popIn_180ms_ease-out]"
 		>
-			<header class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+			<header
+				class="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4"
+			>
 				<div>
 					<h3 class="text-base font-semibold tracking-tight">Semua Berita</h3>
 					<p class="mt-0.5 text-xs text-[var(--fg-muted)]">

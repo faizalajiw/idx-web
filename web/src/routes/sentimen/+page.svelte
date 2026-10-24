@@ -8,55 +8,55 @@
 		TrendingUp,
 		WavesHorizontal,
 		type LucideIcon
-	} from "@lucide/svelte";
-	import { useSentiment } from "#lib/hooks.svelte.ts";
-	import type { SentimentItem } from "#lib/types.ts";
-	import Card from "#lib/components/Card.svelte";
-	import EmptyState from "#lib/components/EmptyState.svelte";
-	import ErrorState from "#lib/components/ErrorState.svelte";
-	import LastUpdated from "#lib/components/LastUpdated.svelte";
-	import Skeleton from "#lib/components/Skeleton.svelte";
-	import TickerLogo from "#lib/components/TickerLogo.svelte";
+	} from '@lucide/svelte';
+	import { useSentiment } from '#lib/hooks.svelte.ts';
+	import type { SentimentItem } from '#lib/types.ts';
+	import Card from '#lib/components/Card.svelte';
+	import EmptyState from '#lib/components/EmptyState.svelte';
+	import ErrorState from '#lib/components/ErrorState.svelte';
+	import LastUpdated from '#lib/components/LastUpdated.svelte';
+	import Skeleton from '#lib/components/Skeleton.svelte';
+	import TickerLogo from '#lib/components/TickerLogo.svelte';
 
-	const pct1 = (n: number | null | undefined) => (n == null ? "—" : `${n.toFixed(1)}%`);
+	const pct1 = (n: number | null | undefined) => (n == null ? '—' : `${n.toFixed(1)}%`);
 	const signedPct = (n: number | null | undefined, digits = 1) =>
-		n == null ? "—" : `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n).toFixed(digits)}%`;
+		n == null ? '—' : `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n).toFixed(digits)}%`;
 	const signed = (n: number | null | undefined, digits = 2) =>
-		n == null ? "—" : `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n).toFixed(digits)}`;
+		n == null ? '—' : `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n).toFixed(digits)}`;
 
 	const MARKET_TONE: Record<string, { tone: string; Icon: LucideIcon; hint: string }> = {
-		"RISK-ON": { tone: "text-up", Icon: TrendingUp, hint: "Pasar cenderung optimistis." },
-		"RISK-OFF": { tone: "text-down", Icon: TrendingDown, hint: "Pasar cenderung defensif." },
-		NETRAL: { tone: "text-muted", Icon: Minus, hint: "Pasar belum punya arah yang jelas." }
+		'RISK-ON': { tone: 'text-up', Icon: TrendingUp, hint: 'Pasar cenderung optimistis.' },
+		'RISK-OFF': { tone: 'text-down', Icon: TrendingDown, hint: 'Pasar cenderung defensif.' },
+		NETRAL: { tone: 'text-muted', Icon: Minus, hint: 'Pasar belum punya arah yang jelas.' }
 	};
 	const FALLBACK_TONE = {
-		tone: "text-accent",
+		tone: 'text-accent',
 		Icon: Radio,
-		hint: "Data sentimen belum tersedia."
+		hint: 'Data sentimen belum tersedia.'
 	};
 
 	/** Komponen skor pasar (rentang -1..+1, positif = mendukung risk-on). */
 	const COMPONENT_META: Record<string, { label: string; hint: string }> = {
-		breadth: { label: "Lebar pasar", hint: "Berapa banyak saham yang naik dibanding yang turun." },
-		index: { label: "Gerak IHSG", hint: "Arah dan besar pergerakan indeks hari ini." },
-		foreign: { label: "Arus asing", hint: "Apakah investor asing cenderung membeli atau menjual." }
+		breadth: { label: 'Lebar pasar', hint: 'Berapa banyak saham yang naik dibanding yang turun.' },
+		index: { label: 'Gerak IHSG', hint: 'Arah dan besar pergerakan indeks hari ini.' },
+		foreign: { label: 'Arus asing', hint: 'Apakah investor asing cenderung membeli atau menjual.' }
 	};
 
 	/** Nama tampilan untuk komponen bobot skor per emiten. */
 	const EMITEN_WEIGHT_LABEL: Record<string, string> = {
-		foreign: "Arus asing (persentil)",
-		imbalance: "Ketimpangan buku",
-		absorption: "Absorpsi buku"
+		foreign: 'Arus asing (persentil)',
+		imbalance: 'Ketimpangan buku',
+		absorption: 'Absorpsi buku'
 	};
 
 	/** Label emiten dari backend bisa "AKUMULASI KUAT", "DISTRIBUSI", dst. */
 	function labelBadge(label: string): string {
-		if (label.startsWith("AKUMULASI")) return "badge badge-buy";
-		if (label.startsWith("DISTRIBUSI")) return "badge badge-sell";
-		return "badge badge-hold";
+		if (label.startsWith('AKUMULASI')) return 'badge badge-buy';
+		if (label.startsWith('DISTRIBUSI')) return 'badge badge-sell';
+		return 'badge badge-hold';
 	}
 
-	type Side = "akumulasi" | "distribusi";
+	type Side = 'akumulasi' | 'distribusi';
 
 	type Tile = {
 		key: string;
@@ -79,7 +79,7 @@
 	let expanded = $state<string | null>(null);
 
 	const market = $derived(data?.market);
-	const tone = $derived(MARKET_TONE[(market?.label ?? "").toUpperCase()] ?? FALLBACK_TONE);
+	const tone = $derived(MARKET_TONE[(market?.label ?? '').toUpperCase()] ?? FALLBACK_TONE);
 
 	const accumulation = $derived(data?.accumulation ?? []);
 	const distribution = $derived(data?.distribution ?? []);
@@ -88,40 +88,40 @@
 
 	const tiles = $derived.by((): Tile[] => [
 		{
-			key: "analyzed",
-			label: "Dianalisis",
-			hint: "Emiten yang dinilai",
+			key: 'analyzed',
+			label: 'Dianalisis',
+			hint: 'Emiten yang dinilai',
 			value: stats.analyzed ?? 0,
-			tone: "text-[var(--fg)]",
+			tone: 'text-[var(--fg)]',
 			Icon: ChartColumn,
-			c: "var(--accent)"
+			c: 'var(--accent)'
 		},
 		{
-			key: "accumulation",
-			label: "Akumulasi",
-			hint: "Ditekan pembelian",
+			key: 'accumulation',
+			label: 'Akumulasi',
+			hint: 'Ditekan pembelian',
 			value: stats.accumulation ?? 0,
-			tone: "text-up",
+			tone: 'text-up',
 			Icon: TrendingUp,
-			c: "var(--up)"
+			c: 'var(--up)'
 		},
 		{
-			key: "distribution",
-			label: "Distribusi",
-			hint: "Ditekan penjualan",
+			key: 'distribution',
+			label: 'Distribusi',
+			hint: 'Ditekan penjualan',
 			value: stats.distribution ?? 0,
-			tone: "text-down",
+			tone: 'text-down',
 			Icon: TrendingDown,
-			c: "var(--down)"
+			c: 'var(--down)'
 		},
 		{
-			key: "neutral",
-			label: "Netral",
-			hint: "Tanpa sinyal kuat",
+			key: 'neutral',
+			label: 'Netral',
+			hint: 'Tanpa sinyal kuat',
 			value: stats.neutral ?? 0,
-			tone: "text-muted",
+			tone: 'text-muted',
 			Icon: Minus,
-			c: "var(--fg-muted)"
+			c: 'var(--fg-muted)'
 		}
 	]);
 
@@ -130,8 +130,8 @@
 	}
 
 	function toneOf(n: number | null | undefined): string {
-		if (n == null) return "text-[var(--fg)]";
-		return n > 0 ? "text-up" : n < 0 ? "text-down" : "text-[var(--fg)]";
+		if (n == null) return 'text-[var(--fg)]';
+		return n > 0 ? 'text-up' : n < 0 ? 'text-down' : 'text-[var(--fg)]';
 	}
 
 	function toggle(key: string) {
@@ -147,9 +147,9 @@
 {#snippet scoreGauge(score: number, label: string)}
 	{@const clamped = Math.max(0, Math.min(100, score))}
 	{@const value = (clamped / 100) * 251.3}
-	{@const key = (label ?? "").toUpperCase()}
+	{@const key = (label ?? '').toUpperCase()}
 	{@const color =
-		key === "RISK-ON" ? "var(--up)" : key === "RISK-OFF" ? "var(--down)" : "var(--accent)"}
+		key === 'RISK-ON' ? 'var(--up)' : key === 'RISK-OFF' ? 'var(--down)' : 'var(--accent)'}
 	<div class="relative h-[146px] w-[240px] shrink-0">
 		<svg
 			viewBox="0 0 180 110"
@@ -187,7 +187,7 @@
 	{@const v = value == null ? null : Math.max(-1, Math.min(1, value))}
 	{@const pos = v != null && v >= 0}
 	{@const width = v == null ? 0 : Math.abs(v) * 50}
-	{@const toneCls = v == null ? "text-muted" : pos ? "text-up" : "text-down"}
+	{@const toneCls = v == null ? 'text-muted' : pos ? 'text-up' : 'text-down'}
 	<li class="min-w-0" title={hint}>
 		<div class="mb-1.5 flex items-center justify-between text-xs">
 			<span class="text-muted font-medium">{label}</span>
@@ -255,7 +255,7 @@
 							<span class="font-mono text-sm font-semibold">{it.code}</span>
 							<span class={labelBadge(it.label)}>{it.label}</span>
 						</div>
-						<div class="text-muted mt-0.5 truncate text-xs">{it.name ?? "—"}</div>
+						<div class="text-muted mt-0.5 truncate text-xs">{it.name ?? '—'}</div>
 					</div>
 					<div class="hidden w-24 shrink-0 sm:block">
 						<div class="bg-[var(--bg-elev)] h-1.5 overflow-hidden rounded-full">
@@ -310,7 +310,7 @@
 	items: SentimentItem[],
 	emptyMessage: string
 )}
-	{@const toneCls = side === "akumulasi" ? "text-up" : "text-down"}
+	{@const toneCls = side === 'akumulasi' ? 'text-up' : 'text-down'}
 	{#snippet headTitle()}
 		<Icon size={15} class={toneCls} aria-hidden="true" />
 		{title}
@@ -415,22 +415,22 @@
 							{@render breadthBar(market.up, market.flat, market.down)}
 							<dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
 								{@render stat(
-									"IHSG",
+									'IHSG',
 									signedPct(market.index_percent, 2),
 									undefined,
 									toneOf(market.index_percent)
 								)}
 								{@render stat(
-									"Porsi asing",
+									'Porsi asing',
 									pct1(toPct(market.foreign_breadth)),
-									"Saham dengan arus asing positif",
-									"text-[var(--fg)]"
+									'Saham dengan arus asing positif',
+									'text-[var(--fg)]'
 								)}
 								{@render stat(
-									"Asing / nilai",
+									'Asing / nilai',
 									pct1(toPct(market.foreign_to_value)),
-									"Transaksi asing terhadap total nilai",
-									"text-[var(--fg)]"
+									'Transaksi asing terhadap total nilai',
+									'text-[var(--fg)]'
 								)}
 							</dl>
 						</div>
@@ -444,26 +444,29 @@
 		<!-- Baris 2: akumulasi & distribusi berdampingan -->
 		<section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
 			{@render sideCard(
-				"akumulasi",
-				"Akumulasi",
-				"Arus asing peringkat atas & bid lebih tebal dari offer.",
+				'akumulasi',
+				'Akumulasi',
+				'Arus asing peringkat atas & bid lebih tebal dari offer.',
 				TrendingUp,
 				accumulation,
-				"Tidak ada emiten dengan sinyal akumulasi."
+				'Tidak ada emiten dengan sinyal akumulasi.'
 			)}
 			{@render sideCard(
-				"distribusi",
-				"Distribusi",
-				"Arus asing peringkat bawah & offer lebih tebal dari bid.",
+				'distribusi',
+				'Distribusi',
+				'Arus asing peringkat bawah & offer lebih tebal dari bid.',
 				TrendingDown,
 				distribution,
-				"Tidak ada emiten dengan sinyal distribusi."
+				'Tidak ada emiten dengan sinyal distribusi.'
 			)}
 		</section>
 
 		<!-- Baris 3: metodologi & catatan -->
 		<section class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-			<Card title="Bobot Skor Emiten" subtitle="Seberapa besar tiap faktor memengaruhi skor satu emiten.">
+			<Card
+				title="Bobot Skor Emiten"
+				subtitle="Seberapa besar tiap faktor memengaruhi skor satu emiten."
+			>
 				{#if !data}
 					<Skeleton class="h-32 w-full" />
 				{:else if weightRows.length === 0}
@@ -492,8 +495,8 @@
 							class="text-muted flex items-start gap-2 rounded-xl border border-dashed border-[var(--border)] px-3.5 py-2.5 text-xs"
 						>
 							<Info size={14} class="mt-px shrink-0" aria-hidden="true" />
-							Orderbook tidak tersedia pada sesi ini. Sinyal akumulasi dan distribusi memakai arus
-							asing dan breadth sebagai proksi.
+							Orderbook tidak tersedia pada sesi ini. Sinyal akumulasi dan distribusi memakai arus asing
+							dan breadth sebagai proksi.
 						</p>
 					{/if}
 					{#if data?.disclaimer}

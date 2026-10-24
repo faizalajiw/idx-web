@@ -40,7 +40,7 @@
 				<path d="M1 4v6h6" />
 				<path d="M3.5 15.5A9 9 0 0 1 17.5 8" />
 			</svg>
-			{stale ? "Coba sekali lagi" : "Coba lagi"}
+			{stale ? 'Coba sekali lagi' : 'Coba lagi'}
 		</button>
 	{/if}
 </div>
