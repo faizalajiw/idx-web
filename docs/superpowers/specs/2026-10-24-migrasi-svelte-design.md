@@ -23,7 +23,8 @@ Hosting seluruh stack (API, Postgres, scraper) ke VPS adalah proyek terpisah dan
 
 1. Paritas 19 rute: setiap elemen yang ada sekarang tetap ada (teks, kartu, kolom tabel, chip, tautan, tombol, ikon, badge status, empty/loading/error state, shortcut keyboard).
 2. First-load JS per rute masuk anggaran, diukur setelah build produksi:
-   - shell (semua rute): ≤ 60 KB gzip
+   - shell (semua rute): ≤ 65 KB gzip (semula 60 KB; dinaikkan 2026-10-24
+     berdasarkan pengukuran, lihat §11.8)
    - halaman tabel/daftar: ≤ 120 KB gzip
    - halaman dengan chart: ≤ 180 KB gzip
 3. First-load turun minimal 30% dibanding baseline Next yang diukur di fase 1 pada rute yang sama.
@@ -232,6 +233,13 @@ Total: 10,5 sampai 12 sesi, sekitar 42 sampai 52 jam eksekusi, ditambah 30 sampa
 5. Font di-host sendiri di `static/fonts`, hanya weight yang dipakai.
 6. Enam kunci localStorage tidak berubah supaya preferensi pengguna tidak hilang.
 7. Cutover :3000 memakai dev server seperti sekarang; rehearsal produksi di :3100 memakai `vite preview`.
+8. **Anggaran shell dinaikkan dari 60 KB ke 65 KB gzip** (keputusan pemilik,
+   2026-10-24). Dasar pengukuran: shell terpasang 61,9-64,2 KB, dan 33,2 KB di
+   antaranya runtime SvelteKit 3 yang tidak bisa dipotong. Satu-satunya cara
+   masuk 60 KB adalah membuang ikon menu, yang melanggar sasaran §2.1 (semua
+   ikon tetap ada): percobaan build menunjukkan 14 ikon nav berbiaya 9,3 KB
+   gzip (112,7 KB jadi 103,4 KB pada berkas bersama). Paritas UI dipilih di
+   atas angka anggaran.
 
 ## 12. Yang diserahkan ke pelaksana
 

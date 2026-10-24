@@ -46,7 +46,7 @@ Belum di fase 1, sengaja:
 
 - `GlobalLastUpdated` menampilkan keadaan memuat statis sampai hook data ada di fase 2.
 - Palet hanya mencari halaman, belum emiten (butuh `searchStocks`).
-- Anggaran shell 61,9 KB vs target 60 KB: lewat 1,9 KB. Menunggu keputusan pemilik (naikkan ke 65 KB atau potong ikon).
+- Anggaran shell 61,9 KB semula lewat target 60 KB. Diputuskan 2026-10-24: anggaran dinaikkan ke 65 KB (spec §2 dan §11.8), ikon nav dipertahankan demi paritas.
 
 ## Fase 2 — selesai 2026-10-24
 
@@ -206,10 +206,13 @@ Hasil verifikasi:
 `:3100` tetap hidup sebagai cadangan (`npm run preview`). Dev harian:
 `npm run dev` setelah mematikan preview, karena port dikunci `strictPort`.
 
-Yang belum dikerjakan, butuh keputusan/tindakan pemilik: cutover VPS (build
-dengan `PUBLIC_API_BASE_URL`, tambah domain ke `IDX_API_CORS_ORIGINS`, arahkan
-root nginx ke `build/`), dan keputusan anggaran shell 61,9-64,2 KB vs target
-≤60 KB.
+Yang belum dikerjakan: cutover VPS (build dengan `PUBLIC_API_BASE_URL`, tambah
+domain ke `IDX_API_CORS_ORIGINS`, arahkan root nginx ke `build/`).
+
+Anggaran shell diputuskan 2026-10-24: naik dari 60 KB ke 65 KB gzip (spec §2,
+§11.8). Shell terpasang 61,9-64,2 KB, jadi sekarang masuk anggaran. Ikon nav
+dipertahankan; biayanya terukur 9,3 KB gzip untuk 14 ikon, dan membuangnya
+akan melanggar sasaran paritas §2.1.
 
 ## Aturan kerja
 

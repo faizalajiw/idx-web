@@ -97,10 +97,14 @@ menarik semua kartu emiten (chart, aliran, broker, kepemilikan, event study),
    tetap ±62-64 KB seperti fase 2; sisanya kode rute yang dimuat sesuai
    kebutuhan. Karena SPA memecah per rute, tidak ada rute yang membayar kode
    rute lain.
-2. Anggaran shell di spec §2 adalah ≤60 KB. Angka 61,9-64,2 KB pada fase 1-2
-   masih berlaku: lewat 1,9-4,2 KB, penyebabnya runtime SvelteKit 3 (33,2 KB)
-   yang tidak bisa dipotong, bukan kode aplikasi. Usul tetap: naikkan anggaran
-   ke 65 KB, atau potong ikon nav. Menunggu keputusan pemilik.
-3. Recharts tidak lagi dimuat di mana pun. React dan react-dom tidak ada di
+2. Anggaran shell dinaikkan ke **≤65 KB** gzip (keputusan pemilik 2026-10-24,
+   spec §2 dan §11.8). Shell terpasang 61,9-64,2 KB, jadi masuk anggaran baru;
+   33,2 KB di antaranya runtime SvelteKit 3 yang tidak bisa dipotong.
+3. Biaya ikon nav terukur: 14 ikon sidebar = **9,3 KB gzip**. Percobaan build
+   dengan seluruh item nav memakai satu ikon: berkas bersama tiga rute turun
+   dari 112,7 KB / 34 berkas ke 103,4 KB / 22 berkas. Karena membuang ikon
+   melanggar sasaran paritas (§2.1), anggaran yang dinaikkan, bukan ikonnya
+   yang dipotong.
+4. Recharts tidak lagi dimuat di mana pun. React dan react-dom tidak ada di
    bundel. Ukuran total `build/` 13,97 MB, 13,26 MB di antaranya logo emiten.
-4. Angka di atas byte terkirim (gzip), bukan ukuran mentah di disk.
+5. Angka di atas byte terkirim (gzip), bukan ukuran mentah di disk.
