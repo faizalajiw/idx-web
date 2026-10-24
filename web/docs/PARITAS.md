@@ -11,21 +11,21 @@ Setelah port, ulangi dari halaman Svelte dan bandingkan daftarnya.
 | Rute | Berkas Next | Komponen utama | Status |
 |---|---|---|---|
 | `/` | `app/page.tsx` | MarketOverview, LatestNewsCard, TopLeadersPanel, TopBrokersPanel, SignalsPanel, TechnicalChart, MarketRegimeCard, DataHealthCard | placeholder |
-| `/pantau` | `app/pantau/page.tsx` | daftar alert, form | placeholder |
-| `/screener` | `app/screener/page.tsx` | filter, tabel hasil | placeholder |
+| `/pantau` | `app/pantau/page.tsx` | WatchlistTable, AlertRules, TelegramStatus, SmartMoneyWatchCard, TechnicalChart | selesai |
+| `/screener` | `app/screener/page.tsx` | filter, tabel hasil, ScreenerFactorsModal | selesai |
 | `/rekomendasi` | `app/rekomendasi/page.tsx` | parameter portofolio, gerbang rezim, tabel rekomendasi | placeholder |
 | `/keputusan` | `app/keputusan/page.tsx` | DecisionWorkspace (tanpa kode) | placeholder |
 | `/keputusan/[code]` | `app/keputusan/[code]/page.tsx` | DecisionWorkspace | placeholder |
 | `/jejak-sinyal` | `app/jejak-sinyal/page.tsx` | riwayat sinyal | placeholder |
 | `/backtest` | `app/backtest/page.tsx` | EquityCurveChart, ringkasan strategi | placeholder |
-| `/faktor` | `app/faktor/page.tsx` | tabel faktor, kalibrasi | placeholder |
-| `/radar` | `app/radar/page.tsx` | SmartMoneyBanner, daftar emiten | placeholder |
+| `/faktor` | `app/faktor/page.tsx` | tabel faktor, kalibrasi | selesai |
+| `/radar` | `app/radar/page.tsx` | SmartMoneyBanner, daftar emiten | selesai |
 | `/radar/[code]` | `app/radar/[code]/page.tsx` | SmartMoneyBanner, track record | placeholder |
 | `/foreign` | `app/foreign/page.tsx` | chart foreign flow, tabel | placeholder |
 | `/flow` | `app/flow/page.tsx` | FlowWorkspace (tanpa kode) | placeholder |
 | `/flow/[code]` | `app/flow/[code]/page.tsx` | FlowWorkspace | placeholder |
 | `/sentimen` | `app/sentimen/page.tsx` | daftar berita, skor | placeholder |
-| `/broker-activity` | `app/broker-activity/page.tsx` | BrokerActivityCard | placeholder |
+| `/broker-activity` | `app/broker-activity/page.tsx` | BrokerActivityCard, BrokerFlowCard, FlowTimelineCard | selesai |
 | `/sectors` | `app/sectors/page.tsx` | SectorRotationTable, peta sektor, RegimeBanner | selesai |
 | `/stock/[code]` | `app/stock/[code]/page.tsx` | TechnicalChart, HistoryTable, BrokerSummary, ForeignFlowCard, FlowTimelineCard, BrokerFlowCard, BrokerActivityCard, OwnershipCard | placeholder |
 | `/dossier/[code]` | `app/dossier/[code]/page.tsx` | tujuh seksi dossier | placeholder |

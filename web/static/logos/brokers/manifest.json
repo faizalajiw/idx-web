@@ -1,0 +1,892 @@
+{
+  "source": "idx.co.id/StaticData/Brokers/Logo",
+  "license_note": "[BELUM TERVERIFIKASI] Logo milik masing-masing broker dan Bursa Efek Indonesia.",
+  "generated_at": "2026-10-10T19:49:57+00:00",
+  "counts": {
+    "ok": 88,
+    "fallback": 0,
+    "failed": 0
+  },
+  "entries": [
+    {
+      "code": "AD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AD.jpg",
+      "file": "AD.jpg",
+      "format": "jpeg",
+      "bytes": 3563,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:24+00:00"
+    },
+    {
+      "code": "AF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AF.jpg",
+      "file": "AF.jpg",
+      "format": "jpeg",
+      "bytes": 7311,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:29+00:00"
+    },
+    {
+      "code": "AG",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AG.jpg",
+      "file": "AG.jpg",
+      "format": "jpeg",
+      "bytes": 3713,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:30+00:00"
+    },
+    {
+      "code": "AH",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AH.jpg",
+      "file": "AH.jpg",
+      "format": "jpeg",
+      "bytes": 11072,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:31+00:00"
+    },
+    {
+      "code": "AI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AI.jpg",
+      "file": "AI.jpg",
+      "format": "jpeg",
+      "bytes": 5884,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:32+00:00"
+    },
+    {
+      "code": "AK",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AK.jpg",
+      "file": "AK.jpg",
+      "format": "jpeg",
+      "bytes": 5193,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:33+00:00"
+    },
+    {
+      "code": "AO",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AO.jpg",
+      "file": "AO.jpg",
+      "format": "jpeg",
+      "bytes": 3662,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:34+00:00"
+    },
+    {
+      "code": "AP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AP.jpg",
+      "file": "AP.jpg",
+      "format": "jpeg",
+      "bytes": 2716,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:35+00:00"
+    },
+    {
+      "code": "AR",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AR.jpg",
+      "file": "AR.jpg",
+      "format": "jpeg",
+      "bytes": 4984,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:36+00:00"
+    },
+    {
+      "code": "AT",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AT.jpg",
+      "file": "AT.jpg",
+      "format": "jpeg",
+      "bytes": 5736,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:38+00:00"
+    },
+    {
+      "code": "AZ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/AZ.jpg",
+      "file": "AZ.jpg",
+      "format": "jpeg",
+      "bytes": 4207,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:39+00:00"
+    },
+    {
+      "code": "BB",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BB.jpg",
+      "file": "BB.jpg",
+      "format": "jpeg",
+      "bytes": 3474,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:40+00:00"
+    },
+    {
+      "code": "BF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BF.jpg",
+      "file": "BF.jpg",
+      "format": "jpeg",
+      "bytes": 4758,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:41+00:00"
+    },
+    {
+      "code": "BK",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BK.jpg",
+      "file": "BK.jpg",
+      "format": "jpeg",
+      "bytes": 4542,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:42+00:00"
+    },
+    {
+      "code": "BQ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BQ.jpg",
+      "file": "BQ.jpg",
+      "format": "jpeg",
+      "bytes": 4392,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:43+00:00"
+    },
+    {
+      "code": "BR",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BR.jpg",
+      "file": "BR.jpg",
+      "format": "jpeg",
+      "bytes": 3734,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:44+00:00"
+    },
+    {
+      "code": "BS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/BS.jpg",
+      "file": "BS.jpg",
+      "format": "jpeg",
+      "bytes": 3955,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:45+00:00"
+    },
+    {
+      "code": "CC",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/CC.jpg",
+      "file": "CC.jpg",
+      "format": "jpeg",
+      "bytes": 5076,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:05+00:00"
+    },
+    {
+      "code": "CD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/CD.jpg",
+      "file": "CD.jpg",
+      "format": "jpeg",
+      "bytes": 2377,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:46+00:00"
+    },
+    {
+      "code": "CP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/CP.jpg",
+      "file": "CP.jpg",
+      "format": "jpeg",
+      "bytes": 1602,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:47+00:00"
+    },
+    {
+      "code": "DD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DD.jpg",
+      "file": "DD.jpg",
+      "format": "jpeg",
+      "bytes": 7382,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:48+00:00"
+    },
+    {
+      "code": "DH",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DH.jpg",
+      "file": "DH.jpg",
+      "format": "jpeg",
+      "bytes": 2518,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:49+00:00"
+    },
+    {
+      "code": "DP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DP.jpg",
+      "file": "DP.jpg",
+      "format": "jpeg",
+      "bytes": 2927,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:50+00:00"
+    },
+    {
+      "code": "DR",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DR.jpg",
+      "file": "DR.jpg",
+      "format": "jpeg",
+      "bytes": 2257,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:51+00:00"
+    },
+    {
+      "code": "DU",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DU.jpg",
+      "file": "DU.jpg",
+      "format": "jpeg",
+      "bytes": 2376,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:52+00:00"
+    },
+    {
+      "code": "DX",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/DX.jpg",
+      "file": "DX.jpg",
+      "format": "jpeg",
+      "bytes": 2905,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:53+00:00"
+    },
+    {
+      "code": "EL",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/EL.jpg",
+      "file": "EL.jpg",
+      "format": "jpeg",
+      "bytes": 2823,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:54+00:00"
+    },
+    {
+      "code": "EP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/EP.jpg",
+      "file": "EP.jpg",
+      "format": "jpeg",
+      "bytes": 3986,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:55+00:00"
+    },
+    {
+      "code": "ES",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/ES.jpg",
+      "file": "ES.jpg",
+      "format": "jpeg",
+      "bytes": 2923,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:56+00:00"
+    },
+    {
+      "code": "FO",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/FO.jpg",
+      "file": "FO.jpg",
+      "format": "jpeg",
+      "bytes": 2810,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:57+00:00"
+    },
+    {
+      "code": "FS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/FS.jpg",
+      "file": "FS.jpg",
+      "format": "jpeg",
+      "bytes": 6352,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:58+00:00"
+    },
+    {
+      "code": "FZ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/FZ.jpg",
+      "file": "FZ.jpg",
+      "format": "jpeg",
+      "bytes": 2301,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:59+00:00"
+    },
+    {
+      "code": "GA",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/GA.jpg",
+      "file": "GA.jpg",
+      "format": "jpeg",
+      "bytes": 6823,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:01+00:00"
+    },
+    {
+      "code": "GI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/GI.jpg",
+      "file": "GI.jpg",
+      "format": "jpeg",
+      "bytes": 3840,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:02+00:00"
+    },
+    {
+      "code": "GR",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/GR.jpg",
+      "file": "GR.jpg",
+      "format": "jpeg",
+      "bytes": 4375,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:03+00:00"
+    },
+    {
+      "code": "HD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/HD.jpg",
+      "file": "HD.jpg",
+      "format": "jpeg",
+      "bytes": 4492,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:04+00:00"
+    },
+    {
+      "code": "HP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/HP.jpg",
+      "file": "HP.jpg",
+      "format": "jpeg",
+      "bytes": 2974,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:05+00:00"
+    },
+    {
+      "code": "IC",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IC.jpg",
+      "file": "IC.jpg",
+      "format": "jpeg",
+      "bytes": 2885,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:06+00:00"
+    },
+    {
+      "code": "ID",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/ID.jpg",
+      "file": "ID.jpg",
+      "format": "jpeg",
+      "bytes": 3500,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:07+00:00"
+    },
+    {
+      "code": "IF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IF.jpg",
+      "file": "IF.jpg",
+      "format": "jpeg",
+      "bytes": 4876,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:08+00:00"
+    },
+    {
+      "code": "IH",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IH.jpg",
+      "file": "IH.jpg",
+      "format": "jpeg",
+      "bytes": 7151,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:09+00:00"
+    },
+    {
+      "code": "II",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/II.jpg",
+      "file": "II.jpg",
+      "format": "jpeg",
+      "bytes": 9151,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:10+00:00"
+    },
+    {
+      "code": "IN",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IN.jpg",
+      "file": "IN.jpg",
+      "format": "jpeg",
+      "bytes": 4072,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:11+00:00"
+    },
+    {
+      "code": "IT",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IT.jpg",
+      "file": "IT.jpg",
+      "format": "jpeg",
+      "bytes": 2598,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:12+00:00"
+    },
+    {
+      "code": "IU",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/IU.jpg",
+      "file": "IU.jpg",
+      "format": "jpeg",
+      "bytes": 2991,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:13+00:00"
+    },
+    {
+      "code": "KI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/KI.jpg",
+      "file": "KI.jpg",
+      "format": "jpeg",
+      "bytes": 2481,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:14+00:00"
+    },
+    {
+      "code": "KK",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/KK.jpg",
+      "file": "KK.jpg",
+      "format": "jpeg",
+      "bytes": 5216,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:15+00:00"
+    },
+    {
+      "code": "KZ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/KZ.jpg",
+      "file": "KZ.jpg",
+      "format": "jpeg",
+      "bytes": 3597,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:16+00:00"
+    },
+    {
+      "code": "LG",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/LG.jpg",
+      "file": "LG.jpg",
+      "format": "jpeg",
+      "bytes": 2356,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:17+00:00"
+    },
+    {
+      "code": "LS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/LS.jpg",
+      "file": "LS.jpg",
+      "format": "jpeg",
+      "bytes": 3378,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:18+00:00"
+    },
+    {
+      "code": "MG",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/MG.jpg",
+      "file": "MG.jpg",
+      "format": "jpeg",
+      "bytes": 8052,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:19+00:00"
+    },
+    {
+      "code": "MI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/MI.jpg",
+      "file": "MI.jpg",
+      "format": "jpeg",
+      "bytes": 7309,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:20+00:00"
+    },
+    {
+      "code": "MU",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/MU.jpg",
+      "file": "MU.jpg",
+      "format": "jpeg",
+      "bytes": 3913,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:21+00:00"
+    },
+    {
+      "code": "NI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/NI.jpg",
+      "file": "NI.jpg",
+      "format": "jpeg",
+      "bytes": 4894,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:22+00:00"
+    },
+    {
+      "code": "OD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/OD.jpg",
+      "file": "OD.jpg",
+      "format": "jpeg",
+      "bytes": 3772,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:23+00:00"
+    },
+    {
+      "code": "OK",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/OK.jpg",
+      "file": "OK.jpg",
+      "format": "jpeg",
+      "bytes": 5163,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:24+00:00"
+    },
+    {
+      "code": "PC",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PC.jpg",
+      "file": "PC.bmp",
+      "format": "bmp",
+      "bytes": 70256,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:10+00:00"
+    },
+    {
+      "code": "PD",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PD.jpg",
+      "file": "PD.jpg",
+      "format": "jpeg",
+      "bytes": 4666,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:26+00:00"
+    },
+    {
+      "code": "PF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PF.jpg",
+      "file": "PF.jpg",
+      "format": "jpeg",
+      "bytes": 6210,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:27+00:00"
+    },
+    {
+      "code": "PG",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PG.jpg",
+      "file": "PG.jpg",
+      "format": "jpeg",
+      "bytes": 63975,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:28+00:00"
+    },
+    {
+      "code": "PI",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PI.jpg",
+      "file": "PI.jpg",
+      "format": "jpeg",
+      "bytes": 4413,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:29+00:00"
+    },
+    {
+      "code": "PO",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PO.jpg",
+      "file": "PO.jpg",
+      "format": "jpeg",
+      "bytes": 1951,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:30+00:00"
+    },
+    {
+      "code": "PP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/PP.jpg",
+      "file": "PP.jpg",
+      "format": "jpeg",
+      "bytes": 24972,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:31+00:00"
+    },
+    {
+      "code": "QA",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/QA.jpg",
+      "file": "QA.jpg",
+      "format": "jpeg",
+      "bytes": 4370,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:32+00:00"
+    },
+    {
+      "code": "RB",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RB.jpg",
+      "file": "RB.jpg",
+      "format": "jpeg",
+      "bytes": 1834,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:33+00:00"
+    },
+    {
+      "code": "RF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RF.jpg",
+      "file": "RF.jpg",
+      "format": "jpeg",
+      "bytes": 4688,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:34+00:00"
+    },
+    {
+      "code": "RG",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RG.jpg",
+      "file": "RG.jpg",
+      "format": "jpeg",
+      "bytes": 5974,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:35+00:00"
+    },
+    {
+      "code": "RO",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RO.jpg",
+      "file": "RO.jpg",
+      "format": "jpeg",
+      "bytes": 3875,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:36+00:00"
+    },
+    {
+      "code": "RS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RS.jpg",
+      "file": "RS.jpg",
+      "format": "jpeg",
+      "bytes": 4469,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:37+00:00"
+    },
+    {
+      "code": "RX",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/RX.jpg",
+      "file": "RX.jpg",
+      "format": "jpeg",
+      "bytes": 2941,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:38+00:00"
+    },
+    {
+      "code": "SA",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/SA.jpg",
+      "file": "SA.jpg",
+      "format": "jpeg",
+      "bytes": 4415,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:39+00:00"
+    },
+    {
+      "code": "SF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/SF.jpg",
+      "file": "SF.jpg",
+      "format": "jpeg",
+      "bytes": 13057,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:40+00:00"
+    },
+    {
+      "code": "SH",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/SH.jpg",
+      "file": "SH.jpg",
+      "format": "jpeg",
+      "bytes": 3548,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:41+00:00"
+    },
+    {
+      "code": "SQ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/SQ.jpg",
+      "file": "SQ.jpg",
+      "format": "jpeg",
+      "bytes": 12677,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:42+00:00"
+    },
+    {
+      "code": "SS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/SS.jpg",
+      "file": "SS.jpg",
+      "format": "jpeg",
+      "bytes": 7313,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:43+00:00"
+    },
+    {
+      "code": "TF",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/TF.jpg",
+      "file": "TF.jpg",
+      "format": "jpeg",
+      "bytes": 4533,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:44+00:00"
+    },
+    {
+      "code": "TP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/TP.jpg",
+      "file": "TP.jpg",
+      "format": "jpeg",
+      "bytes": 10849,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:45+00:00"
+    },
+    {
+      "code": "TS",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/TS.jpg",
+      "file": "TS.jpg",
+      "format": "jpeg",
+      "bytes": 1834,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:46+00:00"
+    },
+    {
+      "code": "XA",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/XA.jpg",
+      "file": "XA.jpg",
+      "format": "jpeg",
+      "bytes": 2925,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:47+00:00"
+    },
+    {
+      "code": "XC",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/XC.jpg",
+      "file": "XC.jpg",
+      "format": "jpeg",
+      "bytes": 2912,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:48+00:00"
+    },
+    {
+      "code": "XL",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/XL.jpg",
+      "file": "XL.jpg",
+      "format": "jpeg",
+      "bytes": 2971,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:49+00:00"
+    },
+    {
+      "code": "YB",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/YB.jpg",
+      "file": "YB.jpg",
+      "format": "jpeg",
+      "bytes": 2307,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:50+00:00"
+    },
+    {
+      "code": "YJ",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/YJ.jpg",
+      "file": "YJ.jpg",
+      "format": "jpeg",
+      "bytes": 2432,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:52+00:00"
+    },
+    {
+      "code": "YO",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/YO.jpg",
+      "file": "YO.jpg",
+      "format": "jpeg",
+      "bytes": 2259,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:53+00:00"
+    },
+    {
+      "code": "YP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/YP.jpg",
+      "file": "YP.jpg",
+      "format": "jpeg",
+      "bytes": 3169,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:54+00:00"
+    },
+    {
+      "code": "YU",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/YU.jpg",
+      "file": "YU.jpg",
+      "format": "jpeg",
+      "bytes": 4031,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:48:11+00:00"
+    },
+    {
+      "code": "ZP",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/ZP.jpg",
+      "file": "ZP.jpg",
+      "format": "jpeg",
+      "bytes": 4324,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:55+00:00"
+    },
+    {
+      "code": "ZR",
+      "logo_url": "https://www.idx.co.id/StaticData/Brokers/Logo/ZR.jpg",
+      "file": "ZR.jpg",
+      "format": "jpeg",
+      "bytes": 4149,
+      "status": "ok",
+      "reason": null,
+      "checked_at": "2026-10-10T19:49:56+00:00"
+    }
+  ]
+}

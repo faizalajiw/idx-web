@@ -11,8 +11,8 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 1 | Fondasi: shell, 19 rute placeholder, Tailwind, adapter-static, baseline ukur | selesai |
 | 2 | Lapisan data: `api.ts`, `types.ts`, 5 modul lib, helper query, 48 hook | selesai |
 | 3 | Pilot `/sectors` end-to-end | selesai |
-| 4 | 13 rute statis | belum |
-| 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | belum |
+| 4 | 13 rute statis | sebagian (5/13) |
+| 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | selesai |
 | 6 | 5 rute dinamis dan workspace | belum |
 | 7 | Tes e2e dan audit paritas | belum |
 | 8 | Build produksi dan paket deploy | belum |
@@ -83,6 +83,29 @@ Gate fase 3 (dibandingkan langsung dengan `next start -p 3000`):
 - `npm run check` 0 error 0 warning.
 
 Bukti tangkapan layar: `docs/bukti/fase3-next-sectors-1440.png`, `fase3-svelte-sectors-1440.png`, varian `-390` dan `-1440-light`.
+
+## Fase 5 — selesai 2026-10-24
+
+Dua komponen SVG menggantikan Recharts:
+
+- `LineArea.svelte`: garis/area, kisi horizontal, label Y mengikuti lebar label terpanjang, label X dihitung dari perkiraan lebar teks (tidak bertumpuk, ujung kiri/kanan tidak terpotong), garis referensi, legenda HTML, tooltip kursor.
+- `Bars.svelte`: batang tunggal berwarna per titik, batang bertumpuk, mode `normalize` (porsi 0–100%), garis nol, tooltip dengan `footer` untuk label tambahan.
+
+Tiga bug ditemukan lewat tangkapan layar, bukan lewat `npm run check`:
+
+1. Segmen path kedua dan seterusnya mulai dengan `L`, bukan `M` → garis RSI/Bollinger/MACD tidak tampil. Diperbaiki dengan menandai awal segmen per kelompok, bukan per indeks array.
+2. Label X bertumpuk saat 476 titik data; sekarang jarak minimum dihitung dari panjang label.
+3. Label Y terpotong di tepi kiri (`1,602.572` tampil `,602.572`); kolom label sekarang melebar sendiri sampai 104 px.
+
+## Fase 4 gelombang A — selesai 2026-10-24
+
+Rute: `/pantau`, `/screener`, `/faktor`, `/radar`, `/broker-activity`.
+
+Komponen baru: `WatchlistTable`, `AlertRules`, `TelegramStatus`, `SmartMoneyWatchCard`, `SmartMoneyBanner`, `SmartMoneyPatternsBoard`, `SmartMoneyTrackRecordCard`, `ScreenerFactorsModal`, `BrokerActivityCard`, `BrokerFlowCard`, `FlowTimelineCard`, `TickerLogo`.
+
+Paritas terukur terhadap `next start -p 3000` (viewport 1440): h1, daftar h2, header tabel, jumlah baris, jumlah kartu, dan `scrollWidth` identik di kelima rute; tanpa error konsol. Baris watchlist `/pantau` memilih chart dengan benar (`Technical — AADI`, 3 panel, 10 path bergaris).
+
+`public/logos` (1002 berkas, 13,26 MB) disalin ke `web/static/logos` supaya `TickerLogo` menemukan manifest.
 
 ## Aturan kerja
 
