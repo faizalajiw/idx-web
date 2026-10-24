@@ -203,6 +203,15 @@ Hasil verifikasi:
 - Tangkapan layar: `docs/bukti/fase9-3000-dashboard-gelap.png`,
   `-terang.png`, `fase9-3000-stock.png`.
 
+Ikon tab (favicon): layout masih memakai logo Svelte bawaan `sv create`, dan
+karena SSR mati `<link rel="icon">` baru muncul setelah hidrasi — tab tampil
+tanpa ikon lebih dulu, lalu logo Svelte. Sekarang ikon Market Labs
+(`app/icon.svg` di app Next) disalin ke `web/static/favicon.svg` dan dirujuk
+statis dari `src/app.html`, jadi sudah ada sejak HTML pertama. Link di layout
+dihapus supaya tidak ada dua permintaan. Verifikasi: `GET /favicon.svg` → 200
+`image/svg+xml` 603 byte; satu elemen `link[rel=icon]` di `/` dan
+`/stock/BBCA`; tidak ada lagi 404 `/favicon.ico`.
+
 `:3100` tetap hidup sebagai cadangan (`npm run preview`). Dev harian:
 `npm run dev` setelah mematikan preview, karena port dikunci `strictPort`.
 

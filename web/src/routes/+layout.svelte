@@ -1,5 +1,4 @@
 <script lang="ts">
-	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 	import CommandPalette from '#lib/components/CommandPalette.svelte';
 	import Footer from '#lib/components/Footer.svelte';
@@ -12,7 +11,6 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
 	<title>Market Labs</title>
 	<meta
 		name="description"
