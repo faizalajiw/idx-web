@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {
 		Activity,
-		Building,
+		BuildingComplex,
 		Handshake,
 		Landmark,
 		LayoutDashboard,
@@ -76,7 +76,7 @@
 			icon: Wallet,
 			color: "#4ade80"
 		},
-		{ label: "Emiten Aktif", value: fmtNum(stocks), icon: Building, color: "#c4b5fd" }
+		{ label: "Emiten Aktif", value: fmtNum(stocks), icon: BuildingComplex, color: "#c4b5fd" }
 	]);
 
 	const segments = $derived<Tile[]>([

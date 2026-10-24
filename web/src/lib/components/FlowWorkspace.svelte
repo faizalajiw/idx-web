@@ -36,7 +36,7 @@
 	function pick(event: SubmitEvent) {
 		event.preventDefault();
 		const next = draft.trim().toUpperCase();
-		if (next) void goto(`/flow?code=${encodeURIComponent(next)}`);
+		if (next) void goto(`/flow/${encodeURIComponent(next)}`);
 	}
 </script>
 
@@ -57,7 +57,12 @@
 	</header>
 
 	<div class="card space-y-3 p-4">
-		<form class="flex flex-col gap-2 sm:flex-row sm:items-center" method="get" action="/flow" onsubmit={pick}>
+		<form
+			class="flex flex-col gap-2 sm:flex-row sm:items-center"
+			method="get"
+			action="/flow/{draft.trim().toUpperCase()}"
+			onsubmit={pick}
+		>
 			<div class="group relative flex-1">
 				<Search
 					size={16}
@@ -85,7 +90,7 @@
 				<span class="text-muted text-[11px] font-medium">Cepat:</span>
 				{#each suggestions as c (c)}
 					<a
-						href="/flow?code={c}"
+						href="/flow/{c}"
 						class="inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors {c ===
 						code
 							? 'border-[var(--accent)] bg-[var(--accent)] text-white'

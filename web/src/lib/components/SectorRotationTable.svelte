@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {
 		Briefcase,
-		Building,
+		BuildingComplex,
 		Car,
 		Clapperboard,
 		Cpu,
@@ -50,7 +50,7 @@
 		Energi: { icon: Flame, color: "#fb923c" },
 		Batubara: { icon: Mountain, color: "#a3a3a3" },
 		"Logam & Mineral": { icon: Gem, color: "#c084fc" },
-		Properti: { icon: Building, color: "#f472b6" },
+		Properti: { icon: BuildingComplex, color: "#f472b6" },
 		"Telkom & Internet": { icon: Signal, color: "#60a5fa" },
 		Infrastruktur: { icon: TowerControl, color: "#818cf8" },
 		Konstruksi: { icon: HardHat, color: "#facc15" },

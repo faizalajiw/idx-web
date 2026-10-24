@@ -1,7 +1,7 @@
 # Tugas migrasi SvelteKit
 
-Branch kerja: `svelte`. App Next di akar tetap utuh; app baru di `web/`.
-Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && npm run preview`.
+Branch kerja: `dev` (`main` dan `dev` bertemu di `2d94705`). App Next di akar tetap utuh sebagai rujukan; app baru di `web/`.
+Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && npm run preview`. Sajian cutover lokal: `node deploy/serve.mjs 3000 build`.
 
 ## Status per fase
 
@@ -17,6 +17,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 7 | Tes e2e dan audit paritas | selesai |
 | 8 | Build produksi dan paket deploy | selesai |
 | 9 | Cutover :3000 | lokal selesai; VPS menunggu pemilik |
+| 10 | Audit sisa migrasi: halaman galat, bentuk URL `/flow`, koreksi ikon | selesai |
 
 ## Fase 1 — selesai 2026-10-24
 
@@ -114,7 +115,7 @@ Delapan rute terakhir, semuanya 13 rute statis kini lengkap:
 - `/sentimen`: gauge suhu pasar, empat tile, breadth & aliran, akumulasi dan distribusi dengan panel rincian, bobot skor, catatan.
 - `/rekomendasi`: gerbang rezim, `PortfolioStrip` (satu sumber state dengan panel rencana), `ClaimRecord`, papan kandidat dengan tiga tab, track record per horizon, lapisan skor.
 - `/foreign`: posisi asing, tren harian (`Bars` warna per tanda + garis nol), daftar mover dua tab, `ForeignFlowCard` yang dipakai ulang fase 6.
-- `/flow`: `FlowWorkspace` + pemilih emiten, menerima `?code=`.
+- `/flow`: `FlowWorkspace` + pemilih emiten. Sejak fase 10 hanya bentuk path `/flow/<kode>`; `?code=` dihapus (Next juga tidak mendukungnya).
 - `/jejak-sinyal`: tiga tab horizon, hasil beli/jual per rezim, tabel sinyal terbaru.
 - `/`: hero IHSG dengan count-up, kesehatan data, suasana pasar, berita + modal, top gainers/losers, empat papan peringkat, sinyal dengan filter, chart teknikal.
 - `/backtest`: form parameter lima strategi, `EquityCurveChart`, `RebalanceLedger`, lima tab hasil, tabel perbandingan biaya.
@@ -222,6 +223,39 @@ Anggaran shell diputuskan 2026-10-24: naik dari 60 KB ke 65 KB gzip (spec §2,
 §11.8). Shell terpasang 61,9-64,2 KB, jadi sekarang masuk anggaran. Ikon nav
 dipertahankan; biayanya terukur 9,3 KB gzip untuk 14 ikon, dan membuangnya
 akan melanggar sasaran paritas §2.1.
+
+## Fase 10 — audit sisa migrasi, selesai 2026-10-24
+
+Pemeriksaan ulang seluruh permukaan Next, bukan hanya rute yang sudah
+dicentang: 43 komponen, 224 ekspor `lib/*.ts`, 48 hook beserta
+`refreshInterval`, 7 endpoint, 63 selector CSS, 37 variabel CSS, `aria-label`
+dan `role`, glyph ikon per berkas (63 pasang, dibandingkan lewat path SVG),
+6 kunci localStorage, 1002 logo, grup menu sidebar, dan pintasan keyboard.
+Hasil lengkap ada di `PARITAS.md` bagian "Audit sisa migrasi (fase 10)".
+
+Temuan yang dikerjakan:
+
+- `src/routes/+error.svelte` baru. Rute tak dikenal menampilkan halaman
+  "Halaman tidak ditemukan" (copy `app/not-found.tsx`), error lain memakai
+  copy `app/error.tsx`; tombol, aria-label, dan ThemeToggle sama.
+- `FlowWorkspace` pindah ke bentuk URL path: `goto`, `action` form, dan chip
+  saran memakai `/flow/<kode>`; pembacaan `?code=` di `/flow` dihapus.
+- Dua ikon yang salah petakan dikoreksi: `CircleCheckBig` → `CircleCheck`
+  (padanan `CheckCircle2`) dan `Building` → `BuildingComplex` (padanan
+  `Building2`). Path SVG lama dan baru dibandingkan langsung.
+- `web/e2e/galat-dan-flow.spec.ts` menambah 2 tes: halaman tidak ditemukan dan
+  form `/flow` berpindah ke `/flow/<kode>`.
+
+Deviasi yang diterima: `app/loading.tsx` tidak diport karena SPA tidak punya
+suspense per rute; muat data ditangani skeleton di komponen. Biaya halaman
+galat: 1,2 KB gzip pada muatan awal setiap rute (node `1.*.js`).
+
+Verifikasi: `npm run check` 0 error 0 warning; `npm run build` sukses;
+`E2E_BASE_URL=http://localhost:3000 npx playwright test` → **47 passed**;
+suite lama app Next di akar (`npx playwright test` di `idx-web/`, baseURL
+:3000) → **45 passed** terhadap build Svelte. Live: `/halaman-yang-tidak-ada`
+dan `/stock/` menampilkan halaman tidak ditemukan; `/flow/BBRI` dan
+`/flow?code=BBRI` masing-masing menampilkan workspace dan empty state.
 
 ## Aturan kerja
 

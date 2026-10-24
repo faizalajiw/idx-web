@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CircleCheckBig, Clock, CircleQuestionMark, TriangleAlert, type LucideIcon } from "@lucide/svelte";
+	import { CircleCheck, Clock, CircleQuestionMark, TriangleAlert, type LucideIcon } from "@lucide/svelte";
 	import { useFreshness } from "#lib/hooks.svelte.ts";
 	import { fmtDateStr } from "#lib/format.ts";
 	import type { Freshness, FreshnessStatus } from "#lib/types.ts";
@@ -14,7 +14,7 @@
 	 * dengan sebabnya di `title`, bukan menggantung di "memuat…" selamanya.
 	 */
 	const META: Record<FreshnessStatus, { badge: string; label: string; icon: LucideIcon }> = {
-		segar: { badge: "badge badge-buy", label: "Segar", icon: CircleCheckBig },
+		segar: { badge: "badge badge-buy", label: "Segar", icon: CircleCheck },
 		basi: { badge: "badge badge-warn", label: "Basi", icon: TriangleAlert },
 		"tak diketahui": { badge: "badge badge-hold", label: "Tak diketahui", icon: CircleQuestionMark }
 	};

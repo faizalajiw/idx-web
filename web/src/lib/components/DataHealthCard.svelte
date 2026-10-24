@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {
-		CircleCheckBig,
+		CircleCheck,
 		Clock,
 		TriangleAlert,
 		XCircle,
@@ -39,7 +39,7 @@
 	};
 
 	const IKON: Record<Sev, LucideIcon> = {
-		ok: CircleCheckBig,
+		ok: CircleCheck,
 		info: Clock,
 		warn: TriangleAlert,
 		bad: XCircle

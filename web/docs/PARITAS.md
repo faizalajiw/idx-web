@@ -80,13 +80,62 @@ Perbedaan yang disengaja dan berlaku di semua rute:
   tiga halaman yang punya metadata sendiri.
 - Recharts diganti `LineArea`/`Bars`; tooltip menampilkan nama seri, bukan
   hanya label titik.
-- Ikon lucide 1.x: delapan nama yang dihapus dipetakan (lihat PANDUAN-PORT).
+- Ikon lucide 1.x: sepuluh nama yang berganti dipetakan ke geometri yang sama
+  (`Filter`→`Funnel`, `History`→`RotateCcwClock`, `Waves`→`WavesHorizontal`,
+  `Globe2`→`Earth`, `AlertTriangle`→`TriangleAlert`, `CheckCircle2`→`CircleCheck`,
+  `HelpCircle`→`CircleQuestionMark`, `BarChart3`→`ChartColumn`,
+  `LineChart`→`ChartLine`, `Building2`→`BuildingComplex`). Dua di antaranya
+  sempat salah petakan (`CircleCheckBig`, `Building`) dan dikoreksi di fase 10:
+  path SVG-nya dibandingkan langsung dengan `lucide-react` 1.47.
+
+## Audit sisa migrasi (fase 10)
+
+Pemeriksaan ulang seluruh permukaan migrasi, bukan hanya rute yang sudah
+dicentang:
+
+| Yang dibandingkan | Hasil |
+|---|---|
+| 43 komponen `components/*.tsx` | semuanya punya padanan Svelte (`States` dipecah jadi `EmptyState`, `ErrorState`, `Skeleton`) |
+| 224 ekspor `lib/*.ts` Next | semua nama ada di `web/src/lib` |
+| 48 hook + `refreshInterval` per hook | 48 lawan 48, 0 beda interval |
+| Endpoint `/api/*` di `api.ts` | 7 lawan 7, sama |
+| 63 selector kelas `globals.css` | 63 lawan 63, tanpa selisih |
+| `var(--x)` yang dipakai | 37 dipakai, semuanya terdefinisi |
+| `aria-label` + `role` | 28 label Next semua ada; dua label baru muncul setelah halaman galat diport |
+| Glyph ikon per berkas | 63 berkas dibandingkan lewat path SVG: 0 glyph hilang |
+| Kunci localStorage | 6 kunci sama |
+| `public/logos` | 1002 berkas, termasuk `manifest.json` |
+| Grup menu sidebar | 5 grup, 14 item, label dan href sama |
+| Pintasan keyboard | Ctrl/Cmd+K, Esc, panah tab, Enter watchlist sama |
+
+Temuan yang diperbaiki:
+
+- **Halaman galat tidak ada.** Rute tak dikenal menampilkan "404 Not Found"
+  polos SvelteKit, sedangkan Next punya `app/not-found.tsx` ("Halaman tidak
+  ditemukan", tombol "Kembali ke beranda"/"Kembali", ThemeToggle) dan
+  `app/error.tsx` ("Halaman ingin disajikan tapi kami mengalami masalah.",
+  "Muat lagi"/"Kembali", aria-label "Muat ulang halaman"/"Kembali ke halaman
+  sebelumnya"). Sekarang `src/routes/+error.svelte` bercabang pada
+  `page.status === 404` dengan copy, tombol, dan atribut yang sama.
+- **Dua bentuk URL untuk satu tampilan.** `/flow` memakai `?code=` di Svelte
+  sedangkan Next memakai `/flow/<kode>`; `SmartMoneyBanner` dan `/radar/[code]`
+  sudah memakai bentuk path. Form, chip saran, dan `goto` disamakan ke
+  `/flow/<kode>`; pembacaan `?code=` dihapus supaya hanya ada satu bentuk.
+- **Dua ikon berbeda geometri** (lihat daftar deviasi di atas).
+
+Deviasi yang diterima:
+
+- `app/loading.tsx` ("Menyiapkan halaman...") tidak diport. SPA tidak punya
+  suspense per rute: perpindahan halaman instan dan data dimuat dengan skeleton
+  di dalam komponen. Halaman `+error.svelte` yang baru menambah 1,2 KB gzip
+  pada muatan awal setiap rute karena node galat dimuat bersama shell.
 
 ## Suite tes
 
 `web/e2e/` menyalin suite app Next dengan baseURL `:3100`: 14 rute x (status
 200 + h1 tampil) dan (tidak luber di 390), tiga halaman bebas galat konsol.
-Total 45 tes, semuanya lulus.
+Fase 10 menambah `galat-dan-flow.spec.ts` (halaman tidak ditemukan, form
+`/flow` berpindah ke `/flow/<kode>`). Total 47 tes, semuanya lulus.
 
 ## Checklist elemen (diisi per rute)
 

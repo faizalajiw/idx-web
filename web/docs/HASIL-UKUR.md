@@ -78,14 +78,47 @@ browser baru per rute.
 
 Rentang: JS **74,5-116,0 KB**, total **115,9-162,7 KB**.
 
+## SvelteKit fase 10 (setelah halaman galat)
+
+Fase 10 menambah `+error.svelte`. Node galat dimuat bersama shell di setiap
+rute, jadi seluruh angka naik tipis. Diukur ulang dengan metode yang sama
+(`npm run build`, `npm run preview` :3100, konteks baru per rute):
+
+| Rute | JS (KB gzip) | CSS | Font | Total |
+|---|---|---|---|---|
+| `/` | 99,2 | 12,4 | 51,9 | 163,5 |
+| `/stock/BBCA` | 116,9 | 12,4 | 29,0 | 158,3 |
+| `/pantau` | 89,6 | 12,4 | 51,9 | 153,9 |
+| `/screener` | 89,3 | 12,4 | 29,0 | 130,7 |
+| `/backtest` | 93,5 | 12,4 | 29,0 | 134,9 |
+| `/rekomendasi` | 93,0 | 12,4 | 29,0 | 134,5 |
+| `/broker-activity` | 91,5 | 12,4 | 29,0 | 132,9 |
+| `/flow` | 87,7 | 12,4 | 29,0 | 129,1 |
+| `/flow/BBRI` | 88,0 | 12,4 | 29,0 | 129,4 |
+| `/sectors` | 87,4 | 12,4 | 29,0 | 128,9 |
+| `/foreign` | 84,0 | 12,4 | 29,0 | 125,4 |
+| `/radar/BBCA` | 84,1 | 12,4 | 29,0 | 125,5 |
+| `/radar` | 82,5 | 12,4 | 29,0 | 123,9 |
+| `/sentimen` | 82,1 | 12,4 | 51,9 | 146,4 |
+| `/keputusan/BBRI` | 80,8 | 12,4 | 29,0 | 122,3 |
+| `/keputusan` | 80,6 | 12,4 | 29,0 | 122,1 |
+| `/jejak-sinyal` | 79,6 | 12,4 | 29,0 | 121,0 |
+| `/faktor` | 77,5 | 12,4 | 29,0 | 118,9 |
+| `/dossier/BBCA` | 75,4 | 12,4 | 29,0 | 116,8 |
+
+Rentang: JS **75,4-116,9 KB**, total **116,8-163,5 KB** — naik 0,8-0,9 KB per
+rute dari tabel fase 8. Angka yang berlaku sekarang adalah tabel fase 10;
+tabel fase 8 disimpan sebagai riwayat sebelum halaman galat ada. Selisih
+terhadap Next tetap turun 70-82% (JS) dan 65-76% (total).
+
 ## Selisih
 
 | Ukuran | Next | SvelteKit | Selisih |
 |---|---|---|---|
-| JS | 401,2-418,0 KB | 74,5-116,0 KB | turun 71-82% |
+| JS | 401,2-418,0 KB | 75,4-116,9 KB | turun 70-82% |
 | CSS | 12,8 KB | 12,4 KB | turun 3% |
 | Font | 51,8 KB | 29,0-51,9 KB | sama atau turun 44% |
-| Total | 465,8-482,5 KB | 115,9-162,7 KB | turun 66-76% |
+| Total | 465,8-482,5 KB | 116,8-163,5 KB | turun 65-76% |
 
 Selisih per rute ditentukan komponen yang dimuat rute itu: `/stock/BBCA`
 menarik semua kartu emiten (chart, aliran, broker, kepemilikan, event study),
@@ -104,7 +137,8 @@ menarik semua kartu emiten (chart, aliran, broker, kepemilikan, event study),
    dengan seluruh item nav memakai satu ikon: berkas bersama tiga rute turun
    dari 112,7 KB / 34 berkas ke 103,4 KB / 22 berkas. Karena membuang ikon
    melanggar sasaran paritas (§2.1), anggaran yang dinaikkan, bukan ikonnya
-   yang dipotong.
+   yang dipotong. Setelah halaman galat ditambahkan (fase 10), himpunan yang
+   sama berukuran 113,6 KB / 36 berkas.
 4. Recharts tidak lagi dimuat di mana pun. React dan react-dom tidak ada di
    bundel. Ukuran total `build/` 13,97 MB, 13,26 MB di antaranya logo emiten.
 5. Angka di atas byte terkirim (gzip), bukan ukuran mentah di disk.
