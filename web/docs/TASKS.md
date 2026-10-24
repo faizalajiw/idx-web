@@ -11,7 +11,7 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 1 | Fondasi: shell, 19 rute placeholder, Tailwind, adapter-static, baseline ukur | selesai |
 | 2 | Lapisan data: `api.ts`, `types.ts`, 5 modul lib, helper query, 48 hook | selesai |
 | 3 | Pilot `/sectors` end-to-end | selesai |
-| 4 | 13 rute statis | sebagian (5/13) |
+| 4 | 13 rute statis | selesai |
 | 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | selesai |
 | 6 | 5 rute dinamis dan workspace | belum |
 | 7 | Tes e2e dan audit paritas | belum |
@@ -106,6 +106,21 @@ Komponen baru: `WatchlistTable`, `AlertRules`, `TelegramStatus`, `SmartMoneyWatc
 Paritas terukur terhadap `next start -p 3000` (viewport 1440): h1, daftar h2, header tabel, jumlah baris, jumlah kartu, dan `scrollWidth` identik di kelima rute; tanpa error konsol. Baris watchlist `/pantau` memilih chart dengan benar (`Technical — AADI`, 3 panel, 10 path bergaris).
 
 `public/logos` (1002 berkas, 13,26 MB) disalin ke `web/static/logos` supaya `TickerLogo` menemukan manifest.
+
+## Fase 4 gelombang B dan C — selesai 2026-10-24
+
+Delapan rute terakhir, semuanya 13 rute statis kini lengkap:
+
+- `/sentimen`: gauge suhu pasar, empat tile, breadth & aliran, akumulasi dan distribusi dengan panel rincian, bobot skor, catatan.
+- `/rekomendasi`: gerbang rezim, `PortfolioStrip` (satu sumber state dengan panel rencana), `ClaimRecord`, papan kandidat dengan tiga tab, track record per horizon, lapisan skor.
+- `/foreign`: posisi asing, tren harian (`Bars` warna per tanda + garis nol), daftar mover dua tab, `ForeignFlowCard` yang dipakai ulang fase 6.
+- `/flow`: `FlowWorkspace` + pemilih emiten, menerima `?code=`.
+- `/jejak-sinyal`: tiga tab horizon, hasil beli/jual per rezim, tabel sinyal terbaru.
+- `/`: hero IHSG dengan count-up, kesehatan data, suasana pasar, berita + modal, top gainers/losers, empat papan peringkat, sinyal dengan filter, chart teknikal.
+- `/backtest`: form parameter lima strategi, `EquityCurveChart`, `RebalanceLedger`, lima tab hasil, tabel perbandingan biaya.
+- `/keputusan`: `DecisionWorkspace code={null}` dan `PositionPlanPanel`.
+
+Paritas terukur (1440) terhadap `next start -p 3000`: h1, daftar h2, header tabel, jumlah baris, jumlah kartu, `scrollWidth` identik di kedelapan rute; tanpa error konsol. `/` 12 kartu, `/rekomendasi` 25 kartu, `/jejak-sinyal` 40 baris di kedua app.
 
 ## Aturan kerja
 

@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { Scale } from '@lucide/svelte';
-	import StubPage from '#lib/components/StubPage.svelte';
+	import DecisionWorkspace from "#lib/components/DecisionWorkspace.svelte";
 </script>
 
-<StubPage title="Ruang" accent="Keputusan" icon={Scale} />
+<svelte:head>
+	<title>Ruang Keputusan · Market Labs</title>
+</svelte:head>
+
+<!-- /keputusan — tanpa emiten: pemilih + panduan singkat. -->
+<DecisionWorkspace code={null} />
