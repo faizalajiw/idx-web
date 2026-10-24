@@ -15,8 +15,8 @@ Dev: `cd web && npm run dev` → :3100. Rehearsal produksi: `npm run build && np
 | 5 | Chart: `LineArea.svelte`, `Bars.svelte`, 7 pemakaian | selesai |
 | 6 | 5 rute dinamis dan workspace | selesai |
 | 7 | Tes e2e dan audit paritas | selesai |
-| 8 | Build produksi dan paket deploy | belum |
-| 9 | Cutover :3000 | belum |
+| 8 | Build produksi dan paket deploy | selesai |
+| 9 | Cutover :3000 | siap, menunggu tindakan pemilik |
 
 ## Fase 1 — selesai 2026-10-24
 
@@ -149,6 +149,28 @@ Suite tes disalin dari app Next ke `web/e2e/` dengan baseURL `:3100`:
 Audit paritas 19 rute ada di `PARITAS.md` (tabel terukur: h1, h2, header tabel, baris, kartu, `scrollWidth`).
 
 `@playwright/test@1.64.1` ditambahkan ke devDependencies `web/` supaya suite bisa dijalankan dari folder itu sendiri.
+
+## Fase 8 — selesai 2026-10-24
+
+Build produksi: `npm run build` → `web/build/`, 1097 berkas, 13,97 MB (13,26 MB
+logo emiten). Tidak ada proses Node di server: `adapter-static` + `index.html`
+sebagai fallback SPA.
+
+Verifikasi terhadap hasil build, bukan dev server:
+
+- `npm run preview` di :3100 (port sama dengan dev supaya CORS API tetap sah).
+- `npx playwright test` → **45 passed** (28,2 detik, lebih cepat dari dev).
+- `GET /` dan `GET /stock/BBCA` langsung dari URL → 200, bukan 404.
+- Byte terkirim: lihat `HASIL-UKUR.md` — JS 74,5-116,0 KB, total 115,9-162,7 KB
+  per rute; Next 401,2-418,0 KB JS.
+
+Paket deploy:
+
+- `web/docs/DEPLOY.md` — build, variabel `PUBLIC_API_BASE_URL` (inline saat
+  build), CORS `IDX_API_CORS_ORIGINS`, urutan cutover, pemeriksaan pasca-deploy.
+- `web/deploy/nginx.conf` — siap pakai: fallback `try_files`, cache immutable
+  untuk `_app/immutable`, `no-cache` untuk `index.html`.
+- `web/.env.example` — variabel build yang dibaca `api.ts`.
 
 ## Aturan kerja
 

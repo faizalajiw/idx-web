@@ -49,23 +49,58 @@ Kenaikan dari fase 1 (+2,3 KB JS, +0,3 KB CSS) berasal dari lapisan data yang
 memang dipakai shell di semua rute: `api.ts`, `query.svelte.ts`, `hooks.svelte.ts`,
 `format.ts`, `portfolio.svelte.ts`, dan pencarian emiten di palet.
 
+## SvelteKit fase 8 (build produksi, semua rute lengkap)
+
+Diukur dari `npm run build` + `npm run preview` di :3100, data nyata, konteks
+browser baru per rute.
+
+| Rute | JS (KB gzip) | CSS | Font | Total |
+|---|---|---|---|---|
+| `/` | 98,4 | 12,4 | 51,9 | 162,7 |
+| `/stock/BBCA` | 116,0 | 12,4 | 29,0 | 157,4 |
+| `/pantau` | 88,7 | 12,4 | 51,9 | 153,0 |
+| `/screener` | 88,4 | 12,4 | 29,0 | 129,9 |
+| `/backtest` | 92,6 | 12,4 | 29,0 | 134,0 |
+| `/rekomendasi` | 92,2 | 12,4 | 29,0 | 133,6 |
+| `/broker-activity` | 90,6 | 12,4 | 29,0 | 132,0 |
+| `/flow` | 87,0 | 12,4 | 29,0 | 128,4 |
+| `/flow/BBRI` | 87,1 | 12,4 | 29,0 | 128,5 |
+| `/sectors` | 86,6 | 12,4 | 29,0 | 128,1 |
+| `/foreign` | 83,1 | 12,4 | 29,0 | 124,5 |
+| `/radar/BBCA` | 83,2 | 12,4 | 29,0 | 124,6 |
+| `/radar` | 81,6 | 12,4 | 29,0 | 123,0 |
+| `/sentimen` | 81,2 | 12,4 | 51,9 | 145,5 |
+| `/keputusan/BBRI` | 79,9 | 12,4 | 29,0 | 121,4 |
+| `/keputusan` | 79,7 | 12,4 | 29,0 | 121,1 |
+| `/jejak-sinyal` | 78,7 | 12,4 | 29,0 | 120,1 |
+| `/faktor` | 76,6 | 12,4 | 29,0 | 118,0 |
+| `/dossier/BBCA` | 74,5 | 12,4 | 29,0 | 115,9 |
+
+Rentang: JS **74,5-116,0 KB**, total **115,9-162,7 KB**.
+
 ## Selisih
 
 | Ukuran | Next | SvelteKit | Selisih |
 |---|---|---|---|
-| JS | 401,2–418,0 KB | 61,9–62,5 KB | turun 84,5–85,2% |
-| CSS | 12,8 KB | 8,3 KB | turun 35% |
-| Font | 51,8 KB | 29,0 KB | turun 44% |
+| JS | 401,2-418,0 KB | 74,5-116,0 KB | turun 71-82% |
+| CSS | 12,8 KB | 12,4 KB | turun 3% |
+| Font | 51,8 KB | 29,0-51,9 KB | sama atau turun 44% |
+| Total | 465,8-482,5 KB | 115,9-162,7 KB | turun 66-76% |
+
+Selisih per rute ditentukan komponen yang dimuat rute itu: `/stock/BBCA`
+menarik semua kartu emiten (chart, aliran, broker, kepemilikan, event study),
+`/dossier/BBCA` hanya renderer seksi generik.
 
 ## Catatan penting
 
-1. Angka SvelteKit di atas adalah **batas bawah**, bukan hasil akhir: 19 rute masih
-   placeholder. Komponen halaman, hook data, dan chart ditambahkan di fase 2–6.
-   Ukur ulang tiap fase; angka final dicatat di fase 8.
-2. Perbandingan belum setara isi. Yang setara saat ini hanya shell (sidebar,
-   topbar, drawer, footer, palet, tema), dan itu turun dari 401 KB ke 62 KB.
-3. Anggaran shell di spec §2 adalah ≤60 KB; hasil 61,9 KB berarti **lewat 1,9 KB**.
-   Penyebabnya runtime SvelteKit 3 (33,2 KB) yang tidak bisa dipotong, bukan kode
-   aplikasi. Usul: naikkan anggaran shell ke 65 KB, atau potong ikon nav sampai
-   dua. Menunggu keputusan pemilik.
-4. Recharts tidak lagi dimuat di mana pun. React dan react-dom tidak ada di bundel.
+1. Shell (sidebar, topbar, drawer, footer, palet, tema) plus lapisan data
+   tetap ±62-64 KB seperti fase 2; sisanya kode rute yang dimuat sesuai
+   kebutuhan. Karena SPA memecah per rute, tidak ada rute yang membayar kode
+   rute lain.
+2. Anggaran shell di spec §2 adalah ≤60 KB. Angka 61,9-64,2 KB pada fase 1-2
+   masih berlaku: lewat 1,9-4,2 KB, penyebabnya runtime SvelteKit 3 (33,2 KB)
+   yang tidak bisa dipotong, bukan kode aplikasi. Usul tetap: naikkan anggaran
+   ke 65 KB, atau potong ikon nav. Menunggu keputusan pemilik.
+3. Recharts tidak lagi dimuat di mana pun. React dan react-dom tidak ada di
+   bundel. Ukuran total `build/` 13,97 MB, 13,26 MB di antaranya logo emiten.
+4. Angka di atas byte terkirim (gzip), bukan ukuran mentah di disk.
