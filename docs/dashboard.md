@@ -16,7 +16,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | IHSG · Composite (hero) |
 | Komponen | `HeroIndex`/`SegmentBox` di [`routes/+page.svelte`](../web/src/routes/+page.svelte) |
 | Fungsi | Harga IHSG + perubahan, volume/value total, jumlah emiten aktif, rincian pasar reguler vs non-reguler |
-| Sumber data | `GET /api/market/overview` ([app.py:179](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_market_overview` ([services.py:200](../../idx-scraper/src/idx_scraper/api/services.py)) → tabel `index_quotes`; `GET /api/market/trade-summary` → `research.market_segment_daily` |
+| Sumber data | `GET /api/market/overview` ([app.py:275](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_market_overview` ([services.py:200](../../idx-scraper/src/idx_scraper/api/services.py)) → tabel `index_quotes`; `GET /api/market/trade-summary` → `research.market_segment_daily` |
 | Rumus/Logika | `index_quotes` close/change/percent; segment share = value segmen ÷ total ([services.py:55](../../idx-scraper/src/idx_scraper/api/services.py) `_segment`, `_share`) |
 | Periode/Window | Sesi terbaru; volume dalam lot (1 lot = 100 lembar) |
 | Interaksi | Hover `InfoHint` untuk definisi pasar |
@@ -28,7 +28,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Kesehatan Data |
 | Komponen | [DataHealthCard.svelte](../web/src/lib/components/DataHealthCard.svelte) |
 | Fungsi | Menjawab "boleh percaya angka di layar ini?": kesegaran EOD, cakupan kolom `foreign_*`, jumlah baris per sesi vs median, hari bursa tanpa sesi. Ditempatkan tepat setelah hero supaya sisa halaman dibaca dengan kesadaran itu |
-| Sumber data | `GET /api/data-health` ([app.py](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_data_health` ([services.py](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` |
+| Sumber data | `GET /api/data-health` ([app.py:243](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_data_health` ([services.py](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.prices_pit`, `index_quotes`, `research.raw_eod`, `index_summary_daily` |
 | Rumus/Logika | Evaluator murni di `idx_scraper/health.py`. Dipakai bersama `idx health` (exit 1 kalau ada temuan) + job `health_eod` (Telegram) + endpoint ini, jadi tak ada dua cerita berbeda: `evaluate_health` (tanggal vs hari bursa), `evaluate_field_coverage` (`foreign_net` per sesi), `evaluate_row_counts` (baris < 50% median) & `evaluate_session_gaps` (+ `count_sessions_between`: berapa sesi tertinggal) |
 | Periode/Window | 30 sesi terakhir untuk kolom & baris; seluruh riwayat `raw_eod` untuk lubang sesi. Pemeriksa baris melewati sesi hari ini (`in_progress`): saat ingest sore berjalan, sesi yang belum lengkap itu bukan kerusakan — lubang sesi tak perlu perlakuan itu karena hanya dihitung di dalam rentang sesi yang sudah ada |
 | Interaksi | Hover `InfoHint`; badge status Sehat / Menunggu / Waspada / Bermasalah |
@@ -42,7 +42,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Suasana Pasar |
 | Komponen | [MarketRegimeCard.svelte](../web/src/lib/components/MarketRegimeCard.svelte) |
 | Fungsi | Status tren & volatilitas IHSG (ADX(14)+DI, realized vol 20 hari) |
-| Sumber data | `GET /api/market/regime` ([app.py:197](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_market_regime` ([analytics.py:62](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `index_summary_daily`, fallback breadth `research.latest_pit` |
+| Sumber data | `GET /api/market/regime` ([app.py:293](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_market_regime` ([market.py:20](../../idx-scraper/src/idx_scraper/api/analytics/market.py)) → `index_summary_daily`, fallback breadth `research.latest_pit` |
 | Rumus/Logika | Regime dari ADX/DI + realized vol → label tren/ranging/transisi; klasifikasi di `research/regime.py` |
 | Periode/Window | 20 hari (vol), ADX 14 |
 | Interaksi | — |
@@ -77,7 +77,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Top Leader (3 varian) |
 | Komponen | [TopLeadersPanel.svelte](../web/src/lib/components/TopLeadersPanel.svelte) (`metric="volume"/"value"/"frequency"`) |
 | Fungsi | 5 emiten teratas per metrik likuiditas |
-| Sumber data | `GET /api/market/leaders?metric=` ([app.py:207](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_market_leaders` ([services.py:490](../../idx-scraper/src/idx_scraper/api/services.py)) → `stock_summary_daily`/`stock_quotes` |
+| Sumber data | `GET /api/market/leaders?metric=` ([app.py:304](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_market_leaders` ([services.py:490](../../idx-scraper/src/idx_scraper/api/services.py)) → `stock_summary_daily`/`stock_quotes` |
 | Rumus/Logika | Realtime dari `stock_quotes` saat jam bursa, EOD dari `stock_summary_daily` ([services.py:377](../../idx-scraper/src/idx_scraper/api/services.py) `_leaders_eod`, `:424` `_leaders_intraday`) |
 | Periode/Window | Sesi terbaru |
 | Interaksi | Klik emiten → set `selected` → chart di bawah |
@@ -89,7 +89,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Top Broker |
 | Komponen | [TopBrokersPanel.svelte](../web/src/lib/components/TopBrokersPanel.svelte); logo kode broker lewat [TickerLogo.svelte](../web/src/lib/components/TickerLogo.svelte) `basePath="/logos/brokers"`, monogram bila file tidak ada |
 | Fungsi | Broker teraktif per nilai transaksi, dengan logo di samping kode broker |
-| Sumber data | `GET /api/market/top-brokers` ([app.py:215](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_top_brokers` ([services.py:507](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.broker_daily` |
+| Sumber data | `GET /api/market/top-brokers` ([app.py:313](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_top_brokers` ([services.py:507](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.broker_daily` |
 | Rumus/Logika | Rank value per `broker_code` pada `trade_date` terbaru |
 | Periode/Window | EOD harian seluruh pasar |
 | Interaksi | — |
@@ -101,7 +101,7 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Trading Signals |
 | Komponen | [SignalsPanel.svelte](../web/src/lib/components/SignalsPanel.svelte) |
 | Fungsi | Sinyal BUY/SELL/HOLD rule-based per emiten |
-| Sumber data | `GET /api/signals` ([app.py:304](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_signals` ([services.py:1051](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.latest_pit` |
+| Sumber data | `GET /api/signals` ([app.py:423](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_signals` ([services.py:1051](../../idx-scraper/src/idx_scraper/api/services.py)) → `research.latest_pit` |
 | Rumus/Logika | SMA20/50 + RSI(14) rule-based ([SignalsPanel.svelte:128](../web/src/lib/components/SignalsPanel.svelte)) |
 | Periode/Window | SMA20/50, RSI 14, min 25 hari ([services.py:1051](../../idx-scraper/src/idx_scraper/api/services.py)) |
 | Interaksi | Klik emiten → chart |
@@ -113,14 +113,14 @@ Halaman pembuka: satu layar menjawab "bagaimana kondisi pasar hari ini?". Menamp
 | Nama card | Technical Chart |
 | Komponen | [TechnicalChart.svelte](../web/src/lib/components/TechnicalChart.svelte) |
 | Fungsi | Close, MA20/50, Bollinger, RSI, MACD |
-| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:325](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)) → `stock_daily`, live bar dari `stock_quotes` |
+| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:446](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)) → `stock_daily`, live bar dari `stock_quotes` |
 | Rumus/Logika | OHLC historis + live bar di-merge ([services.py:667](../../idx-scraper/src/idx_scraper/api/services.py) `_live_bar`, `:692` `_merge_live_bar`) |
 | Periode/Window | ~60 sesi |
 | Interaksi | Tampil saat ada emiten terpilih |
 | Empty/Loading/Error | Empty bila belum pilih emiten |
 
 ## 4. Data Flow (end-to-end)
-IDX/DataIDX → `cf_transport.py` → `live_capture.py` → PostgreSQL (`index_quotes`, `stock_quotes`, `index_summary_daily`, `stock_summary_daily`, `research.broker_daily`, `research.latest_pit`) → `analytics.py`/`services.py` → FastAPI (`/api/market/*`, `/api/signals`, `/api/stocks/{code}/technical`) → auto-refresh (30s) → `routes/+page.svelte` render.
+IDX/DataIDX → `cf_transport.py` → `live_capture.py` → PostgreSQL (`index_quotes`, `stock_quotes`, `index_summary_daily`, `stock_summary_daily`, `research.broker_daily`, `research.latest_pit`) → `paket analytics/` + `services.py` → FastAPI (`/api/market/*`, `/api/signals`, `/api/stocks/{code}/technical`) → auto-refresh (30s) → `routes/+page.svelte` render.
 
 ## 5. Cara Pengambilan / Update Data
 - **Kapan dibuat**: campuran — `overview`/`leaders` on-demand dari snapshot terbaru; `trade-summary` dari agregat EOD.

@@ -36,7 +36,7 @@ Mesin penyaring saham se-pasar berdasarkan kombinasi filter (momentum, RSI, volu
 | Nama card | Hasil (kolom: Close, RSI, Momentum 20d, Vol Ratio, ATR%, Jarak 52w, Hari sejak sinyal, Skor broker, OB imbalance, Absorption, Foreign net, Value) |
 | Komponen | `COLUMNS`/`SortKey` di [screener/page.svelte:84](../web/src/routes/screener/+page.svelte) |
 | Fungsi | Daftar emiten lolos filter + metrik pendukung; sortable & kolom bisa disembunyikan |
-| Sumber data | `GET /api/screener` ([app.py:527](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_screener` ([analytics.py:1561](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit`, `research.orderbook` (1744–1755) |
+| Sumber data | `GET /api/screener` ([app.py:721](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_screener` ([screener.py:109](../../idx-scraper/src/idx_scraper/api/analytics/screener.py)) → `research.latest_pit`, `research.orderbook` (1744–1755) |
 | Rumus/Logika | Momentum 20d = % perubahan 20 sesi; RSI(14); Vol ratio = volume÷rata-rata 20 sesi; ATR% = ATR(14)/close; Jarak 52w = posisi vs puncak 52 pekan; OB imbalance/absorption dari `research.orderbook`; Skor broker dari `research.factor_ic_history` (bobot lulus IC) |
 | Periode/Window | 20 sesi (momentum/volume), 14 (RSI/ATR), 52 pekan (jarak), lookback broker 60 hari |
 | Interaksi | Klik header → sort; toggle kolom; klik emiten → detail. Hover kolom (`title`) menampilkan keterangan; Foreign Net: net beli (+) / jual (-) asing dalam Rp |

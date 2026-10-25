@@ -16,7 +16,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Nama card | Ruang Keputusan — `{code}` |
 | Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`VerdictBadge`, `MiniBar`) |
 | Fungsi | Verdict gabungan teknikal + valuasi + lapisan IC/broker; skor N/100 + alasan |
-| Sumber data | `GET /api/stocks/{code}/decision` ([app.py:367](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_stock_decision` ([analytics.py:1143](../../idx-scraper/src/idx_scraper/api/analytics.py)); dasar dari `services.get_hold_check` (endpoint `/api/hold-check` tetap dipakai backend) ([services.py:772](../../idx-scraper/src/idx_scraper/api/services.py)) |
+| Sumber data | `GET /api/stocks/{code}/decision` ([app.py:529](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_stock_decision` ([decision.py:46](../../idx-scraper/src/idx_scraper/api/analytics/decision.py)); dasar dari `services.get_hold_check` (endpoint `/api/hold-check` tetap dipakai backend) ([services.py:772](../../idx-scraper/src/idx_scraper/api/services.py)) |
 | Rumus/Logika | Verdict = skor dasar backend; `score = base_score + factor_adj + broker_adj`; verdict merek: STRONG HOLD / HOLD / TRIM / EXIT |
 | Periode/Window | Verdict bergerak harian; cache 30 menit |
 | Interaksi | Ganti emiten lewat StockPicker |
@@ -28,7 +28,7 @@ Satu halaman untuk menjawab "apa posisi saya terhadap emiten ini". Menggabungkan
 | Nama card | Context strip (4 tile) |
 | Komponen | [DecisionWorkspace.svelte](../web/src/lib/components/DecisionWorkspace.svelte) (`ContextStrip`) |
 | Fungsi | Regime IHSG (+ADX, as-of), Sentimen aliran (label + skor), Flip asing terakhir, Gauge pasar (N/100 + band) |
-| Sumber data | `get_stock_decision` membaca `get_market_regime` ([analytics.py:62](../../idx-scraper/src/idx_scraper/api/analytics.py)) + `get_sentiment` ([analytics.py:1984](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `get_stock_decision` membaca `get_market_regime` ([market.py:20](../../idx-scraper/src/idx_scraper/api/analytics/market.py)) + `get_sentiment` ([factors.py:94](../../idx-scraper/src/idx_scraper/api/analytics/factors.py)) |
 | Rumus/Logika | Konteks murni informatif — tidak mengubah verdict |
 | Periode/Window | Regime/sentimen terbaru |
 | Interaksi | — |

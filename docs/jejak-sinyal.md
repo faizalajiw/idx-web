@@ -16,7 +16,7 @@ Rapor kejujuran sinyal BUY/SELL: hit-rate, return setelah sinyal, selisih vs pas
 | Nama card | Ringkasan strip (jumlah sinyal, periode, tanggal data terakhir) |
 | Komponen | `SummaryStrip` [jejak-sinyal/page.svelte](../web/src/routes/jejak-sinyal/+page.svelte) |
 | Fungsi | Gambaran cepat cakupan track record |
-| Sumber data | `GET /api/signals/track` ([app.py:563](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.signal_track` ([analytics.py:2023](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `GET /api/signals/track` ([app.py:758](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_signal_track` ([factors.py:128](../../idx-scraper/src/idx_scraper/api/analytics/factors.py)) |
 | Rumus/Logika | Agregasi jumlah & rentang tanggal dari `signal_log` |
 | Periode/Window | Seluruh riwayat `signal_log` |
 | Interaksi | — |

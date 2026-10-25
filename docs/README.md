@@ -26,7 +26,7 @@ flowchart LR
       LIVE["live_capture.py<br/>throttle 2 req/s"]
       SCH["APScheduler (cli.py)<br/>WIB"]
       API["FastAPI (api/app.py)"]
-      ANA["analytics.py / services.py<br/>kalkulasi"]
+      ANA["paket analytics/ / services.py<br/>kalkulasi"]
       PG[("PostgreSQL<br/>schema + research")]
     end
     subgraph web["idx-web"]
@@ -101,7 +101,7 @@ sequenceDiagram
     participant IDX as IDX/DataIDX
     participant CF as cf_transport
     participant PG as PostgreSQL
-    participant ANA as analytics.py
+    participant ANA as paket analytics/
     participant API as FastAPI
     participant auto-refresh as auto-refresh (30s)
     participant UI as routes/+page.svelte
@@ -209,7 +209,7 @@ sequenceDiagram
 | Sektor | `/api/sectors` | `analytics.get_sector_analysis` | `research.latest_pit` | on-demand |
 | Sektor | `/api/sectors/rotation` | `analytics.get_sector_rotation` | `research.latest_pit` | on-demand |
 | (semua) | `/api/cache/clear` | `analytics.clear_research_cache` | — | dipanggil job refresh |
-| Command Palette (semua) | `/api/search?q=&limit=` | `analytics.search_stocks` ([`analytics.py`](../../idx-scraper/src/idx_scraper/api/analytics.py) baris 1626) | `research.latest_pit` | on-demand, saat mengetik di palette |
+| Command Palette (semua) | `/api/search?q=&limit=` | `analytics.search_stocks` ([screener.py:152](../../idx-scraper/src/idx_scraper/api/analytics/screener.py)) | `research.latest_pit` | on-demand, saat mengetik di palette |
 | (semua) | `/health` | — | — | — |
 
 ## Penjadwalan (APScheduler, WIB)

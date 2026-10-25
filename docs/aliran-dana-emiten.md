@@ -18,7 +18,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Nama card | Pemilih emiten |
 | Komponen | [FlowWorkspace.svelte](../web/src/lib/components/FlowWorkspace.svelte) (`StockPicker`) |
 | Fungsi | Input kode dan saran cepat (8 kode dari watchlist) |
-| Sumber data | `useWatchlist()` → `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) |
+| Sumber data | `useWatchlist()` → `GET /api/watchlist` ([app.py:354](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Filter kode berdasarkan teks; emiten aktif selalu ditawarkan |
 | Periode/Window | — |
 | Interaksi | Ketik kode + Enter/Lihat → `/flow/{KODE}`; chip cepat → link |
@@ -30,7 +30,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Nama card | Arus Asing |
 | Komponen | [ForeignFlowCard.svelte](../web/src/lib/components/ForeignFlowCard.svelte) (`code` prop) |
 | Fungsi | Arah net asing harian, streak, flip terakhir, dan lama sejak flip |
-| Sumber data | `GET /api/stocks/{code}/foreign-flow?days=30&peer_days=10` ([app.py:397](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_foreign_flow` ([analytics.py:318](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `stock_foreign_flow:{code}:{days}:{peer_days}:{peer_limit}` |
+| Sumber data | `GET /api/stocks/{code}/foreign-flow?days=30&peer_days=10` ([app.py:559](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_foreign_flow` ([broker_flow.py:165](../../idx-scraper/src/idx_scraper/api/analytics/broker_flow.py)); cache `stock_foreign_flow:{code}:{days}:{peer_days}:{peer_limit}` |
 | Rumus/Logika | Arah = tanda net asing harian; streak = jumlah sesi berturut-turut searah; flip = pergantian tanda; peer = emiten sebanding |
 | Periode/Window | 30 sesi; peer 10 sesi |
 | Interaksi | Hover pada titik peer; "Emiten ini" ditandai |
@@ -42,7 +42,7 @@ Satu halaman untuk membaca aliran dana satu emiten: arah asing harian dan timeli
 | Nama card | Timeline Aliran Dana |
 | Komponen | [FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte) |
 | Fungsi | Skor akumulasi per tanggal dan median pasar sebagai pembanding |
-| Sumber data | `GET /api/stocks/{code}/broker-activity?lookback=60` ([app.py:378](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_broker_activity` ([analytics.py:2578](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` ([analytics.py:2192](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `GET /api/stocks/{code}/broker-activity?lookback=60` ([app.py:540](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_broker_activity` ([broker_activity.py:270](../../idx-scraper/src/idx_scraper/api/analytics/broker_activity.py)); skor dari `broker_activity_snapshot` ([broker_activity.py:58](../../idx-scraper/src/idx_scraper/api/analytics/broker_activity.py)) |
 | Rumus/Logika | Skor 0–100 dari faktor aliran yang lolos gate IC; median = median skor pasar pada tanggal itu |
 | Periode/Window | Lookback 60 sesi (default) |
 | Interaksi | Tooltip per titik: tanggal, skor, median |

@@ -16,7 +16,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Nama card | Watchlist (tabel, klik baris → pilih emiten) |
 | Komponen | [WatchlistTable.svelte](../web/src/lib/components/WatchlistTable.svelte) |
 | Fungsi | Daftar emiten pantauan + harga/perubahan; baris terpilih menggerakkan chart di bawah |
-| Sumber data | `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_watchlist` ([services.py:334](../../idx-scraper/src/idx_scraper/api/services.py)); tambah `POST /api/watchlist` (249), ubah `PUT /api/watchlist` (260), hapus `DELETE /api/watchlist` (274) |
+| Sumber data | `GET /api/watchlist` ([app.py:354](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_watchlist` ([services.py:334](../../idx-scraper/src/idx_scraper/api/services.py)); tambah `POST /api/watchlist` (363), ubah `PUT /api/watchlist` (374), hapus `DELETE /api/watchlist/{code}` (388) |
 | Rumus/Logika | Gabungan snapshot harga (`stock_quotes`) per kode watchlist |
 | Periode/Window | Sesi terbaru; refresh auto-refresh 30 detik |
 | Interaksi | Klik baris → `onSelect` → chart; tombol tambah/hapus emiten |
@@ -28,7 +28,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Nama card | Grafik teknikal (mengikuti emiten terpilih) |
 | Komponen | [TechnicalChart.svelte](../web/src/lib/components/TechnicalChart.svelte) |
 | Fungsi | Candlestick + overlay indikator (SMA/RSI/MACD per mode) |
-| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:325](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); OHLC via `GET /api/stocks/{code}/history` (314) → `services.get_price_history` ([services.py:715](../../idx-scraper/src/idx_scraper/api/services.py)) |
+| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:446](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); OHLC via `GET /api/stocks/{code}/history` (435) → `services.get_price_history` ([services.py:715](../../idx-scraper/src/idx_scraper/api/services.py)) |
 | Rumus/Logika | Indikator dihitung di `services` dari frame OHLC (`prices_adjusted`) |
 | Periode/Window | 120 sesi (default history); refresh 30 detik |
 | Interaksi | Ganti emiten lewat tabel; hover tooltip |
@@ -40,7 +40,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Nama card | Verdict Smart Money (verdicts board) |
 | Komponen | [SmartMoneyWatchCard.svelte](../web/src/lib/components/SmartMoneyWatchCard.svelte) |
 | Fungsi | Ringkasan verdict akumulasi/distribusi untuk emiten yang dipantau |
-| Sumber data | `GET /api/smart-money/verdicts` ([app.py:478](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_smart_money_verdicts` ([analytics.py:924](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit` |
+| Sumber data | `GET /api/smart-money/verdicts` ([app.py:668](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_smart_money_verdicts` ([smart_money.py:483](../../idx-scraper/src/idx_scraper/api/analytics/smart_money.py)) → `research.latest_pit` |
 | Rumus/Logika | Verdict dari net asing + pola aliran terbaru |
 | Periode/Window | Jendela aliran terbaru (5 sesi default) |
 | Interaksi | Tautan ke detail emiten |
@@ -52,7 +52,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Nama card | Aturan Notifikasi |
 | Komponen | [AlertRules.svelte](../web/src/lib/components/AlertRules.svelte) |
 | Fungsi | Bangun/kelola aturan harga/RSI/volume; notifikasi sekali per persilangan |
-| Sumber data | `GET /api/alerts` ([app.py:650](../../idx-scraper/src/idx_scraper/api/app.py)); `POST /api/alerts` (656); `DELETE /api/alerts/{rule_id}` (666); `POST /api/alerts/test` (674) |
+| Sumber data | `GET /api/alerts` ([app.py:803](../../idx-scraper/src/idx_scraper/api/app.py)); `POST /api/alerts` (809); `DELETE /api/alerts/{rule_id}` (819); `POST /api/alerts/test` (827) |
 | Rumus/Logika | Dievaluasi tiap kali data EOD baru masuk; state "tersimpan aman" mencegah spam |
 | Periode/Window | Evaluasi per data EOD masuk |
 | Interaksi | Form tambah aturan, hapus, uji kirim |
@@ -64,7 +64,7 @@ Pusat watchlist + notifikasi. Menjawab "saham apa yang saya pantau, dan kabari s
 | Nama card | Status Notifikasi Telegram |
 | Komponen | [TelegramStatus.svelte](../web/src/lib/components/TelegramStatus.svelte) |
 | Fungsi | Kesiapan saluran notifikasi (configured/aktif) |
-| Sumber data | `GET /api/health` ([app.py:174](../../idx-scraper/src/idx_scraper/api/app.py)) / status alert |
+| Sumber data | `/health` ([app.py:238](../../idx-scraper/src/idx_scraper/api/app.py)) / status alert |
 | Rumus/Logika | Cek konfigurasi bot Telegram (nama variabel env saja) |
 | Periode/Window | Real-time |
 | Interaksi | — |

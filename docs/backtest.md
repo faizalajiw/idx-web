@@ -6,7 +6,7 @@ Simulasi strategi di atas data historis untuk menguji apakah sebuah aturan entry
 ## 2. Route & Berkas
 - URL: `/backtest` → [`routes/backtest/+page.svelte`](../web/src/routes/backtest/+page.svelte)
 - Hook: `useBacktestConfig()` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik) dan `runBacktest` ([api.ts](../web/src/lib/api.ts))
-- Backend: [simulation.py](../../idx-scraper/src/idx_scraper/api/simulation.py), endpoint [app.py:693](../../idx-scraper/src/idx_scraper/api/app.py) (config) dan [app.py:699](../../idx-scraper/src/idx_scraper/api/app.py) (run, POST)
+- Backend: [simulation.py](../../idx-scraper/src/idx_scraper/api/simulation.py), endpoint [app.py:893](../../idx-scraper/src/idx_scraper/api/app.py) (config) dan [app.py:899](../../idx-scraper/src/idx_scraper/api/app.py) (run, POST)
 
 ## 3. Layout Halaman
 
@@ -22,7 +22,7 @@ Halaman dibagi dua kolom. Kolom kiri untuk menyusun uji, kolom kanan untuk memba
 | Pengaturan lanjutan | Dapat dilipat. Rebalance, modal awal, dan preset/field biaya |
 | Tombol "Jalankan Backtest" | Sticky di bagian bawah kolom. Memanggil `POST /api/backtest/run` |
 
-Sumber config: `GET /api/backtest/config` ([app.py:693](../../idx-scraper/src/idx_scraper/api/app.py)) → `simulation.get_config()` ([simulation.py:296](../../idx-scraper/src/idx_scraper/api/simulation.py)). Skeleton tampil sampai config dimuat.
+Sumber config: `GET /api/backtest/config` ([app.py:893](../../idx-scraper/src/idx_scraper/api/app.py)) → `simulation.get_config()` ([simulation.py:296](../../idx-scraper/src/idx_scraper/api/simulation.py)). Skeleton tampil sampai config dimuat.
 
 Logika strategi: `ma_cross` = sinyal dari persilangan rata-rata bergerak; `momentum_top` = peringkat return terkuat; `rsi_oversold` = entry saat RSI di bawah ambang. Daftar: `STRATEGIES` ([simulation.py:234](../../idx-scraper/src/idx_scraper/api/simulation.py)).
 
@@ -33,7 +33,7 @@ Logika strategi: `ma_cross` = sinyal dari persilangan rata-rata bergerak; `momen
 | Tab | Isi | Sumber data |
 |---|---|---|
 | Ringkasan | Empat kartu `Stat`: total return neto, alpha vs buy & hold, max drawdown, Sharpe | `metrics`, `benchmark` |
-| Kurva Modal | Grafik pertumbuhan modal strategi vs benchmark (`EquityCurveChart`, Recharts) | `equity_curve` |
+| Kurva Modal | Grafik pertumbuhan modal strategi vs benchmark (`EquityCurveChart` di atas `LineArea`) | `equity_curve` |
 | Perbandingan | Metrik kotor (sebelum biaya) vs neto (sesudah biaya) vs benchmark | `gross_metrics`, `metrics`, `benchmark` |
 | Biaya | Total biaya, komisi + pajak, slippage, porsi biaya dari modal, dan erosi return | `cost_impact`, `costs` |
 | Jejak Transaksi | Ledger setiap transaksi per tanggal rebalance (beli/jual, jumlah, harga) | `ledger` |
@@ -42,7 +42,7 @@ Hanya satu panel tab yang di-mount pada satu waktu.
 
 3. **Istilah singkat**: glosarium di bagian bawah halaman untuk istilah seperti alpha, drawdown, Sharpe, dan slippage.
 
-Sumber run: `POST /api/backtest/run` ([app.py:699](../../idx-scraper/src/idx_scraper/api/app.py)) → `simulation.run_backtest` ([simulation.py:546](../../idx-scraper/src/idx_scraper/api/simulation.py)).
+Sumber run: `POST /api/backtest/run` ([app.py:899](../../idx-scraper/src/idx_scraper/api/app.py)) → `simulation.run_backtest` ([simulation.py:546](../../idx-scraper/src/idx_scraper/api/simulation.py)).
 
 ## 4. Data Flow (end-to-end)
 ```

@@ -7,7 +7,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 - URL: `/broker-activity` → [`routes/broker-activity/+page.svelte`](../web/src/routes/broker-activity/+page.svelte)
 - Komponen: `FlowTimelineCard` ([components/FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte)), `BrokerFlowCard` ([components/BrokerFlowCard.svelte](../web/src/lib/components/BrokerFlowCard.svelte)), `Card`
 - Hook: `useBrokerActivity(25)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik); `useBrokerFlow` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
-- Backend: `GET /api/broker-activity?limit=25` ([app.py:234](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `broker_activity_snapshot` ([analytics.py:2192](../../idx-scraper/src/idx_scraper/api/analytics.py))
+- Backend: `GET /api/broker-activity?limit=25` ([app.py:332](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_broker_activity` ([broker_activity.py:199](../../idx-scraper/src/idx_scraper/api/analytics/broker_activity.py)) → `broker_activity_snapshot` ([broker_activity.py:58](../../idx-scraper/src/idx_scraper/api/analytics/broker_activity.py))
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -17,7 +17,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Nama card | Peringkat Skor Akumulasi |
 | Komponen | [broker-activity/page.svelte](../web/src/routes/broker-activity/+page.svelte) ~baris 355–363 |
 | Fungsi | Daftar emiten urut skor 0–100 dari faktor aliran yang tervalidasi |
-| Sumber data | `GET /api/broker-activity` → `get_broker_activity` ([analytics.py:2333](../../idx-scraper/src/idx_scraper/api/analytics.py)); skor dari `broker_activity_snapshot` (satu sumber bersama Screener dan Ruang Keputusan) |
+| Sumber data | `GET /api/broker-activity` → `get_broker_activity` ([broker_activity.py:199](../../idx-scraper/src/idx_scraper/api/analytics/broker_activity.py)); skor dari `broker_activity_snapshot` (satu sumber bersama Screener dan Ruang Keputusan) |
 | Rumus/Logika | Composite faktor yang lolos gate: \|mean IC\| ≥ 0,05 dan \|ICIR\| ≥ 0,5; arah mengikuti tanda IC. Skor relatif terhadap pasar hari itu. Pilih emiten untuk timeline (klik baris) |
 | Periode/Window | Lookback panel 60 hari; horizon bobot = `WEIGHT_HORIZON` |
 | Interaksi | Klik baris → timeline aliran dana muncul di bawah |
@@ -53,7 +53,7 @@ Peringkat emiten berdasarkan skor akumulasi broker (kombinasi faktor aliran yang
 | Nama card | Komposisi Broker; Timeline Aliran Dana |
 | Komponen | `BrokerFlowCard` ([BrokerFlowCard.svelte](../web/src/lib/components/BrokerFlowCard.svelte)); `FlowTimelineCard` ([FlowTimelineCard.svelte](../web/src/lib/components/FlowTimelineCard.svelte)) |
 | Fungsi | Komposisi kategori broker; timeline skor satu emiten |
-| Sumber data | `GET /api/broker-flow` ([app.py:221](../../idx-scraper/src/idx_scraper/api/app.py)); `GET /api/stocks/{code}/broker-activity` ([app.py:378](../../idx-scraper/src/idx_scraper/api/app.py)) |
+| Sumber data | `GET /api/broker-flow` ([app.py:319](../../idx-scraper/src/idx_scraper/api/app.py)); `GET /api/stocks/{code}/broker-activity` ([app.py:540](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Lihat [Aliran Dana Emiten](aliran-dana-emiten.md) |
 | Periode/Window | Lookback 60 sesi (timeline) |
 | Interaksi | Timeline muncul setelah klik baris di tabel |

@@ -64,37 +64,70 @@ node deploy/serve.mjs 3000 build   # server statis tanpa dependensi
 
 ## Peta Navigasi
 
-Sidebar dibagi jadi 7 grup. Semua tabel emiten bisa di-klik untuk membuka
-detail teknikal `/stock/[code]`.
+Sidebar dibagi jadi **5 grup** (sumber: `web/src/lib/nav.ts`). Semua tabel
+emiten bisa di-klik untuk membuka detail teknikal `/stock/[code]`.
 
 ```mermaid
 graph LR
   subgraph Utama
     A[Dashboard /]
-    B[Watchlist /watchlist]
-    C[Pantau /pantau]
+    B[Pantau /pantau]
   end
   subgraph Screening
-    D[Screener /screener]
+    D[Screener AI /screener]
   end
   subgraph Analisis
     E[Rekomendasi Beli /rekomendasi]
+    F[Ruang Keputusan /keputusan]
     G[Jejak Sinyal /jejak-sinyal]
     H[Backtest /backtest]
     J[Faktor & Kalibrasi /faktor]
   end
   subgraph Flow
-    K[Foreign Flow /foreign]
-    L[Sentimen /sentimen]
+    K[Radar Smart Money /radar]
+    L[Foreign Flow /foreign]
+    N[Aliran Dana Emiten /flow]
+    O[Sentimen /sentimen]
     M[Aktivitas Broker /broker-activity]
   end
   subgraph Sektor
-    M[Sektor /sectors]
+    S[Sektor /sectors]
   end
   A -.klik ticker.-> P[Stock Detail /stock/CODE]
-  B -.klik ticker.-> P
   D -.klik ticker.-> P
+  E -.klik kandidat.-> Q[Detail Keputusan /keputusan/CODE]
+  F -.pilih emiten.-> Q
+  K -.klik emiten.-> R[Radar Detail /radar/CODE]
+  N -.pilih emiten.-> T[Aliran Dana /flow/CODE]
+  P -.buka dossier.-> W[Dossier /dossier/CODE]
 ```
+
+### Tabel Rute ↔ Grup ↔ Endpoint API
+
+| Rute | Grup | Endpoint API utama |
+|---|---|---|
+| `/` | Utama | `/api/market/overview`, `/api/market/regime`, `/api/market/trade-summary`, `/api/market/leaders`, `/api/market/top-brokers`, `/api/signals`, `/api/search` |
+| `/pantau` | Utama | `/api/watchlist` (GET/POST/PUT/DELETE), `/api/smart-money/verdicts`, `/api/alerts`, `/health` |
+| `/screener` | Screening | `/api/screener` |
+| `/rekomendasi` | Analisis | `/api/recommendations`, `/api/recommendations/track` |
+| `/keputusan` | Analisis | `/api/watchlist` (pemilih emiten) |
+| `/keputusan/[code]` | Analisis | `/api/stocks/{code}/decision` (dasar: `/api/hold-check`) |
+| `/jejak-sinyal` | Analisis | `/api/signals/track` |
+| `/backtest` | Analisis | `/api/backtest/config`, `/api/backtest/run` |
+| `/faktor` | Analisis | `/api/factors/overview`, `/api/market/regime/history` |
+| `/radar` | Flow | `/api/smart-money/radar`, `/api/smart-money/patterns`, `/api/smart-money/track-record` |
+| `/radar/[code]` | Flow | `/api/stocks/{code}/smart-money`, `/api/smart-money/track-record` |
+| `/foreign` | Flow | `/api/foreign-flow` |
+| `/flow` | Flow | pemilih emiten (saran dari `/api/watchlist`) |
+| `/flow/[code]` | Flow | `/api/stocks/{code}/foreign-flow`, `/api/stocks/{code}/broker-activity` |
+| `/sentimen` | Flow | `/api/sentiment` |
+| `/broker-activity` | Flow | `/api/broker-activity`, `/api/factors/overview` |
+| `/sectors` | Sektor | `/api/sectors`, `/api/sectors/rotation` |
+| `/stock/[code]` | Detail (klik ticker) | `/api/stocks/{code}/technical\|history\|brokers\|smart-money\|broker-activity\|ownership\|events\|recommendation` |
+| `/dossier/[code]` | Detail (klik ticker) | `/api/stocks/{code}/dossier`, `/api/stocks/{code}/dossier.pdf` |
+
+Rincian tiap halaman: [docs/README.md](./docs/README.md) dan dokumen per-halaman
+di [docs/](docs/).
 
 ## Menu & Fitur
 
@@ -165,6 +198,15 @@ Keputusan atau detail teknikal.
 > Alat bantu riset, bukan rekomendasi keuangan. Kandidat tanpa level stop yang
 > bisa dihitung tidak ditampilkan.
 
+#### Ruang Keputusan (`/keputusan`, `/keputusan/[code]`)
+Satu layar untuk menjawab "apa posisi saya terhadap emiten ini":
+- **Verdict dasar** — skor gabungan teknikal + valuasi + lapisan IC/broker
+  (STRONG HOLD / HOLD / TRIM / EXIT) beserta skor N/100 dan alasan per poin.
+- **Konteks tanpa mengubah verdict** — rezim pasar, sentimen aliran, jejak asing,
+  base rate event, dan level pembatalan, semuanya dilabeli sebagai konteks.
+- Versi `/keputusan/[code]` membuka workspace penuh satu emiten
+  (auto-refresh 120 detik); dasar verdict dari backend `get_hold_check`.
+
 #### Jejak Sinyal (`/jejak-sinyal`)
 Track record kualitas sinyal:
 - Hit rate, mean/median forward return, abnormal return vs pasar, dan MFE/MAE per
@@ -202,6 +244,13 @@ buta.
 
 #### Foreign Flow (`/foreign`)
 Arus dana asing (net buy/sell) peringkat pasar.
+
+#### Aliran Dana Emiten (`/flow`, `/flow/[code]`)
+Satu halaman untuk membaca aliran dana satu emiten: pemilih emiten (saran cepat
+dari watchlist), **Arus Asing** — arah net asing harian, streak, flip terakhir,
+lama sejak flip — dan **timeline skor akumulasi** broker per emiten (jendela
+30 sesi + pembanding peer 10 sesi). Versi `/flow/[code]` membuka detail
+satu emiten; tanpa kode, halaman menampilkan pemilih dan empty state.
 
 #### Sentimen (`/sentimen`)
 - **Gauge sentimen pasar** (0–100: risk-on / netral / risk-off) — breadth harga +

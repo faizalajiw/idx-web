@@ -7,7 +7,7 @@ Menampilkan faktor mana yang terbukti memprediksi return (uji IC), bobot composi
 - URL: `/faktor` → [`routes/faktor/+page.svelte`](../web/src/routes/faktor/+page.svelte)
 - Hook: `useFactorsOverview()` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 600 detik)
 - Hook pendukung: `useRegimeHistory(90)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts))
-- Backend: `GET /api/factors/overview` ([app.py:593](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_factors_overview` ([analytics.py:1859](../../idx-scraper/src/idx_scraper/api/analytics.py))
+- Backend: `GET /api/factors/overview` ([app.py:788](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_factors_overview` ([factors.py:14](../../idx-scraper/src/idx_scraper/api/analytics/factors.py))
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -29,7 +29,7 @@ Menampilkan faktor mana yang terbukti memprediksi return (uji IC), bobot composi
 | Nama card | Regime IHSG Historis |
 | Komponen | [faktor/page.svelte](../web/src/routes/faktor/+page.svelte) ~baris 241 |
 | Fungsi | Riwayat regime pasar untuk konteks: faktor bisa bekerja beda di tiap regime |
-| Sumber data | `GET /api/market/regime/history?days=90` ([app.py:599](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_regime_history` ([analytics.py:1940](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `GET /api/market/regime/history?days=90` ([app.py:794](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_regime_history` ([market.py:107](../../idx-scraper/src/idx_scraper/api/analytics/market.py)) |
 | Rumus/Logika | Klasifikasi regime harian (lihat [Dashboard](dashboard.md)) |
 | Periode/Window | 90 hari |
 | Interaksi | — |
@@ -77,7 +77,7 @@ Menampilkan faktor mana yang terbukti memprediksi return (uji IC), bobot composi
 | Nama card | Registry Faktor |
 | Komponen | [faktor/page.svelte](../web/src/routes/faktor/+page.svelte) ~baris 257 |
 | Fungsi | Definisi tiap faktor (nama, arti, arah) |
-| Sumber data | `FACTOR_DEFINITIONS` ([analytics.py](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `FACTOR_DEFINITIONS` ([research/factors.py:38](../../idx-scraper/src/idx_scraper/research/factors.py)) |
 | Rumus/Logika | Teks definisi statis |
 | Periode/Window | — |
 | Interaksi | — |
@@ -93,8 +93,8 @@ Harga EOD (Postgres) → research.ic (build panel, IC harian)
 
 ## 5. Cara Pengambilan / Update Data
 - **Precomputed**: IC dihitung job terjadwal `daily_ic` (Senin-Jumat 16:50 WIB, [cli.py](../../idx-scraper/src/idx_scraper/cli.py)) dan disimpan ke `research.factor_ic_history`. Halaman hanya membaca.
-- **Manual**: `idx ic` (disebut di pesan kosong [analytics.py](../../idx-scraper/src/idx_scraper/api/analytics.py)).
-- **Cache**: respons di-cache in-process; `POST /api/cache/clear` ([app.py:516](../../idx-scraper/src/idx_scraper/api/app.py)) mengosongkannya.
+- **Manual**: `idx ic` ([cli.py:802](../../idx-scraper/src/idx_scraper/cli.py)).
+- **Cache**: respons di-cache in-process; `POST /api/cache/clear` ([app.py:710](../../idx-scraper/src/idx_scraper/api/app.py)) mengosongkannya.
 - **Refresh UI**: auto-refresh 600 detik.
 - **Idempotensi**: satu baris per (run_date, faktor, horizon); run ulang menimpa.
 - **Fallback**: bobot statis `FACTOR_WEIGHTS` bila tabel kosong.

@@ -16,7 +16,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Header kode + tombol prev/next |
 | Komponen | [routes/stock/[code]/+page.svelte](../web/src/routes/stock/[code]/+page.svelte) |
 | Fungsi | Menampilkan kode dan pindah ke emiten sebelum/sesudah dalam watchlist |
-| Sumber data | `GET /api/watchlist` ([app.py:244](../../idx-scraper/src/idx_scraper/api/app.py)) |
+| Sumber data | `GET /api/watchlist` ([app.py:354](../../idx-scraper/src/idx_scraper/api/app.py)) |
 | Rumus/Logika | Urutan array watchlist; prev/next = indeks ± 1 |
 | Periode/Window | — |
 | Interaksi | Tombol prev/next → `/stock/{kode}` |
@@ -28,7 +28,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Grafik Teknikal |
 | Komponen | `components/TechnicalChart.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Candlestick dengan indikator (SMA, MACD, RSI) |
-| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:325](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); hook `useTechnical` refresh 30 detik |
+| Sumber data | `GET /api/stocks/{code}/technical` ([app.py:446](../../idx-scraper/src/idx_scraper/api/app.py)) → `services.get_technical_chart` ([services.py:1098](../../idx-scraper/src/idx_scraper/api/services.py)); hook `useTechnical` refresh 30 detik |
 | Rumus/Logika | Indikator dihitung di backend dari OHLC |
 | Periode/Window | Ditentukan backend [BELUM TERVERIFIKASI] |
 | Interaksi | Hover per candle |
@@ -40,7 +40,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Sinyal |
 | Komponen | `components/SignalsPanel.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Sinyal BUY/SELL untuk emiten ini |
-| Sumber data | `GET /api/signals?min_days=…` ([app.py:304](../../idx-scraper/src/idx_scraper/api/app.py)); hook `useSignals`, 30 detik |
+| Sumber data | `GET /api/signals?min_days=…` ([app.py:423](../../idx-scraper/src/idx_scraper/api/app.py)); hook `useSignals`, 30 detik |
 | Rumus/Logika | Lihat [Jejak Sinyal](jejak-sinyal.md) |
 | Periode/Window | Parameter `min_days` |
 | Interaksi | — |
@@ -52,7 +52,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Kepemilikan |
 | Komponen | `components/OwnershipCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Komposisi pemegang saham |
-| Sumber data | `GET /api/stocks/{code}/ownership` ([app.py:439](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_ownership` ([analytics.py:1004](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache 600 detik; hook 3600 detik |
+| Sumber data | `GET /api/stocks/{code}/ownership` ([app.py:629](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_ownership` ([decision.py:165](../../idx-scraper/src/idx_scraper/api/analytics/decision.py)); cache 600 detik; hook 3600 detik |
 | Rumus/Logika | Dari data kepemilikan tersimpan (tabel `research.ownership`) |
 | Periode/Window | Periode laporan kepemilikan |
 | Interaksi | — |
@@ -76,7 +76,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Ringkasan Broker |
 | Komponen | `components/BrokerSummary.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Broker teratas untuk emiten ini |
-| Sumber data | `GET /api/stocks/{code}/brokers` ([app.py:336](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
+| Sumber data | `GET /api/stocks/{code}/brokers` ([app.py:457](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
 | Rumus/Logika | Dari `broker_summary` per emiten |
 | Periode/Window | Tanggal EOD |
 | Interaksi | — |
@@ -88,7 +88,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Event Study |
 | Komponen | `components/EventStudyCard.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Reaksi harga di sekitar event (dividen, aksi korporasi, pengumuman) |
-| Sumber data | `GET /api/stocks/{code}/events` ([app.py:584](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_events` ([analytics.py:1809](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache 6 jam |
+| Sumber data | `GET /api/stocks/{code}/events` ([app.py:779](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_stock_events` ([screener.py:356](../../idx-scraper/src/idx_scraper/api/analytics/screener.py)); cache 6 jam |
 | Rumus/Logika | Return abnormal sekitar tanggal event [BELUM TERVERIFIKASI window] |
 | Periode/Window | Window event |
 | Interaksi | — |
@@ -100,7 +100,7 @@ Satu halaman lengkap untuk satu emiten: grafik teknikal, sinyal, kepemilikan, ar
 | Nama card | Riwayat Harga |
 | Komponen | `components/HistoryTable.svelte` [BELUM TERVERIFIKASI baris] |
 | Fungsi | Tabel OHLCV harian |
-| Sumber data | `GET /api/stocks/{code}/history?limit=…` ([app.py:314](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
+| Sumber data | `GET /api/stocks/{code}/history?limit=…` ([app.py:435](../../idx-scraper/src/idx_scraper/api/app.py)); hook refresh 30 detik |
 | Rumus/Logika | Data mentah dari tabel harga |
 | Periode/Window | Parameter `limit` |
 | Interaksi | Scroll |

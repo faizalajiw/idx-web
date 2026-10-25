@@ -7,7 +7,7 @@ Membaca suasana pasar dari data yang sudah ada: arus asing, ketimpangan buku ord
 - URL: `/sentimen` → [`routes/sentimen/+page.svelte`](../web/src/routes/sentimen/+page.svelte)
 - Hook: `useSentiment(limit=15)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 300 detik, tanpa retry saat error)
 - Tipe: `SentimentResponse`, `SentimentItem`, `SentimentMarket` ([lib/types.ts](../web/src/lib/types.ts))
-- Backend: `GET /api/sentiment?limit=15` ([app.py](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sentiment` ([analytics.py](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research/sentiment.compute` ([research/sentiment.py](../../idx-scraper/src/idx_scraper/research/sentiment.py))
+- Backend: `GET /api/sentiment?limit=15` ([app.py:769](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sentiment` ([factors.py:94](../../idx-scraper/src/idx_scraper/api/analytics/factors.py)) → `research/sentiment.compute` ([research/sentiment.py](../../idx-scraper/src/idx_scraper/research/sentiment.py))
 
 ## 3. Tata Letak Halaman
 
@@ -75,7 +75,7 @@ latest_pit.foreign_net + research.orderbook (intraday, tertutup close T) + index
 ```
 
 ## 5. Cara Pengambilan / Update Data
-- **On-demand** dengan cache `sentiment:{limit}` 1 jam (`_RESEARCH_TTL`, analytics.py).
+- **On-demand** dengan cache `sentiment:{limit}` 1 jam (`_RESEARCH_TTL`, analytics/_common.py).
 - **Sumber orderbook**: diisi capture intraday (lihat [README](../../idx-scraper/README.md) bagian scheduler: `intraday`, interval 60 detik).
 - **Refresh UI**: auto-refresh 300 detik; data tetap sampai cache 1 jam habis.
 - **Reset cache**: `POST /api/cache/clear`.

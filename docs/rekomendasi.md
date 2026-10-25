@@ -16,7 +16,7 @@ Papan kandidat beli se-pasar dengan level masuk, stop, target, dan R/R, diurutka
 | Nama card | Papan Kandidat |
 | Komponen | [rekomendasi/page.svelte:330](../web/src/routes/rekomendasi/+page.svelte) (Card) + `CandidateCard` |
 | Fungsi | Daftar kandidat beli: kode, grade A/B/C, entry, stop, target, R/R, alasan |
-| Sumber data | `GET /api/recommendations` ([app.py:341](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.recommendations` ([analytics.py:2798](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.latest_pit`, `research.recommendation_log` (2776–2791) |
+| Sumber data | `GET /api/recommendations` ([app.py:462](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_recommendations` ([recommendation.py:329](../../idx-scraper/src/idx_scraper/api/analytics/recommendation.py)) → `research.latest_pit`, `research.recommendation_log` |
 | Rumus/Logika | Gate: kandidat wajib punya stop yang dapat dihitung. Grade = peringkat relatif dalam pool hari itu: A 2% · B 10% · C 25% teratas (bukan probabilitas). Skor hanya dari lapisan lolos walk-forward |
 | Periode/Window | Sesi terbaru; `limit` 10/20/50/100 baris |
 | Interaksi | Filter grade (A saja / B ke atas / C ke atas); pilih jumlah baris |
@@ -40,7 +40,7 @@ Papan kandidat beli se-pasar dengan level masuk, stop, target, dan R/R, diurutka
 | Nama card | Track Record Kandidat |
 | Komponen | [rekomendasi/page.svelte:397](../web/src/routes/rekomendasi/+page.svelte) |
 | Fungsi | Hit-rate dan return kandidat historis ("diukur, bukan diklaim") |
-| Sumber data | `GET /api/recommendations/track` ([app.py:355](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.recommendation_track` ([analytics.py:2948](../../idx-scraper/src/idx_scraper/api/analytics.py)) → `research.recommendation_log` (2951–2974) |
+| Sumber data | `GET /api/recommendations/track` ([app.py:497](../../idx-scraper/src/idx_scraper/api/app.py)) → `analytics.get_recommendation_track` ([recommendation.py:537](../../idx-scraper/src/idx_scraper/api/analytics/recommendation.py)) → `research.recommendation_log` |
 | Rumus/Logika | Return sejak tanggal rekomendasi per horizon; hit = return positif |
 | Periode/Window | Horizon per log; cache 3600 s |
 | Interaksi | — |

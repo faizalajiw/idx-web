@@ -7,7 +7,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 - URL: `/sectors` → [`routes/sectors/+page.svelte`](../web/src/routes/sectors/+page.svelte)
 - Komponen: `RegimeBanner` ([components/RegimeBanner.svelte](../web/src/lib/components/RegimeBanner.svelte)), `SectorRotationTable` ([components/SectorRotationTable.svelte](../web/src/lib/components/SectorRotationTable.svelte)), `Card`, `LastUpdated`
 - Hook: `useSectors()` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), refresh 30 detik); `useSectorRotation(60, 3)` ([hooks.svelte.ts](../web/src/lib/hooks.svelte.ts), 300 detik) [BELUM TERVERIFIKASI baris hook]
-- Backend: `GET /api/sectors` ([app.py:507](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_analysis` ([analytics.py:1266](../../idx-scraper/src/idx_scraper/api/analytics.py)); `GET /api/sectors/rotation?lookback=60&min_names=3` ([app.py:493](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_rotation` ([analytics.py:2478](../../idx-scraper/src/idx_scraper/api/analytics.py)); pemetaan sektor [api/sector_map.py](../../idx-scraper/src/idx_scraper/api/sector_map.py)
+- Backend: `GET /api/sectors` ([app.py:699](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_analysis` ([market.py:143](../../idx-scraper/src/idx_scraper/api/analytics/market.py)); `GET /api/sectors/rotation?lookback=60&min_names=3` ([app.py:683](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_sector_rotation` ([sector.py:86](../../idx-scraper/src/idx_scraper/api/analytics/sector.py)); pemetaan sektor [api/sector_map.py](../../idx-scraper/src/idx_scraper/api/sector_map.py)
 
 ## 3. Penjelasan Per-Card / Per-Panel
 
@@ -17,7 +17,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Nama card | Banner Regime |
 | Komponen | [RegimeBanner.svelte](../web/src/lib/components/RegimeBanner.svelte) (baris 62 untuk volatilitas) |
 | Fungsi | Konteks tren pasar sebelum membaca sektor |
-| Sumber data | `GET /api/market/regime` ([app.py:197](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_market_regime` ([analytics.py:62](../../idx-scraper/src/idx_scraper/api/analytics.py)) |
+| Sumber data | `GET /api/market/regime` ([app.py:293](../../idx-scraper/src/idx_scraper/api/app.py)) → `get_market_regime` ([market.py:20](../../idx-scraper/src/idx_scraper/api/analytics/market.py)) |
 | Rumus/Logika | ADX(14) + DI pada IHSG; volatilitas = realized vol 20 hari, dianualisasi (~240 sesi) |
 | Periode/Window | 20 hari (volatilitas) |
 | Interaksi | — |
@@ -29,7 +29,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Nama card | Rotasi Sektor |
 | Komponen | [SectorRotationTable.svelte](../web/src/lib/components/SectorRotationTable.svelte) |
 | Fungsi | Perubahan performa sektor dan pergeseran urutan (rotasi) |
-| Sumber data | `GET /api/sectors/rotation` → `get_sector_rotation` ([analytics.py:2478](../../idx-scraper/src/idx_scraper/api/analytics.py)); cache `sector_rotation:{lookback}:{min_names}` |
+| Sumber data | `GET /api/sectors/rotation` → `get_sector_rotation` ([sector.py:86](../../idx-scraper/src/idx_scraper/api/analytics/sector.py)); cache `sector_rotation:{lookback}:{min_names}` |
 | Rumus/Logika | Return sektor periode `lookback` (60 sesi); sektor dengan minimal 3 emiten (`min_names`) |
 | Periode/Window | Lookback 60 sesi |
 | Interaksi | — [BELUM TERVERIFIKASI interaksi klik] |
@@ -41,7 +41,7 @@ Membandingkan performa antar sektor (perbankan, energi, konsumer, dan lain-lain)
 | Nama card | Peta Sektor |
 | Komponen | [sectors/page.svelte](../web/src/routes/sectors/+page.svelte) baris 41 (subtitle "Diurutkan dari sektor terkuat") |
 | Fungsi | Tabel per sektor: Rata-rata %, Breadth, Value, Foreign Net, Top Stock; warna sel (`heatColor`) |
-| Sumber data | `GET /api/sectors` → `get_sector_analysis` ([analytics.py:1266](../../idx-scraper/src/idx_scraper/api/analytics.py)) via `useSectors` |
+| Sumber data | `GET /api/sectors` → `get_sector_analysis` ([market.py:143](../../idx-scraper/src/idx_scraper/api/analytics/market.py)) via `useSectors` |
 | Rumus/Logika | Rata-rata % perubahan harga emiten per sektor; breadth = porsi emiten naik; value = total nilai transaksi; foreign net = jumlah net asing sektor; top stock = kontributor terbesar |
 | Periode/Window | Sesi terakhir (`date` opsional di backend) |
 | Interaksi | Warna heat-map; sort menurut rata-rata |
@@ -70,4 +70,4 @@ Harga & volume EOD (stock_quotes/stock_daily, latest_pit) + foreign_net
 - Pemetaan sektor bergantung pada `sector_map.py`; emiten tanpa pemetaan tidak masuk.
 - Data EOD: sektor tidak berubah intraday.
 - Sektor dengan emiten sedikit tidak stabil; gunakan `min_names`.
-- [BELUM TERVERIFIKASI] Kolom persis `get_sector_analysis` dan logika breadth; cek analytics.py:1266.
+- [BELUM TERVERIFIKASI] Kolom persis `get_sector_analysis` dan logika breadth; cek analytics/market.py:143.
